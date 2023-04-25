@@ -9,6 +9,8 @@ Cadeira de Programação Orientada a Objetos
 
 [Maria Eduarda Sampaio](https://github.com/MariaEduardaSampaio)
 
+[Pedro Kalil](https://github.com/KalilDev)
+
 [Raissa Gonçalves Diniz](https://github.com/raissagd)
 
 [Raphal Lucas Amaral](https://github.com/RaphaelLucasAmaral)

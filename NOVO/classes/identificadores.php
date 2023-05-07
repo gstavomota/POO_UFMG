@@ -12,8 +12,7 @@
 
         public function __construct(string $sigla)
         {
-            parent::__construct(['sigla' => $sigla]);
-            $this->sigla = $sigla;
+            $this->sigla = SiglaCompanhiaAerea::valida_sigla($sigla);
         }
 
         public function __toString(): string
@@ -38,12 +37,8 @@
             SiglaCompanhiaAerea $sigla_da_companhia,
             int $numero
         ) {
-            parent::__construct([
-                'sigla_da_companhia' => $sigla_da_companhia,
-                'numero' => $numero
-            ]);
-            $this->sigla_da_companhia = $sigla_da_companhia;
-            $this->numero = $numero;
+            $this->sigla_da_companhia = SiglaCompanhiaAerea::valida_sigla($sigla_da_companhia);
+            $this->numero = CodigoVoo::valida_numero($numero);
         }
 
         public function __toString(): string
@@ -80,12 +75,8 @@
             PrefixoRegistroDeAeronave $prefixo,
             string $sufixo
         ) {
-            parent::__construct([
-                'prefixo' => $prefixo,
-                'sufixo' => $sufixo
-            ]);
             $this->prefixo = $prefixo;
-            $this->sufixo = $sufixo;
+            $this->sufixo = RegistroDeAeronave::valida_sufixo($sufixo);
         }
 
         public function __toString(): string
@@ -113,10 +104,7 @@
 
         public function __construct(int $number)
         {
-            parent::__construct([
-                'number' => $number
-            ]);
-            $this->number = $number;
+            $this->number = RegistroDePassagem::valida_numero($number);
         }
 
         public static function valida_numero(int $numero): int
@@ -139,12 +127,8 @@
 
         public function __construct(string $prefixo, int $numero)
         {
-            parent::__construct([
-                'prefixo' => $prefixo,
-                'numero' => $numero
-            ]);
-            $this->prefixo = $prefixo;
-            $this->numero = $numero;
+            $this->prefixo = RegistroDeViagem::valida_prefixo($prefixo);
+            $this->numero = RegistroDeViagem::valida_numero($numero);
         }
 
         public function __toString(): string
@@ -182,7 +166,7 @@
         public $sigla;
     
         public function __construct($sigla) {
-            parent::__construct(["sigla" => $sigla]);
+            $this->sigla = SiglaAeroporto::valida_sigla($sigla);
         }
     
         public function __toString() {
@@ -203,12 +187,29 @@
         }
     }
 
+    trait EnumToArray {
+        public static function names(): array
+        {
+            return array_column(self::cases(), 'name');
+        }
+
+        public static function values(): array
+        {
+            return array_column(self::cases(), 'value');
+        }
+
+        public static function array(): array
+        {
+            return array_combine(self::values(), self::names());
+        }
+    }
+
         class RG {
         public $rg;
 
         public function __construct($rg)
         {
-            parent::__construct(["rg" => $rg]);
+            $this->rg = RG::valida_rg($rg);
         }
 
         public function valida_rg($rg)
@@ -216,7 +217,7 @@
             $estado = substr($rg, 2);
             $numeros = substr($rg, 0, 2);
 
-            if (!in_array($estado, Estado::getConstants())) {
+            if (!in_array($estado, Estado::names())) {
                 throw new Exception("Estado invalido");
             }
 
@@ -254,7 +255,7 @@
         public string $passaporte;
 
         public function __construct(string $passaporte) {
-            parent::__construct(['passaporte' => $passaporte]);
+            $this->passaporte = Passaporte::valida_passaporte($passaporte);
         }
 
         public function __toString() {
@@ -338,6 +339,7 @@
                 Classe::EXECUTIVA => 'E',
                 Classe::STANDARD => 'S',
             };
+            throw new Exception("Classe desconhecida");
         }
     }
 
@@ -393,11 +395,11 @@
             if ($this->current_index <= $this->executive_count) {
                 $row = (int) (($this->current_index - 1) / $this->seats_per_row) + 1;
                 $coluna = ($this->current_index - 1) % $this->seats_per_row + 1;
-                $classe = Classe::EXECUTIVA();
+                $classe = Classe::EXECUTIVA;
             } else {
                 $row = (int) (($this->current_index - $this->executive_count - 1) / $this->seats_per_row) + 1;
                 $coluna = ($this->current_index - $this->executive_count - 1) % $this->seats_per_row + 1;
-                $classe = Classe::STANDARD();
+                $classe = Classe::STANDARD;
             }
             $fileira = chr(ord('A') + $coluna - 1);
             $this->current_index += 1;

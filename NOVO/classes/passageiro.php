@@ -1,12 +1,15 @@
 <?php
 
+require_once('identificadores.php');
+require_once('nacionalidades.php');
+
 namespace MyApp;
 
-use MyApp\Identificadores\DocumentoPassageiro;
-use MyApp\Identificadores\Email;
-use MyApp\Identificadores\CPF;
-use MyApp\Identificadores\RegistroDePassagem;
-use MyApp\Nacionalidades\Nacionalidade;
+use DateTime;
+use DocumentoPassageiro;
+use CPF;
+use Email;
+use Nacionalidade;
 
 class Passageiro{
 
@@ -15,7 +18,7 @@ class Passageiro{
     public DocumentoPassageiro $documento;
     public string $nacionalidade;
     public ?CPF $cpf;
-    public Data $data_de_nascimento;
+    public DateTime $data_de_nascimento;
     public Email $email;
     public array $passagens;
     public bool $vip;
@@ -26,7 +29,7 @@ class Passageiro{
         DocumentoPassageiro $documento,
         string $nacionalidade,
         ?CPF $cpf,
-        Data $data_de_nascimento,
+        DateTime $data_de_nascimento,
         Email $email,
         array $passagens,
         bool $vip
@@ -44,7 +47,7 @@ class Passageiro{
             vip: $vip
         );
     }
-    
+
     public function valida_cpf_se_brasileiro($cpf, $values) {
         if ($values['nacionalidade'] == Nacionalidade::BRASIL && $cpf === null) {
             throw new \Exception('O CPF deve ser definido para brasileiros');

@@ -10,6 +10,7 @@ require_once 'temporal.php';
 require_once 'viagem.php';
 require_once 'viagem_builder.php';
 require_once 'voo.php';
+require_once 'tripulante.php';
 
 use \Temporal\Data;
 use \Temporal\Duracao;
@@ -55,12 +56,13 @@ class CompanhiaAerea extends Persist {
     public $tarifa_franquia;
     public $passagens;
     public $passageiros;
+    public $tripulantes;
     public $local_filename = "companhia_aerea.txt";
 
     public function __construct($nome, $codigo, $razao_social, $sigla,
         $aeronaves, $voos_planejados, $voos_em_venda, $voos_executados,
         $gerador_de_registro_de_viagem, $gerador_de_registro_de_passagem, $tarifa_franquia, 
-        $passagens, $passageiros, ...$args) {
+        $passagens, $passageiros, $tripulantes, ...$args) {
             
         $this->nome = $nome;
         $this->codigo = $codigo;
@@ -75,6 +77,7 @@ class CompanhiaAerea extends Persist {
         $this->tarifa_franquia = $tarifa_franquia;
         $this->passagens = $passagens;
         $this->passageiros = $passageiros;
+        $this->tripulantes = $tripulantes;
         parent::__construct(...$args);
     }
 

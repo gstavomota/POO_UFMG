@@ -5,6 +5,7 @@ require_once ('franquia_de_bagagem.php');
 require_once ('identificadores.php');
 require_once ('temporal.php');
 require_once ('viagem.php');
+require_once ('tripulacao.php');
 
 use function assento\{construir_assentos};
 use function franquia_de_bagagem\{carga};
@@ -17,16 +18,19 @@ use franquia_de_bagagem\FranquiasDeBagagem;
 use viagem\{Voo, Viagem};
 
 class ViagemBuilder {
+    private float $carga, $tarifa, $tarifa_franquia;
+    private int $passageiros, $valorDeMilhagem;
+    private array $assentos = array();
     private GeradorDeRegistroDeViagem $gerador_de_registro;
     private RegistroDeViagem $registro;
-    private Data $data;
     private RegistroDeAeronave $aeronave;
-    private float $carga, $tarifa, $tarifa_franquia;
-    private int $passageiros;
+    private Tripulacao $tripulacao;
+    private Data $data;
     private CodigoVoo $codigo_do_voo;
+
     private SiglaAeroporto $aeroporto_de_saida, $aeroporto_de_chegada;
+
     private DataTempo $hora_de_partida, $hora_de_chegada;
-    private array $assentos = array();
 
     public function add_tarifa_franquia(float $tarifa_franquia): self {
         $this->tarifa_franquia = $tarifa_franquia;
@@ -136,15 +140,16 @@ class ViagemBuilder {
     public function build() {
         return new Viagem(
             $this->registro,
-            $this->codigo_do_voo,
-            $this->aeroporto_de_saida,
+            $this->aeronave,
             $this->aeroporto_de_chegada,
+            $this->aeroporto_de_saida,
+            $this->assentos,
+            $this->codigo_do_voo,
             $this->hora_de_partida,
             $this->hora_de_chegada,
-            $this->aeronave,
             $this->tarifa,
             $this->tarifa_franquia,
-            $this->assentos
+            $this->tripulacao
         );
     }
 }

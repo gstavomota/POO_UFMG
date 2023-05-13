@@ -109,7 +109,7 @@
         
             // Verifica se o CEP está vazio ou não possui 8 dígitos
             if (empty($cep) || strlen($cep) != 8) {
-                print_r('Por favor, insira um cpf válido.');
+                print_r('Por favor, insira um cep válido.');
             }
         
             // Verifica se a cidade está vazia

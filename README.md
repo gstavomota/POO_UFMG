@@ -13,7 +13,7 @@ Cadeira de Programação Orientada a Objetos
 
 [Raissa Gonçalves Diniz](https://github.com/raissagd)
 
-[Raphal Lucas Amaral](https://github.com/RaphaelLucasAmaral)
+[Raphael Lucas Amaral](https://github.com/RaphaelLucasAmaral)
 
 ## Descrição
 

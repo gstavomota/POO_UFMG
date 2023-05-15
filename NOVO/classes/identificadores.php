@@ -6,6 +6,7 @@
 
     from pydantic import BaseModel, validator */
     include_once("estado.php");
+    include_once("enum_to_array.php");
 
     class SiglaCompanhiaAerea{
         public string $sigla;
@@ -37,7 +38,7 @@
             SiglaCompanhiaAerea $sigla_da_companhia,
             int $numero
         ) {
-            $this->sigla_da_companhia = SiglaCompanhiaAerea::valida_sigla($sigla_da_companhia);
+            $this->sigla_da_companhia = $sigla_da_companhia;
             $this->numero = CodigoVoo::valida_numero($numero);
         }
 
@@ -59,11 +60,12 @@
         }
     }
 
-    enum PrefixoRegistroDeAeronave {
-        const PT = "PT";
-        const PR = "PR";
-        const PP = "PP";
-        const PS = "PS";
+    enum PrefixoRegistroDeAeronave: string {
+        use EnumToArray;
+        case PT = "PT";
+        case PR = "PR";
+        case PP = "PP";
+        case PS = "PS";
     }
 
 
@@ -184,23 +186,6 @@
                 throw new Exception("A sigla deve ser feita de caracteres");
             }
             return $v;
-        }
-    }
-
-    trait EnumToArray {
-        public static function names(): array
-        {
-            return array_column(self::cases(), 'name');
-        }
-
-        public static function values(): array
-        {
-            return array_column(self::cases(), 'value');
-        }
-
-        public static function array(): array
-        {
-            return array_combine(self::values(), self::names());
         }
     }
 

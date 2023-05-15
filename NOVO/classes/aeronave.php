@@ -2,7 +2,6 @@
 require_once 'identificadores.php';
 
 class Aeronave {
-    /*teste*/
     public $companhia_aerea;
     public $fabricante;
     public $modelo;

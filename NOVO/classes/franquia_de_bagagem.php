@@ -4,10 +4,10 @@ class FranquiaDeBagagem{
     public float $peso;
 
     public function __construct(float $peso) {
-        $this->peso = $peso;
+        $this->peso = FranquiaDeBagagem::validarPeso($peso);
     }
 
-    public function validarPeso(float $peso): float {
+    public static function validarPeso(float $peso): float {
         if ($peso > 23.0) {
             throw new Exception("O peso máximo de uma franquia é 23kg");
         }
@@ -19,10 +19,10 @@ class FranquiasDeBagagem{
     public array $franquias;
 
     public function __construct(array $franquias) {
-        $this->franquias = $franquias;
+        $this->franquias = FranquiasDeBagagem::validarFranquias($franquias);
     }
 
-    public function validarFranquias(array $franquias): array {
+    public static function validarFranquias(array $franquias): array {
         if (count($franquias) > 3) {
             throw new Exception("No máximo três franquias são suportadas");
         }

@@ -11,6 +11,12 @@
             $this->nome = $p_nome;
             $this->pontuacao = $p_pontuacao;
         }
+        public function getNome(){
+            return $this->nome;
+        }
+        public function getPontuacao(){
+            return $this->pontuacao;
+        }
     }
 
 ?>

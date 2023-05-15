@@ -21,7 +21,6 @@ class Passageiro{
     public DateTime $data_de_nascimento;
     public Email $email;
     public array $passagens;
-    public bool $vip;
 
     public function __construct(
         string $nome,
@@ -32,27 +31,23 @@ class Passageiro{
         DateTime $data_de_nascimento,
         Email $email,
         array $passagens,
-        bool $vip
     )
     {
-        parent::__construct(
-            nome: $nome,
-            sobrenome: $sobrenome,
-            documento: $documento,
-            nacionalidade: $nacionalidade,
-            cpf: $cpf,
-            data_de_nascimento: $data_de_nascimento,
-            email: $email,
-            passagens: $passagens,
-            vip: $vip
-        );
+        $this->nome = $nome;
+        $this->sobrenome = $sobrenome;
+        $this->documento = $documento;
+        $this->nacionalidade = $nacionalidade;
+        $this->cpf = Passageiro::valida_cpf_se_brasileiro($cpf, $nacionalidade);
+        $this->data_de_nascimento = $data_de_nascimento;
+        $this->email = $email;
+        $this->passagens = $passagens;
     }
 
-    public function valida_cpf_se_brasileiro($cpf, $values) {
-        if ($values['nacionalidade'] == Nacionalidade::BRASIL && $cpf === null) {
+    public static function valida_cpf_se_brasileiro($cpf, $nacionalidade) {
+        if ($nacionalidade == Nacionalidade::BRASIL && $cpf === null) {
             throw new \Exception('O CPF deve ser definido para brasileiros');
         }
-        if ($values['nacionalidade'] != Nacionalidade::BRASIL && $cpf !== null) {
+        if ($nacionalidade != Nacionalidade::BRASIL && $cpf !== null) {
             throw new \Exception('O CPF deve ser definido somente para brasileiros');
         }
         return $cpf;

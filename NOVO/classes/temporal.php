@@ -239,6 +239,14 @@ class Tempo {
     {
         return "{$this->hora}h{$this->minuto}m{$this->segundo}s";
     }
+
+    /** Adiciona uma data a esse tempo
+     * @param Data $data
+     * @return DataTempo
+     */
+    public function comData(Data $data): DataTempo {
+        return new DataTempo($data, $this);
+    }
 }
 
 /** Um Enum com os dias da semana. Ele possui a trait EnumToArray pra ter acesso a metodos estaticos uteis.
@@ -406,6 +414,15 @@ class Data {
     public function __toString(): string
     {
         return "{$this->dia}/{$this->mes}/{$this->ano}";
+    }
+
+
+    /** Adiciona uma tempo a essa data
+     * @param Tempo $tempo
+     * @return DataTempo
+     */
+    public function comTempo(Tempo $tempo): DataTempo {
+        return new DataTempo($this, $tempo);
     }
 }
 

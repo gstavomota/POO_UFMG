@@ -57,7 +57,7 @@ class CompanhiaAerea extends Persist {
     public $passagens;
     public $passageiros;
     public $tripulantes;
-    public $local_filename = "companhia_aerea.txt";
+    private static $local_filename = "companhia_aerea.txt";
 
     public function __construct($nome, $codigo, $razao_social, $sigla,
         $aeronaves, $voos_planejados, $voos_em_venda, $voos_executados,
@@ -79,14 +79,6 @@ class CompanhiaAerea extends Persist {
         $this->passageiros = $passageiros;
         $this->tripulantes = $tripulantes;
         parent::__construct(...$args);
-    }
-
-    public static function get_records_by_field($field, $value) {
-        return parent::get_records_by_field($field, $value, 'CompanhiaAerea');
-    }
-
-    public static function get_records() {
-        return parent::get_records('CompanhiaAerea');
     }
 
     public static function get_filename() {

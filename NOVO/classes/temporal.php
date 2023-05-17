@@ -34,35 +34,35 @@ class Duracao {
      * @return Duracao
      */
     public function add(Duracao $outra): Duracao {
-        return new Duracao($this->getDia()+$outra->getDia(), $this->getSegundo()+$outra->getSegundo());
+        return new Duracao($this->dia+$outra->dia, $this->segundo+$outra->segundo);
     }
 
     /** Retorna a subtracao da Duracao provida com $this
      * @return Duracao
      */
     public function sub(Duracao $outra): Duracao {
-        return new Duracao($this->getDia()-$outra->getDia(), $this->getSegundo()-$outra->getSegundo());
+        return new Duracao($this->dia-$outra->dia, $this->segundo-$outra->segundo);
     }
 
     /** Retorna a multiplicacao de $this pelo numero provido
      * @return Duracao
      */
     public function mul(float $num): Duracao {
-        return new Duracao($this->getDia()*$num, $this->getSegundo()*$num);
+        return new Duracao($this->dia*$num, $this->segundo*$num);
     }
 
     /** Retorna a divisao de $this pelo numero provido
      * @return Duracao
      */
     public function div(float $num): Duracao {
-        return new Duracao($this->getDia()/$num, $this->getSegundo()/$num,);
+        return new Duracao($this->dia/$num, $this->segundo/$num,);
     }
 
     /** Operador de comparação >
      * @return bool
      */
     public function gt(Duracao $outra): bool {
-        return $outra->getDia() > $this->getDia() || $outra->getDia() == $this->getDia() && $outra->getSegundo() > $this->getSegundo();
+        return $outra->dia > $this->dia || $outra->dia == $this->dia && $outra->segundo > $this->segundo;
     }
 
     /** Operador de comparação >=
@@ -76,7 +76,7 @@ class Duracao {
      * @return bool
      */
     public function st(Duracao $outra): bool {
-        return $outra->getDia() < $this->getDia() || $outra->getDia() == $this->getDia() && $outra->getSegundo() < $this->getSegundo();
+        return $outra->dia < $this->dia || $outra->dia == $this->dia && $outra->segundo < $this->segundo;
     }
 
     /** Operador de comparação <=
@@ -90,7 +90,7 @@ class Duracao {
      * @return bool
      */
     public function eq(Duracao $outra): bool {
-        return $outra->getDia() == $this->getDia() && $outra->getSegundo() == $this->getSegundo();
+        return $outra->dia == $this->dia && $outra->segundo == $this->segundo;
     }
 
     /** Conversão em string
@@ -98,7 +98,7 @@ class Duracao {
      */
     public function __toString(): string
     {
-        return "{$this->getDia()}d{$this->getSegundo()}s";
+        return "{$this->dia}d{$this->segundo}s";
     }
 }
 
@@ -162,7 +162,7 @@ class Tempo {
      * @throws Exception when hora is more than 24
      */
     public function add(Duracao $outra): Tempo {
-        return new Tempo($this->getHora() + $outra->getDia()*24, $this->getMinuto(), $this->getSegundo()+$outra->getSegundo());
+        return new Tempo($this->hora + $outra->getDia()*24, $this->minuto, $this->segundo+$outra->getSegundo());
     }
 
     /** Retorna a subtracao da Duracao provido com $this
@@ -171,7 +171,7 @@ class Tempo {
      * @throws Exception when hora is more than 24
      */
     public function sub(Duracao $outra): Tempo {
-        return new Tempo($this->getHora() - $outra->getDia()*24, $this->getMinuto(), $this->getSegundo()-$outra->getSegundo());
+        return new Tempo($this->hora - $outra->getDia()*24, $this->minuto, $this->segundo-$outra->getSegundo());
     }
 
     /** Retorna a multiplicacao de $this pelo numero provido
@@ -180,7 +180,7 @@ class Tempo {
      * @throws Exception when hora is more than 24
      */
     public function mul(float $num): Tempo {
-        return new Tempo($this->getHora()*$num, $this->getMinuto()*$num, $this->getSegundo()*$num);
+        return new Tempo($this->hora*$num, $this->minuto*$num, $this->segundo*$num);
     }
 
     /** Retorna a divisao de $this pelo numero provido
@@ -189,7 +189,7 @@ class Tempo {
      * @throws Exception when hora is more than 24
      */
     public function div(float $num): Tempo {
-        return new Tempo($this->getHora()/$num, $this->getMinuto()/$num, $this->getSegundo()/$num);
+        return new Tempo($this->hora/$num, $this->minuto/$num, $this->segundo/$num);
     }
 
     /** Operador de comparação >
@@ -197,7 +197,7 @@ class Tempo {
      * @return bool
      */
     public function gt(Tempo $outra): bool {
-        return $outra->getHora() > $this->getHora() || $outra->getHora() == $this->getHora() && $outra->getMinuto() > $this->getMinuto() || $outra->getHora() == $this->getHora() && $outra->getMinuto() == $this->getMinuto() && $outra->getSegundo() > $this->getSegundo();
+        return $outra->hora > $this->hora || $outra->hora == $this->hora && $outra->minuto > $this->minuto || $outra->hora == $this->hora && $outra->minuto == $this->minuto && $outra->segundo > $this->segundo;
     }
 
     /** Operador de comparação >=
@@ -213,7 +213,7 @@ class Tempo {
      * @return bool
      */
     public function st(Tempo $outra): bool {
-        return $outra->getHora() < $this->getHora() || $outra->getHora() == $this->getHora() && $outra->getMinuto() < $this->getMinuto() || $outra->getHora() == $this->getHora() && $outra->getMinuto() == $this->getMinuto() && $outra->getSegundo() < $this->getSegundo();
+        return $outra->hora < $this->hora || $outra->hora == $this->hora && $outra->minuto < $this->minuto || $outra->hora == $this->hora && $outra->minuto == $this->minuto && $outra->segundo < $this->segundo;
     }
 
     /** Operador de comparação <=
@@ -229,7 +229,7 @@ class Tempo {
      * @return bool
      */
     public function eq(Tempo $outra): bool {
-        return $outra->getHora() == $this->getHora() && $outra->getMinuto() == $this->getMinuto() && $outra->getSegundo() == $this->getSegundo();
+        return $outra->hora == $this->hora && $outra->minuto == $this->minuto && $outra->segundo == $this->segundo;
     }
 
     /** Conversão em string
@@ -237,7 +237,7 @@ class Tempo {
      */
     public function __toString(): string
     {
-        return "{$this->getHora()}h{$this->getMinuto()}m{$this->getSegundo()}s";
+        return "{$this->hora}h{$this->minuto}m{$this->segundo}s";
     }
 }
 
@@ -308,7 +308,7 @@ class Data {
 
     public function toDateTime(): DateTime {
         $dateTime = new DateTime();
-        $dateTime->setDate($this->getAno(), $this->getMes(), $this->getDia());
+        $dateTime->setDate($this->ano, $this->mes, $this->dia);
         return $dateTime;
     }
 
@@ -365,7 +365,7 @@ class Data {
      * @return bool
      */
     public function gt(Data $outra): bool {
-        return $outra->getAno() > $this->getAno() || $outra->getAno() == $this->getAno() && $outra->getMes() > $this->getMes() || $outra->getAno() == $this->getAno() && $outra->getMes() == $this->getMes() && $outra->getDia() > $this->getDia();
+        return $outra->ano > $this->ano || $outra->ano == $this->ano && $outra->mes > $this->mes || $outra->ano == $this->ano && $outra->mes == $this->mes && $outra->dia > $this->dia;
     }
 
     /** Operador de comparação >=
@@ -381,7 +381,7 @@ class Data {
      * @return bool
      */
     public function st(Data $outra): bool {
-        return $outra->getAno() < $this->getAno() || $outra->getAno() == $this->getAno() && $outra->getMes() < $this->getMes() || $outra->getAno() == $this->getAno() && $outra->getMes() == $this->getMes() && $outra->getDia() < $this->getDia();
+        return $outra->ano < $this->ano || $outra->ano == $this->ano && $outra->mes < $this->mes || $outra->ano == $this->ano && $outra->mes == $this->mes && $outra->dia < $this->dia;
     }
 
     /** Operador de comparação <=
@@ -397,7 +397,7 @@ class Data {
      * @return bool
      */
     public function eq(Data $outra): bool {
-        return $outra->getAno() == $this->getAno() && $outra->getMes() == $this->getMes() && $outra->getDia() == $this->getDia();
+        return $outra->ano == $this->ano && $outra->mes == $this->mes && $outra->dia == $this->dia;
     }
 
     /** Conversão em string
@@ -405,7 +405,7 @@ class Data {
      */
     public function __toString(): string
     {
-        return "{$this->getDia()}/{$this->getMes()}/{$this->getAno()}";
+        return "{$this->dia}/{$this->mes}/{$this->ano}";
     }
 }
 
@@ -493,7 +493,7 @@ class DataTempo {
      * @return bool
      */
     public function gt(DataTempo $outra): bool {
-        return $outra->getData()->gt($this->getData()) || $outra->getData()->eq($this->getData()) && $outra->getTempo()->gt($this->getTempo());
+        return $outra->data->gt($this->data) || $outra->data->eq($this->data) && $outra->tempo->gt($this->tempo);
     }
 
     /** Operador de comparação >=
@@ -509,7 +509,7 @@ class DataTempo {
      * @return bool
      */
     public function st(DataTempo $outra): bool {
-        return $outra->getData()->st($this->getData()) || $outra->getData()->eq($this->getData()) && $outra->getTempo()->st($this->getTempo());
+        return $outra->data->st($this->data) || $outra->data->eq($this->data) && $outra->tempo->st($this->tempo);
     }
 
     /** Operador de comparação <=
@@ -525,7 +525,7 @@ class DataTempo {
      * @return bool
      */
     public function eq(Data $outra): bool {
-        return $outra->getData()->eq($this->getData()) && $outra->getTempo()->eq($this->getTempo());
+        return $outra->data->eq($this->data) && $outra->tempo->eq($this->tempo);
     }
 
     /** Conversão em string
@@ -533,7 +533,7 @@ class DataTempo {
      */
     public function __toString(): string
     {
-        return "{$this->getData()} {$this->getTempo()}";
+        return "{$this->data} {$this->tempo}";
     }
 
     /** Função de formatação

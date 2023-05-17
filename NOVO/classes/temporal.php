@@ -31,6 +31,7 @@ class Duracao {
     }
 
     /** Retorna a soma da Duracao provida com $this
+     * @param Duracao $outra
      * @return Duracao
      */
     public function add(Duracao $outra): Duracao {
@@ -38,6 +39,7 @@ class Duracao {
     }
 
     /** Retorna a subtracao da Duracao provida com $this
+     * @param Duracao $outra
      * @return Duracao
      */
     public function sub(Duracao $outra): Duracao {
@@ -45,6 +47,7 @@ class Duracao {
     }
 
     /** Retorna a multiplicacao de $this pelo numero provido
+     * @param float $num
      * @return Duracao
      */
     public function mul(float $num): Duracao {
@@ -52,6 +55,7 @@ class Duracao {
     }
 
     /** Retorna a divisao de $this pelo numero provido
+     * @param float $num
      * @return Duracao
      */
     public function div(float $num): Duracao {
@@ -59,6 +63,7 @@ class Duracao {
     }
 
     /** Operador de comparação >
+     * @param Duracao $outra
      * @return bool
      */
     public function gt(Duracao $outra): bool {
@@ -66,6 +71,7 @@ class Duracao {
     }
 
     /** Operador de comparação >=
+     * @param Duracao $outra
      * @return bool
      */
     public function gte(Duracao $outra): bool {
@@ -73,6 +79,7 @@ class Duracao {
     }
 
     /** Operador de comparação <
+     * @param Duracao $outra
      * @return bool
      */
     public function st(Duracao $outra): bool {
@@ -80,6 +87,7 @@ class Duracao {
     }
 
     /** Operador de comparação <=
+     * @param Duracao $outra
      * @return bool
      */
     public function ste(Duracao $outra): bool {
@@ -87,6 +95,7 @@ class Duracao {
     }
 
     /** Operador de igualdade ==
+     * @param Duracao $outra
      * @return bool
      */
     public function eq(Duracao $outra): bool {
@@ -99,6 +108,46 @@ class Duracao {
     public function __toString(): string
     {
         return "{$this->dia}d{$this->segundo}s";
+    }
+
+    /** Um mes de 31 dias em Duracao
+     * @return Duracao
+     */
+    public static function umMes(): Duracao
+    {
+        return new Duracao(31, 0);
+    }
+
+    /** Um dia em Duracao
+     * @return Duracao
+     */
+    public static function umDia(): Duracao
+    {
+        return new Duracao(1, 0);
+    }
+
+    /** Uma hora em Duracao
+     * @return Duracao
+     */
+    public static function umaHora(): Duracao
+    {
+        return new Duracao(0, 60 * 60);
+    }
+
+    /** Meia hora em Duracao
+     * @return Duracao
+     */
+    public static function meiaHora(): Duracao
+    {
+        return Duracao::umaHora()->div(2);
+    }
+
+    /** Uma hora e meia em Duracao
+     * @return Duracao
+     */
+    public static function umaHoraEMeia(): Duracao
+    {
+        return Duracao::umaHora()->add(Duracao::meiaHora());
     }
 }
 

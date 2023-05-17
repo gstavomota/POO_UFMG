@@ -81,7 +81,7 @@ class CompanhiaAerea extends Persist {
         parent::__construct(...$args);
     }
 
-    public static function get_filename() {
+    public static function getFilename() {
         return self::$local_filename;
     }
 

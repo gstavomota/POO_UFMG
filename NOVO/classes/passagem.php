@@ -2,25 +2,24 @@
 
 require_once ('identificadores.php');
 
-use Estado;
-use Enum;
-
-class Tipo extends Enum {
-    const CANCELADA = "cancelada";
-    const CHECK_IN_NAO_ABERTO = "check_in_nao_aberto";
-    const AGUARDANDO_CHECK_IN = "aguardando_check_in";
-    const NAO_APARECEU = "nao_apareceu";
-    const CHECKED_IN = "checked_in";
-    const EMBARCADO = "embarcado";
-    const CONCLUIDA_COM_SUCESSO = "concluida_com_sucesso";
+enum Tipo: string {
+    use EnumToArray;
+    case CANCELADA = "cancelada";
+    case CHECK_IN_NAO_ABERTO = "check_in_nao_aberto";
+    case AGUARDANDO_CHECK_IN = "aguardando_check_in";
+    case NAO_APARECEU = "nao_apareceu";
+    case CHECKED_IN = "checked_in";
+    case EMBARCADO = "embarcado";
+    case CONCLUIDA_COM_SUCESSO = "concluida_com_sucesso";
 }
 
-class Evento extends Enum {
-    const CANCELAR = "cancelar";
-    const ABRIR_CHECK_IN = "abrir_check_in";
-    const FAZER_CHECK_IN = "fazer_check_in";
-    const EMBARCAR = "embarcar";
-    const CONCLUIR = "concluir";
+enum Evento: string {
+    use EnumToArray;
+    case CANCELAR = "cancelar";
+    case ABRIR_CHECK_IN = "abrir_check_in";
+    case FAZER_CHECK_IN = "fazer_check_in";
+    case EMBARCAR = "embarcar";
+    case CONCLUIR = "concluir";
 }
 
 class StatusDaPassagem {
@@ -53,24 +52,24 @@ class StatusDaPassagem {
 
     public function dispatch_event(Evento $evento): StatusDaPassagem {
         switch ($evento) {
-            case StatusDaPassagem::Evento()->CANCELAR: return $this->cancelar();
-            case StatusDaPassagem::Evento()->ABRIR_CHECK_IN: return $this->abrir_check_in();
-            case StatusDaPassagem::Evento()->FAZER_CHECK_IN: return $this->fazer_check_in();
-            case StatusDaPassagem::Evento()->EMBARCAR: return $this->embarcar();
-            case StatusDaPassagem::Evento()->CONCLUIR: return $this->concluir();
+            case Evento::CANCELAR: return $this->cancelar();
+            case Evento::ABRIR_CHECK_IN: return $this->abrir_check_in();
+            case Evento::FAZER_CHECK_IN: return $this->fazer_check_in();
+            case Evento::EMBARCAR: return $this->embarcar();
+            case Evento::CONCLUIR: return $this->concluir();
         }
     }
 }
 
 class PassagemCancelada extends StatusDaPassagem {
     public function __construct() {
-        parent::__construct(StatusDaPassagem::Tipo()->CANCELADA);
+        parent::__construct(Tipo::CANCELADA);
     }
 }
 
 class PassagemCheckInNaoAberto extends StatusDaPassagem {
     public function __construct() {
-        parent::__construct(StatusDaPassagem::Tipo()["CHECK_IN_NAO_ABERTO"]);
+        parent::__construct(Tipo::CHECK_IN_NAO_ABERTO);
     }
     // Transition to cancelled or to checkin aberto
     public function cancelar(): StatusDaPassagem {
@@ -83,7 +82,7 @@ class PassagemCheckInNaoAberto extends StatusDaPassagem {
 
 class PassagemAguardandoCheckIn extends StatusDaPassagem {
     public function __construct() {
-        parent::__construct(StatusDaPassagem::Tipo()["AGUARDANDO_CHECK_IN"]);
+        parent::__construct(Tipo::AGUARDANDO_CHECK_IN);
     }
     // Transition to cancelled, checked in or did not show up
     public function cancelar(): StatusDaPassagem {
@@ -99,14 +98,14 @@ class PassagemAguardandoCheckIn extends StatusDaPassagem {
 
 class PassagemNaoApareceu extends StatusDaPassagem {
     public function __construct() {
-        parent::__construct(StatusDaPassagem::Tipo()["NAO_APARECEU"]);
+        parent::__construct(Tipo::NAO_APARECEU);
     }
     // Dont transition
 }
 
 class PassagemCheckedIn extends StatusDaPassagem {
     public function __construct() {
-        parent::__construct(StatusDaPassagem::Tipo()["CHECKED_IN"]);
+        parent::__construct(Tipo::CHECKED_IN);
     }
     // Transition to no show, cancelled or embarcated
     public function embarcar(): StatusDaPassagem {
@@ -122,7 +121,7 @@ class PassagemCheckedIn extends StatusDaPassagem {
 
 class PassagemEmbarcado extends StatusDaPassagem {
     public function __construct() {
-        parent::__construct(StatusDaPassagem::Tipo()["EMBARCADO"]);
+        parent::__construct(Tipo::EMBARCADO);
     }
     // Transition to concluded
     public function concluir(): StatusDaPassagem {
@@ -132,7 +131,7 @@ class PassagemEmbarcado extends StatusDaPassagem {
 
 class PassagemConcluidaComSucesso extends StatusDaPassagem {
     public function __construct() {
-        parent::__construct(StatusDaPassagem::Tipo()["CONCLUIDA_COM_SUCESSO"]);
+        parent::__construct(Tipo::CONCLUIDA_COM_SUCESSO);
     }
     // Dont transition
 }
@@ -176,7 +175,7 @@ class Passagem {
         $this->status = $status;
     }
 
-    public function tipo_de_status(): StatusDaPassagemTipo {
+    public function tipo_de_status(): Tipo {
         return $this->status->tipo;
     }
 
@@ -192,10 +191,10 @@ class Passagem {
         return $this->valor_devendo();
     }
 
-    public function acionar_evento(StatusDaPassagemEvento $evento): bool {
+    public function acionar_evento(Evento $evento): bool {
         $old_status = $this->status;
         $new_status = $this->status->dispatch_event($evento);
         $this->status = $new_status;
-        return $old_status == $new_status;
+        return $old_status === $new_status;
     }
 }

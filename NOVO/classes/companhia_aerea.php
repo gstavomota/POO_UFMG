@@ -296,8 +296,18 @@ class CompanhiaAerea extends Persist {
                 $viagens[] = $viagem;
             }
         }
-    
-        sort($viagens);
+        /** Compara duas viagens, retornando 0 se elas são iguais, -1 se $a for menor que $b e 1 se $a for maior que $b
+         * @param Viagem $a
+         * @param Viagem $b
+         * @return int
+         */
+        function viagem_cmp(Viagem $a, Viagem $b): int {
+            if ($a->eq($b)) {
+                return 0;
+            }
+            return $a->st($b) ? -1 : 1;
+        }
+        usort($viagens, "viagem_cmp");
         return $viagens;
     }
     

@@ -240,6 +240,10 @@ class Tempo {
         return "{$this->getHora()}h{$this->getMinuto()}m{$this->getSegundo()}s";
     }
 }
+
+/** Um Enum com os dias da semana. Ele possui a trait EnumToArray pra ter acesso a metodos estaticos uteis.
+ *
+ */
 enum DiaDaSemana: string {
     use EnumToArray;
     case DOMINGO = "domingo";
@@ -250,6 +254,10 @@ enum DiaDaSemana: string {
     case SEXTA = "sexta";
     case SABADO = "sabado";
 }
+
+/** Uma classe normalizada que determina uma data.
+ *
+ */
 class Data {
     private int $ano;
     private int $mes;
@@ -398,6 +406,142 @@ class Data {
     public function __toString(): string
     {
         return "{$this->getDia()}/{$this->getMes()}/{$this->getAno()}";
+    }
+}
+
+
+/** Uma classe normalizada que determina um dia e um tempo nele.
+ *
+ */
+class DataTempo {
+    private Data $data;
+    private Tempo $tempo;
+    public function __construct(Data $data, Tempo $tempo)
+    {
+        $this->data = $data;
+        $this->tempo = $tempo;
+    }
+
+    /**
+     * @return Data
+     */
+    public function getData(): Data
+    {
+        return $this->data;
+    }
+
+    /**
+     * @return Tempo
+     */
+    public function getTempo(): Tempo
+    {
+        return $this->tempo;
+    }
+
+    public function toDateTime(): DateTime {
+        $dateTime = $this->data->toDateTime();
+        $segundoFloat = $this->tempo->getSegundo();
+        $segundo = floor($segundoFloat);
+        $microsegundo = floor(($segundoFloat - $segundo) * 1000000); // Extract microseconds
+        $dateTime->setTime($this->tempo->getHora(), $this->tempo->getMinuto(), $segundo, $microsegundo);
+        return $dateTime;
+    }
+
+    /**
+     * @throws Exception se a data for invalida
+     */
+    public static function fromDateTime(DateTime $dateTime): DataTempo {
+        $dia = (int) $dateTime->format('d');
+        $mes = (int) $dateTime->format('m');
+        $ano = (int) $dateTime->format('Y');
+        $hora = (int) $dateTime->format('H');
+        $minuto = (int) $dateTime->format('i');
+        $segundo = (float) $dateTime->format('s.u');
+        return new DataTempo(new Data($ano, $mes, $dia), new Tempo($hora, $minuto, $segundo));
+    }
+
+    public function getDiaDaSemana(): DiaDaSemana {
+        return $this->data->getDiaDaSemana();
+    }
+
+    /** Retorna a soma da Duracao provido com $this
+     * @param Duracao $outra
+     * @return DataTempo
+     * @throws Exception se a data for invalida
+     */
+    public function add(Duracao $outra): DataTempo {
+        $dateTime = $this->toDateTime();
+        $dateTime->modify("+{$outra->getDia()} days");
+        $dateTime->modify("+{$outra->getSegundo()} seconds");
+        return DataTempo::fromDateTime($dateTime);
+    }
+
+    /** Retorna a subtracao da Duracao provido com $this
+     * @param Duracao $outra
+     * @return DataTempo
+     * @throws Exception se a data for invalida
+     */
+    public function sub(Duracao $outra): DataTempo {
+        $dateTime = $this->toDateTime();
+        $dateTime->modify("-{$outra->getDia()} days");
+        $dateTime->modify("-{$outra->getSegundo()} seconds");
+        return DataTempo::fromDateTime($dateTime);
+    }
+
+    /** Operador de comparação >
+     * @param DataTempo $outra
+     * @return bool
+     */
+    public function gt(DataTempo $outra): bool {
+        return $outra->getData() > $this->getData() || $outra->getData() == $this->getData() && $outra->getTempo() > $this->getTempo();
+    }
+
+    /** Operador de comparação >=
+     * @param DataTempo $outra
+     * @return bool
+     */
+    public function gte(DataTempo $outra): bool {
+        return $this->gt($outra) || $this->eq($outra);
+    }
+
+    /** Operador de comparação <
+     * @param DataTempo $outra
+     * @return bool
+     */
+    public function st(DataTempo $outra): bool {
+        return $outra->getData() < $this->getData() || $outra->getData() == $this->getData() && $outra->getTempo() < $this->getTempo();
+    }
+
+    /** Operador de comparação <=
+     * @param DataTempo $outra
+     * @return bool
+     */
+    public function ste(DataTempo $outra): bool {
+        return $this->st($outra) || $this->eq($outra);
+    }
+
+    /** Operador de igualdade ==
+     * @param DataTempo $outra
+     * @return bool
+     */
+    public function eq(Data $outra): bool {
+        return $outra->getData() == $this->getData() && $outra->getTempo() == $this->getTempo();
+    }
+
+    /** Conversão em string
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return "{$this->getData()} {$this->getTempo()}";
+    }
+
+    /** Função de formatação
+     * @param string $format
+     * @return string
+     */
+    public function format(string $format): string {
+        return $this->toDateTime()->format($format);
     }
 }
 ?>

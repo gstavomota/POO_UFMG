@@ -247,6 +247,14 @@ class Tempo {
     public function comData(Data $data): DataTempo {
         return new DataTempo($data, $this);
     }
+
+    /** Retorna agora como um Tempo
+     * @return Tempo
+     * @throws Exception
+     */
+    public static function agora(): Tempo {
+        return DataTempo::agora()->getTempo();
+    }
 }
 
 /** Um Enum com os dias da semana. Ele possui a trait EnumToArray pra ter acesso a metodos estaticos uteis.
@@ -424,6 +432,14 @@ class Data {
     public function comTempo(Tempo $tempo): DataTempo {
         return new DataTempo($this, $tempo);
     }
+
+    /** Retorna hoje como uma Data
+     * @return Data
+     * @throws Exception
+     */
+    public static function hoje(): Data {
+        return DataTempo::agora()->getData();
+    }
 }
 
 
@@ -559,6 +575,15 @@ class DataTempo {
      */
     public function format(string $format): string {
         return $this->toDateTime()->format($format);
+    }
+
+
+    /** Retorna agora como um DataTempo
+     * @return DataTempo
+     * @throws Exception
+     */
+    public static function agora(): DataTempo {
+        return DataTempo::fromDateTime(new DateTime());
     }
 }
 ?>

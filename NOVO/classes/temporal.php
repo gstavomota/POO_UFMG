@@ -493,7 +493,7 @@ class DataTempo {
      * @return bool
      */
     public function gt(DataTempo $outra): bool {
-        return $outra->getData() > $this->getData() || $outra->getData() == $this->getData() && $outra->getTempo() > $this->getTempo();
+        return $outra->getData()->gt($this->getData()) || $outra->getData()->eq($this->getData()) && $outra->getTempo()->gt($this->getTempo());
     }
 
     /** Operador de comparação >=
@@ -509,7 +509,7 @@ class DataTempo {
      * @return bool
      */
     public function st(DataTempo $outra): bool {
-        return $outra->getData() < $this->getData() || $outra->getData() == $this->getData() && $outra->getTempo() < $this->getTempo();
+        return $outra->getData()->st($this->getData()) || $outra->getData()->eq($this->getData()) && $outra->getTempo()->st($this->getTempo());
     }
 
     /** Operador de comparação <=
@@ -525,7 +525,7 @@ class DataTempo {
      * @return bool
      */
     public function eq(Data $outra): bool {
-        return $outra->getData() == $this->getData() && $outra->getTempo() == $this->getTempo();
+        return $outra->getData()->eq($this->getData()) && $outra->getTempo()->eq($this->getTempo());
     }
 
     /** Conversão em string

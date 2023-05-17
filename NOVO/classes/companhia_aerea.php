@@ -170,8 +170,7 @@ class CompanhiaAerea extends Persist {
     }
     function _encontrar_melhor_voo($cliente_vip, $data, $aeroporto_de_saida, $aeroporto_de_chegada, $franquias) {
         $voos_sem_conexao = $this->_encontrar_voos_sem_conexao($data, $aeroporto_de_saida, $aeroporto_de_chegada);
-        $infinity = 1 / 0;
-        $melhor_tarifa = $infinity;
+        $melhor_tarifa = INF;
     
         if (count($voos_sem_conexao) != 0) {
             $melhor_voo = null;
@@ -189,9 +188,8 @@ class CompanhiaAerea extends Persist {
     
             return [$melhor_voo->codigo];
         }
-    
-        $infinity = 1 / 0;
-        $melhor_tarifa = $infinity;
+
+        $melhor_tarifa = INF;
         $pares_de_voos = $this->_encontrar_voos_com_conexao($data, $aeroporto_de_saida, $aeroporto_de_chegada);
     
         if (count($pares_de_voos) == 0) {

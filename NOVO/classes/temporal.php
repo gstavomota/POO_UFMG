@@ -240,4 +240,164 @@ class Tempo {
         return "{$this->getHora()}h{$this->getMinuto()}m{$this->getSegundo()}s";
     }
 }
+enum DiaDaSemana: string {
+    use EnumToArray;
+    case DOMINGO = "domingo";
+    case SEGUNDA = "segunda";
+    case TERCA = "terca";
+    case QUARTA = "quarta";
+    case QUINTA = "quinta";
+    case SEXTA = "sexta";
+    case SABADO = "sabado";
+}
+class Data {
+    private int $ano;
+    private int $mes;
+    private int $dia;
+
+    /**
+     * @throws Exception se a data for invalida
+     */
+    public function __construct(int $ano, int $mes, int $dia)
+    {
+        [$ano, $mes, $dia] = Data::validateData($ano, $mes, $dia);
+        $this->ano = $ano;
+        $this->mes = $mes;
+        $this->dia = $dia;
+    }
+
+    /** Valida uma data
+     * @throws Exception se a data for invalida
+     */
+    private static function validateData(int $ano, int $mes, int $dia) {
+        if (!checkdate($mes, $dia, $ano)) {
+            throw new Exception("Data invalida");
+        }
+        return [$ano, $mes, $dia];
+    }
+
+    /**
+     * @return int
+     */
+    public function getAno(): int
+    {
+        return $this->ano;
+    }
+    /**
+     * @return int
+     */
+    public function getMes(): int
+    {
+        return $this->mes;
+    }
+    /**
+     * @return int
+     */
+    public function getDia(): int
+    {
+        return $this->dia;
+    }
+
+    public function toDateTime(): DateTime {
+        $dateTime = new DateTime();
+        $dateTime->setDate($this->getAno(), $this->getMes(), $this->getDia());
+        return $dateTime;
+    }
+
+    /**
+     * @throws Exception se a data for invalida
+     */
+    public static function fromDateTime(DateTime $dateTime): Data {
+        $ano = (int) $dateTime->format('Y'); // Extract the year as an integer
+        $mes = (int) $dateTime->format('m'); // Extract the month as an integer
+        $dia = (int) $dateTime->format('d'); // Extract the day as an integer
+        return new Data($ano, $mes, $dia);
+    }
+
+    private static array $dayOfWeekToDiaDaSemana = [
+        "Sunday" => DiaDaSemana::DOMINGO,
+        "Monday" => DiaDaSemana::SEGUNDA,
+        "Tuesday" => DiaDaSemana::TERCA,
+        "Wednesday" => DiaDaSemana::QUARTA,
+        "Thursday" => DiaDaSemana::QUINTA,
+        "Friday" => DiaDaSemana::SEXTA,
+        "Saturday" => DiaDaSemana::SABADO,
+    ];
+
+    public function getDiaDaSemana(): DiaDaSemana {
+        $dateTime = $this->toDateTime();
+        $dayOfWeek = $dateTime->format('l');
+        return Data::$dayOfWeekToDiaDaSemana[$dayOfWeek];
+    }
+
+    /** Retorna a soma da Duracao provido com $this
+     * @param Duracao $outra
+     * @return Data
+     * @throws Exception se a data for invalida
+     */
+    public function add(Duracao $outra): Data {
+        $dateTime = $this->toDateTime();
+        $dateTime->modify("+{$outra->getDia()} days");
+        return Data::fromDateTime($dateTime);
+    }
+
+    /** Retorna a subtracao da Duracao provido com $this
+     * @param Duracao $outra
+     * @return Data
+     * @throws Exception se a data for invalida
+     */
+    public function sub(Duracao $outra): Data {
+        $dateTime = $this->toDateTime();
+        $dateTime->modify("-{$outra->getDia()} days");
+        return Data::fromDateTime($dateTime);
+    }
+
+    /** Operador de comparação >
+     * @param Data $outra
+     * @return bool
+     */
+    public function gt(Data $outra): bool {
+        return $outra->getAno() > $this->getAno() || $outra->getAno() == $this->getAno() && $outra->getMes() > $this->getMes() || $outra->getAno() == $this->getAno() && $outra->getMes() == $this->getMes() && $outra->getDia() > $this->getDia();
+    }
+
+    /** Operador de comparação >=
+     * @param Data $outra
+     * @return bool
+     */
+    public function gte(Data $outra): bool {
+        return $this->gt($outra) || $this->eq($outra);
+    }
+
+    /** Operador de comparação <
+     * @param Data $outra
+     * @return bool
+     */
+    public function st(Data $outra): bool {
+        return $outra->getAno() < $this->getAno() || $outra->getAno() == $this->getAno() && $outra->getMes() < $this->getMes() || $outra->getAno() == $this->getAno() && $outra->getMes() == $this->getMes() && $outra->getDia() < $this->getDia();
+    }
+
+    /** Operador de comparação <=
+     * @param Data $outra
+     * @return bool
+     */
+    public function ste(Data $outra): bool {
+        return $this->st($outra) || $this->eq($outra);
+    }
+
+    /** Operador de igualdade ==
+     * @param Data $outra
+     * @return bool
+     */
+    public function eq(Data $outra): bool {
+        return $outra->getAno() == $this->getAno() && $outra->getMes() == $this->getMes() && $outra->getDia() == $this->getDia();
+    }
+
+    /** Conversão em string
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return "{$this->getDia()}/{$this->getMes()}/{$this->getAno()}";
+    }
+}
 ?>

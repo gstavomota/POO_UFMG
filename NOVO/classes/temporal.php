@@ -304,6 +304,14 @@ class Tempo {
     public static function agora(): Tempo {
         return DataTempo::agora()->getTempo();
     }
+
+   /** Diferença entre dois tempos
+     * @param Tempo $outra
+     * @return Duracao
+     */
+    public function dt(Tempo $outra): Duracao {
+        throw Exception("Unimplemented");
+    }
 }
 
 /** Um Enum com os dias da semana. Ele possui a trait EnumToArray pra ter acesso a metodos estaticos uteis.
@@ -489,6 +497,14 @@ class Data {
     public static function hoje(): Data {
         return DataTempo::agora()->getData();
     }
+
+   /** Diferença entre duas datas
+     * @param Data $outra
+     * @return Duracao
+     */
+    public function dt(Data $outra): Duracao {
+        throw Exception("Unimplemented");
+    }
 }
 
 
@@ -633,6 +649,14 @@ class DataTempo {
      */
     public static function agora(): DataTempo {
         return DataTempo::fromDateTime(new DateTime());
+    }
+
+    /** Diferença entre dois datatempos
+     * @param DataTempo $outra
+     * @return Duracao
+     */
+    public function dt(DataTempo $outra): Duracao {
+        throw Exception("Unimplemented");
     }
 }
 ?>

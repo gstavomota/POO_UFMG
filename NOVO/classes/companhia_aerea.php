@@ -106,7 +106,7 @@ class CompanhiaAerea extends Persist {
 
             $registro_passagem = $assento->passagem;
             $passagem = $this->passagens[$registro_passagem];
-            $passagem->acionar_evento(StatusDaPassagem::Evento_CONCLUIR);
+            $passagem->acionar_evento(Evento::CONCLUIR);
         }
     }
 
@@ -256,7 +256,7 @@ class CompanhiaAerea extends Persist {
     
         $passagem = $this->passagens[$passagem];
     
-        if (!$passagem->acionar_evento(StatusDaPassagem::Evento_CANCELAR)) {
+        if (!$passagem->acionar_evento(Evento::CANCELAR)) {
             throw new Exception("A passagem não pode ser cancelada agora");
         }
     
@@ -317,7 +317,7 @@ class CompanhiaAerea extends Persist {
     
             foreach ($args as $registro_passagem) {
                 $passagem = $this->passagens[$registro_passagem];
-                $passagem->acionar_evento(StatusDaPassagem::Evento_ABRIR_CHECK_IN);
+                $passagem->acionar_evento(Evento::ABRIR_CHECK_IN);
             }
     
             return;
@@ -325,7 +325,7 @@ class CompanhiaAerea extends Persist {
     
         foreach ($this->passagens as $passagem) {
             if ($passagem->data->diff(Data::now())->days < 2) 
-                $passagem->acionar_evento(StatusDaPassagem::Evento_ABRIR_CHECK_IN);
+                $passagem->acionar_evento(Evento::ABRIR_CHECK_IN);
         }
     }
     
@@ -336,9 +336,9 @@ class CompanhiaAerea extends Persist {
         $passagem = $this->passagens[$passagem];
     
         if ($passagem->data->diff(Data::now())->days < 2) 
-            $passagem->acionar_evento(StatusDaPassagem::Evento_ABRIR_CHECK_IN);
+            $passagem->acionar_evento(Evento::ABRIR_CHECK_IN);
     
-        if (!$passagem->acionar_evento(StatusDaPassagem::Evento_FAZER_CHECK_IN)) 
+        if (!$passagem->acionar_evento(Evento::FAZER_CHECK_IN))
             throw new Exception("Não é possível fazer check-in agora");
     }
     function comprar_passagem($id_cliente, $data, $aeroporto_de_saida, $aeroporto_de_chegada, $franquias, $assento = null) {

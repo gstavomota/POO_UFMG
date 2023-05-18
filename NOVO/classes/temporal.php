@@ -734,4 +734,121 @@ class DataTempo {
         return Duracao::fromDateInterval($dateInterval);
     }
 }
+
+/** Uma classe que representa um intervalo de tempo com inicio e fim.
+ *
+ */
+class IntervaloDeTempo {
+    private DataTempo $inicio;
+    private DataTempo $fim;
+    public function __construct(DataTempo $inicio, DataTempo $fim)
+    {
+        [$inicio, $fim] = IntervaloDeTempo::validaIntervalo($inicio, $fim);
+        $this->inicio = $inicio;
+        $this->fim = $fim;
+    }
+
+    /** Valida um intervalo. Checa se o inicio <= fim
+     * @param DataTempo $inicio
+     * @param DataTempo $fim
+     * @return DataTempo[]
+     * @throws Exception se o inicio for após o fim
+     */
+    private static function validaIntervalo(DataTempo $inicio, DataTempo $fim): array {
+        if ($inicio->gt($fim)) {
+            throw new Exception("O inicio é depois do fim");
+        }
+        return [$inicio, $fim];
+    }
+
+    /** Retorna o inicio do intervalo
+     * @return DataTempo
+     */
+    public function getInicio(): DataTempo
+    {
+        return $this->inicio;
+    }
+
+    /** Retorna o fim do intervalo
+     * @return DataTempo
+     */
+    public function getFim(): DataTempo
+    {
+        return $this->fim;
+    }
+
+    /** Retorna a soma da Duracao provido com $this
+     * @param Duracao $outra
+     * @return IntervaloDeTempo
+     * @throws Exception se a data for invalida
+     */
+    public function add(Duracao $outra): IntervaloDeTempo {
+        return new IntervaloDeTempo($this->inicio->add($outra), $this->fim->add($outra));
+    }
+
+    /** Retorna a subtracao da Duracao provido com $this
+     * @param Duracao $outra
+     * @return IntervaloDeTempo
+     * @throws Exception se a data for invalida
+     */
+    public function sub(Duracao $outra): IntervaloDeTempo {
+        return new IntervaloDeTempo($this->inicio->sub($outra), $this->fim->sub($outra));
+    }
+
+    /** Operador de comparação >
+     * @param IntervaloDeTempo $outra
+     * @return bool
+     */
+    public function gt(IntervaloDeTempo $outra): bool {
+        return $outra->inicio->gt($this->fim);
+    }
+
+    /** Operador de comparação >=
+     * @param IntervaloDeTempo $outra
+     * @return bool
+     */
+    public function gte(IntervaloDeTempo $outra): bool {
+        return $this->gt($outra) || $this->eq($outra);
+    }
+
+    /** Operador de comparação <
+     * @param IntervaloDeTempo $outra
+     * @return bool
+     */
+    public function st(IntervaloDeTempo $outra): bool {
+        return $outra->fim->st($this->inicio);
+    }
+
+    /** Operador de comparação <=
+     * @param IntervaloDeTempo $outra
+     * @return bool
+     */
+    public function ste(IntervaloDeTempo $outra): bool {
+        return $this->st($outra) || $this->eq($outra);
+    }
+
+    /** Operador de igualdade ==
+     * @param IntervaloDeTempo $outra
+     * @return bool
+     */
+    public function eq(IntervaloDeTempo $outra): bool {
+        return $outra->inicio->eq($this->inicio) && $outra->fim->eq($this->fim);
+    }
+
+    /** Conversão em string
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return "{$this->inicio} até {$this->fim}";
+    }
+
+    /** Retorna true se outra está contida em this
+     * @param DataTempo $outra
+     * @return bool
+     */
+    public function contem(DataTempo $outra): bool {
+        return $this->inicio->gte($outra) && $this->fim->ste($outra);
+    }
+}
 ?>

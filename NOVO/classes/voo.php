@@ -11,7 +11,7 @@ require_once "temporal.php";
 class Voo
 {
     private CodigoVoo $codigo;
-    private Companhia $companhia_aerea;
+    private CompanhiaAerea $companhia_aerea;
     private Aeroporto $aeroporto_de_saida;
     private Aeroporto $aeroporto_de_chegada;
     private Data $hora_de_partida;
@@ -24,7 +24,7 @@ class Voo
 
     public function __construct(
         CodigoVoo $codigo,
-        Companhia $companhia_aerea,
+        CompanhiaAerea $companhia_aerea,
         Aeroporto $aeroporto_de_saida,
         Aeroporto $aeroporto_de_chegada,
         Data $hora_de_partida,

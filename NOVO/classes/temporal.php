@@ -5,21 +5,39 @@
 class Duracao {
     private float $segundo;
     private int $dia;
+    private bool $negativo;
     public function __construct(float $dia, float $segundo)
     {
         $segundosNoDia = 60*60*24;
         $segundos = $segundo + $segundosNoDia * $dia;
+        $negativo = $segundos < 0 ? true : false;
+        $segundos = abs($segundos);
         $this->segundo = $segundo % $segundosNoDia;
         $this->dia = floor($segundos / $segundosNoDia);
+        $this->negativo = $negativo;
     }
 
+    /** Retorna o valor em segundos
+     * @return int
+     */
+    private function emSegundos(): float {
+        $segundosNoDia = 60*60*24;
+        return $this->getSinal() * ($this->dia*$segundosNoDia + $this->segundo);
+    }
+
+    /** Retorna o sinal (-1 ou 1)
+     * @return int
+     */
+    public function getSinal(): int {
+        return $this->negativo ? -1 : 1;
+    }
 
     /** Retorna o numero de segundos
      * @return float
      */
     public function getSegundo(): float
     {
-        return $this->segundo;
+        return $this->segundo * $this->getSinal();
     }
 
     /** Retorna o numero de dias
@@ -27,7 +45,7 @@ class Duracao {
      */
     public function getDia(): int
     {
-        return $this->dia;
+        return $this->dia * $this->getSinal();
     }
 
     /** Retorna a soma da Duracao provida com $this
@@ -35,7 +53,7 @@ class Duracao {
      * @return Duracao
      */
     public function add(Duracao $outra): Duracao {
-        return new Duracao($this->dia+$outra->dia, $this->segundo+$outra->segundo);
+        return new Duracao(0, $this->emSegundos() + $outra->emSegundos());
     }
 
     /** Retorna a subtracao da Duracao provida com $this
@@ -43,7 +61,7 @@ class Duracao {
      * @return Duracao
      */
     public function sub(Duracao $outra): Duracao {
-        return new Duracao($this->dia-$outra->dia, $this->segundo-$outra->segundo);
+        return new Duracao(0, $this->emSegundos() - $outra->emSegundos());
     }
 
     /** Retorna a multiplicacao de $this pelo numero provido
@@ -51,7 +69,7 @@ class Duracao {
      * @return Duracao
      */
     public function mul(float $num): Duracao {
-        return new Duracao($this->dia*$num, $this->segundo*$num);
+        return new Duracao(0, $this->emSegundos() * $num);
     }
 
     /** Retorna a divisao de $this pelo numero provido
@@ -59,7 +77,7 @@ class Duracao {
      * @return Duracao
      */
     public function div(float $num): Duracao {
-        return new Duracao($this->dia/$num, $this->segundo/$num,);
+        return new Duracao(0, $this->emSegundos() / $num);
     }
 
     /** Operador de comparação >
@@ -67,7 +85,7 @@ class Duracao {
      * @return bool
      */
     public function gt(Duracao $outra): bool {
-        return $outra->dia > $this->dia || $outra->dia == $this->dia && $outra->segundo > $this->segundo;
+        return $this->emSegundos() > $outra->emSegundos();
     }
 
     /** Operador de comparação >=
@@ -83,7 +101,7 @@ class Duracao {
      * @return bool
      */
     public function st(Duracao $outra): bool {
-        return $outra->dia < $this->dia || $outra->dia == $this->dia && $outra->segundo < $this->segundo;
+        return $this->emSegundos() < $outra->emSegundos();
     }
 
     /** Operador de comparação <=
@@ -99,7 +117,7 @@ class Duracao {
      * @return bool
      */
     public function eq(Duracao $outra): bool {
-        return $outra->dia == $this->dia && $outra->segundo == $this->segundo;
+        return $outra->dia == $this->dia && $outra->segundo == $this->segundo && $outra->negativo == $this->negativo;
     }
 
     /** Conversão em string
@@ -107,7 +125,8 @@ class Duracao {
      */
     public function __toString(): string
     {
-        return "{$this->dia}d{$this->segundo}s";
+        $sinal = $this->negativo ? "-" : "+";
+        return "{$sinal}{$this->dia}d{$this->segundo}s";
     }
 
     /** Um mes de 31 dias em Duracao
@@ -159,11 +178,19 @@ class Duracao {
         $segundosEmUmaHora = $segundosEmUmMinuto*60;
         $microssegundosEmUmSegundo = 1000000;
 
+        $sinal = $dateInterval->invert == 0 ? 1 : -1;
         $dias = abs($dateInterval->days);
         $segundos = $dateInterval->s + $dateInterval->i * $segundosEmUmMinuto + $dateInterval->h * $segundosEmUmaHora;
         $microssegundos = $dateInterval->f * $microssegundosEmUmSegundo;
         $segundos += $microssegundos / $microssegundosEmUmSegundo;
-        return new Duracao($dias, $segundos);
+        return new Duracao($dias*$sinal, $segundos * $sinal);
+    }
+
+    /** Retorna o valor absoluto dessa Duracao
+     * @return Duracao
+     */
+    public function abs(): Duracao {
+        return new Duracao(0, abs($this->emSegundos()));
     }
 }
 
@@ -227,7 +254,10 @@ class Tempo {
      * @throws Exception when hora is more than 24
      */
     public function add(Duracao $outra): Tempo {
-        return new Tempo($this->hora + $outra->getDia()*24, $this->minuto, $this->segundo+$outra->getSegundo());
+        if ($outra->getSinal() == 1) {
+            return new Tempo($this->hora + $outra->getDia()*24, $this->minuto, $this->segundo+$outra->getSegundo());
+        }
+        return $this->sub($outra->abs());
     }
 
     /** Retorna a subtracao da Duracao provido com $this
@@ -236,7 +266,10 @@ class Tempo {
      * @throws Exception when hora is more than 24
      */
     public function sub(Duracao $outra): Tempo {
-        return new Tempo($this->hora - $outra->getDia()*24, $this->minuto, $this->segundo-$outra->getSegundo());
+        if ($outra->getSinal() == 1) {
+            return new Tempo($this->hora - $outra->getDia()*24, $this->minuto, $this->segundo-$outra->getSegundo());
+        }
+        return $this->add($outra->abs());
     }
 
     /** Retorna a multiplicacao de $this pelo numero provido
@@ -445,9 +478,12 @@ class Data {
      * @throws Exception se a data for invalida
      */
     public function add(Duracao $outra): Data {
-        $dateTime = $this->toDateTime();
-        $dateTime->modify("+{$outra->getDia()} days");
-        return Data::fromDateTime($dateTime);
+        if ($outra->getSinal() == 1) {
+            $dateTime = $this->toDateTime();
+            $dateTime->modify("+{$outra->getDia()} days");
+            return Data::fromDateTime($dateTime);
+        }
+        return $this->sub($outra->abs());
     }
 
     /** Retorna a subtracao da Duracao provido com $this
@@ -456,9 +492,12 @@ class Data {
      * @throws Exception se a data for invalida
      */
     public function sub(Duracao $outra): Data {
-        $dateTime = $this->toDateTime();
-        $dateTime->modify("-{$outra->getDia()} days");
-        return Data::fromDateTime($dateTime);
+        if ($outra->getSinal() == 1) {
+            $dateTime = $this->toDateTime();
+            $dateTime->modify("-{$outra->getDia()} days");
+            return Data::fromDateTime($dateTime);
+        }
+        return $this->add($outra->abs());
     }
 
     /** Operador de comparação >
@@ -597,10 +636,13 @@ class DataTempo {
      * @throws Exception se a data for invalida
      */
     public function add(Duracao $outra): DataTempo {
-        $dateTime = $this->toDateTime();
-        $dateTime->modify("+{$outra->getDia()} days");
-        $dateTime->modify("+{$outra->getSegundo()} seconds");
-        return DataTempo::fromDateTime($dateTime);
+        if ($outra->getSinal() == 1) {
+            $dateTime = $this->toDateTime();
+            $dateTime->modify("+{$outra->getDia()} days");
+            $dateTime->modify("+{$outra->getSegundo()} seconds");
+            return DataTempo::fromDateTime($dateTime);
+        }
+        return $this->sub($outra->abs());
     }
 
     /** Retorna a subtracao da Duracao provido com $this
@@ -609,10 +651,13 @@ class DataTempo {
      * @throws Exception se a data for invalida
      */
     public function sub(Duracao $outra): DataTempo {
-        $dateTime = $this->toDateTime();
-        $dateTime->modify("-{$outra->getDia()} days");
-        $dateTime->modify("-{$outra->getSegundo()} seconds");
-        return DataTempo::fromDateTime($dateTime);
+        if ($outra->getSinal() == 1) {
+            $dateTime = $this->toDateTime();
+            $dateTime->modify("-{$outra->getDia()} days");
+            $dateTime->modify("-{$outra->getSegundo()} seconds");
+            return DataTempo::fromDateTime($dateTime);
+        }
+        return $this->add($outra->abs());
     }
 
     /** Operador de comparação >

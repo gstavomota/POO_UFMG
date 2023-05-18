@@ -1,4 +1,3 @@
-
 <?php
 
 require_once "aeroporto.php";
@@ -9,20 +8,33 @@ require_once "franquia_de_bagagem.php";
 require_once "identificadores.php";
 require_once "temporal.php";
 
-class Voo {
-    private $codigo;
-    private $companhia_aerea;
-    private $aeroporto_de_saida;
-    private $aeroporto_de_chegada;
-    private $hora_de_partida;
-    private $duracao_estimada;
-    private $dias_da_semana;
-    private $aeronave_padrao;
-    private $capacidade_passageiros;
-    private $capacidade_carga;
-    private $tarifa;
+class Voo
+{
+    private CodigoVoo $codigo;
+    private Companhia $companhia_aerea;
+    private Aeroporto $aeroporto_de_saida;
+    private Aeroporto $aeroporto_de_chegada;
+    private Data $hora_de_partida;
+    private Duracao $duracao_estimada;
+    private DiaDaSemana $dias_da_semana;
+    private Aeronave $aeronave_padrao;
+    private int $capacidade_passageiros;
+    private float $capacidade_carga;
+    private float $tarifa;
 
-    public function __construct($codigo, $companhia_aerea, $aeroporto_de_saida, $aeroporto_de_chegada, $hora_de_partida, $duracao_estimada, $dias_da_semana, $aeronave_padrao, $capacidade_passageiros, $capacidade_carga, $tarifa) {
+    public function __construct(
+        CodigoVoo $codigo,
+        Companhia $companhia_aerea,
+        Aeroporto $aeroporto_de_saida,
+        Aeroporto $aeroporto_de_chegada,
+        Data $hora_de_partida,
+        Duracao $duracao_estimada,
+        DiaDaSemana $dias_da_semana,
+        Aeronave $aeronave_padrao,
+        int $capacidade_passageiros,
+        float $capacidade_carga,
+        float $tarifa
+    ) {
         $this->codigo = $codigo;
         $this->companhia_aerea = $companhia_aerea;
         $this->aeroporto_de_saida = $aeroporto_de_saida;
@@ -36,11 +48,13 @@ class Voo {
         $this->tarifa = $tarifa;
     }
 
-    public function calcula_tarifa($cliente_vip, $franquias, $tarifa_franquia) {
+    public function calcula_tarifa($cliente_vip, $franquias, $tarifa_franquia)
+    {
         return calculo_tarifa_strategy_for($cliente_vip, $this->tarifa, $tarifa_franquia)->calcula($franquias);
     }
 
-    public function construir_assentos() {
+    public function construir_assentos()
+    {
         $gerador = new GeradorDeCodigoDoAssento($this->capacidade_passageiros, 0.0);
         $assentos = $gerador->gerar_todos();
         $dict_assentos = array();
@@ -48,6 +62,52 @@ class Voo {
             $dict_assentos[$codigo_assento] = new Assento($codigo_assento);
         }
         return $dict_assentos;
+    }
+
+    public function getCodigo(): CodigoVoo
+    {
+        return $this->codigo;
+    }
+
+    public function getCompanhiaAerea(): CompanhiaAerea
+    {
+        return $this->companhia_aerea;
+    }
+    public function getAeroportoSaida(): Aeroporto
+    {
+        return $this->aeroporto_de_saida;
+    }
+    public function getAeroportoChegada(): Aeroporto
+    {
+        return $this->aeroporto_de_chegada;
+    }
+    public function getHoraDePartida(): Data
+    {
+        return $this->hora_de_partida;
+    }
+    public function getDuracaoEstimada(): Duracao
+    {
+        return $this->duracao_estimada;
+    }
+    public function getDiasDaSemana(): DiaDaSemana
+    {
+        return $this->dias_da_semana;
+    }
+    public function getAeronavePadrao(): Aeronave
+    {
+        return $this->aeronave_padrao;
+    }
+    public function getCapacidadeDePassageiros(): int
+    {
+        return $this->capacidade_passageiros;
+    }
+    public function getCapacidadeCarga(): float
+    {
+        return $this->capacidade_carga;
+    }
+    public function getTarifa(): float
+    {
+        return $this->tarifa;
     }
 }
 ?>

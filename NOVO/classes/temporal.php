@@ -733,6 +733,15 @@ class DataTempo {
         $dateInterval = $this->toDateTime()->diff($outra->toDateTime());
         return Duracao::fromDateInterval($dateInterval);
     }
+
+    /** Retorna o intervalo de tempo de this até outra
+     * @param DataTempo $outra
+     * @return IntervaloDeTempo
+     * @throws Exception se o inicio for após o fim
+     */
+    public function ate(DataTempo $outra): IntervaloDeTempo {
+        return new IntervaloDeTempo($this, $outra);
+    }
 }
 
 /** Uma classe que representa um intervalo de tempo com inicio e fim.
@@ -741,6 +750,10 @@ class DataTempo {
 class IntervaloDeTempo {
     private DataTempo $inicio;
     private DataTempo $fim;
+
+    /**
+     * @throws Exception se o inicio for após o fim
+     */
     public function __construct(DataTempo $inicio, DataTempo $fim)
     {
         [$inicio, $fim] = IntervaloDeTempo::validaIntervalo($inicio, $fim);

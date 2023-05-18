@@ -326,7 +326,12 @@ class Tempo {
      * @return Duracao
      */
     public function dt(Tempo $outra): Duracao {
-        throw Exception("Unimplemented");
+        $segundosNumMinuto = 60;
+        $segundosNumaHora = $segundosNumMinuto*60;
+
+        $thisEmSegundos = $segundosNumaHora*$this->hora+$segundosNumMinuto*$this->minuto+$this->segundo;
+        $outraEmSegundos = $segundosNumaHora*$outra->hora+$segundosNumMinuto*$outra->minuto+$outra->segundo;
+        return (new Duracao(0, $thisEmSegundos))->sub(new Duracao(0, $outraEmSegundos));
     }
 
     /** Meia noite em Tempo
@@ -526,7 +531,8 @@ class Data {
      * @return Duracao
      */
     public function dt(Data $outra): Duracao {
-        throw Exception("Unimplemented");
+        $meiaNoite = Tempo::meiaNoite();
+        return $this->comTempo($meiaNoite)->dt($outra->comTempo($meiaNoite));
     }
 }
 
@@ -679,7 +685,8 @@ class DataTempo {
      * @return Duracao
      */
     public function dt(DataTempo $outra): Duracao {
-        throw Exception("Unimplemented");
+        $dateInterval = $this->toDateTime()->diff($outra->toDateTime());
+        return Duracao::fromDateInterval($dateInterval);
     }
 }
 ?>

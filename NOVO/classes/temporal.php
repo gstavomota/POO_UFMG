@@ -328,6 +328,13 @@ class Tempo {
     public function dt(Tempo $outra): Duracao {
         throw Exception("Unimplemented");
     }
+
+    /** Meia noite em Tempo
+     * @return Tempo
+     */
+    public static function meiaNoite(): Tempo {
+        return new Tempo(0,0,0);
+    }
 }
 
 /** Um Enum com os dias da semana. Ele possui a trait EnumToArray pra ter acesso a metodos estaticos uteis.

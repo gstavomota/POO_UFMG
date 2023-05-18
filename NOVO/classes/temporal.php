@@ -149,6 +149,22 @@ class Duracao {
     {
         return Duracao::umaHora()->add(Duracao::meiaHora());
     }
+
+    /** Construtor a partir de um DateInterval
+     * @param DateInterval $dateInterval
+     * @return Duracao
+     */
+    public static function fromDateInterval(DateInterval $dateInterval): Duracao {
+        $segundosEmUmMinuto = 60;
+        $segundosEmUmaHora = $segundosEmUmMinuto*60;
+        $microssegundosEmUmSegundo = 1000000;
+
+        $dias = abs($dateInterval->days);
+        $segundos = $dateInterval->s + $dateInterval->i * $segundosEmUmMinuto + $dateInterval->h * $segundosEmUmaHora;
+        $microssegundos = $dateInterval->f * $microssegundosEmUmSegundo;
+        $segundos += $microssegundos / $microssegundosEmUmSegundo;
+        return new Duracao($dias, $segundos);
+    }
 }
 
 /** Uma classe normalizada que determina um tempo em um dia.

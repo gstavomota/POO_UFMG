@@ -189,6 +189,32 @@
         }
     }
 
+    class RegistroDeTripulante {
+        private int $idTripulante;
+
+        public function __construct(int $idTripulante) {
+            $this->idTripulante = $idTripulante;
+        }
+
+        public function __toString(): string {
+            return "{$this->idTripulante}";
+        }
+    }
+
+    class GeradorDeRegistroDeTripulante {
+        private int $ultimo_id;
+
+        public function __construct(int $ultimo_id = null){
+            $this->ultimo_id = $ultimo_id ?? - 1;
+        }
+
+        public function gerar(): RegistroDeTripulante {
+            $this->ultimo_id += 1;
+            $id = $this->ultimo_id;
+            return new RegistroDeTripulante($id);
+        }
+    }
+
         class RG {
         public $rg;
 

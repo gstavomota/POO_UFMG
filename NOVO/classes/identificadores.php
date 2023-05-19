@@ -534,13 +534,13 @@ class Endereco {
         string $cidade,
         Estado $estado,
         string $referencia,) {
-        $this->logradouro = $logradouro;
-        $this->numero = $numero;
-        $this->bairro = $bairro;
+        $this->logradouro = Endereco::validaLogradouro($logradouro);
+        $this->numero = Endereco::validaNumero($numero);
+        $this->bairro = Endereco::validaBairro($bairro);
         $this->cep = $cep;
-        $this->cidade = $cidade;
+        $this->cidade = Endereco::validaCidade($cidade);
         $this->estado = $estado;
-        $this->referencia = $referencia;
+        $this->referencia = Endereco::validaReferencia($referencia);
     }
     /** Retorna o logradouro
      * @return string
@@ -589,6 +589,36 @@ class Endereco {
      */
     public function getReferencia(): string {
         return $this->referencia;
+    }
+
+    public function validaLogradouro (string $v): string {
+        if (empty($v)) 
+            throw new Exception('Por favor, insira o logradouro.'); 
+        return $v;
+    }
+
+    public function validaNumero (int $v): int {
+        if (empty($v)) 
+            throw new Exception('Por favor, insira o número da residência.'); 
+        return $v;
+    }
+
+    public function validaBairro (string $v): string {
+        if (empty($v)) 
+            throw new Exception('Por favor, insira o bairro.'); 
+        return $v;
+    }
+
+    public function validaCidade (string $v): string {
+        if (empty($v)) 
+            throw new Exception('Por favor, insira a cidade.'); 
+        return $v;
+    }
+
+    public function validaReferencia (string $v): string {
+        if (empty($v)) 
+            throw new Exception('Por favor, insira uma referência.'); 
+        return $v;
     }
 }
                     

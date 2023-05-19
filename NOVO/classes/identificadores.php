@@ -468,6 +468,129 @@
         }
     }
 
+/** Um CEP normalizado e validado.
+ *
+ */
+    class CEP {
+        private string $cep;
+
+        /** Constroi um CEP
+         * @param string $cep
+         * @throws InvalidArgumentException se o CEP não conter 8 digitos
+         */
+        public function __construct(string $cep) {
+            $this->cep = CEP::validaCep($cep);
+        }
+
+        /** Valida um CEP
+         * @param string $cep
+         * @return string
+         * @throws InvalidArgumentException se o CEP não conter 8 digitos
+         */
+        private static function validaCep(string $cep): string {
+            // Remove caracteres não numéricos
+            $cep = preg_replace('/[^0-9]/', '', $cep);
+
+            // Verifica se o CEP possui 8 dígitos
+            if (strlen($cep) !== 8) {
+                throw new InvalidArgumentException('CEP inválido');
+            }
+
+            return $cep;
+        }
+
+        public function __toString(): string
+        {
+            return $this->cep;
+        }
+
+        /** Retorna o cep
+         * @return string
+         */
+        public function getCep(): string
+        {
+            return $this->cep;
+        }
+    }
+
+/** Um endereço normalizado.
+ * TODO: BACKLOG: Integrar api dos correios para validar os dados.
+ *
+ */
+class Endereco {
+    private string $logradouro;
+    private int $numero;
+    private string $bairro;
+    private CEP $cep;
+    private string $cidade;
+    private Estado $estado;
+    private string $referencia;
+
+    public function __construct(
+        string $logradouro,
+        int $numero,
+        string $bairro,
+        CEP $cep,
+        string $cidade,
+        Estado $estado,
+        string $referencia,) {
+        $this->logradouro = $logradouro;
+        $this->numero = $numero;
+        $this->bairro = $bairro;
+        $this->cep = $cep;
+        $this->cidade = $cidade;
+        $this->estado = $estado;
+        $this->referencia = $referencia;
+    }
+    /** Retorna o logradouro
+     * @return string
+     */
+    public function getLogradouro(): string {
+        return $this->logradouro;
+    }
+
+    /** Retorna o numero
+     * @return int
+     */
+    public function getNumero(): int {
+        return $this->numero;
+    }
+
+    /** Retorna o bairro
+     * @return string
+     */
+    public function getBairro(): string {
+        return $this->bairro;
+    }
+
+    /** Retorna o CEP
+     * @return CEP
+     */
+    public function getCep(): CEP {
+        return $this->cep;
+    }
+
+    /** Retorna a cidade
+     * @return string
+     */
+    public function getCidade(): string {
+        return $this->cidade;
+    }
+
+    /** Retorna o estado
+     * @return Estado
+     */
+    public function getEstado(): Estado {
+        return $this->estado;
+    }
+
+    /** Retorna a referencia
+     * @return string
+     */
+    public function getReferencia(): string {
+        return $this->referencia;
+    }
+}
                     
 
 

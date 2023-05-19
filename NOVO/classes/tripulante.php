@@ -12,21 +12,21 @@
     use Email;
 
     class Tripulante {
-        public string $nome;
-        public string $sobrenome;
-        public CPF $cpf;
-        public Nacionalidade $nacionalidade;
-        public DateTime $data_de_nascimento;
-        public Email $email;
-        public string $cht; // criar um identificador para esse documento
-        public string $endereco;
-        public CompanhiaAerea $companhia;
-        public Aeroporto $aeroporto_base;
-        public Cargo $cargo;
-        public string $registro;
+        private string $nome;
+        private string $sobrenome;
+        private CPF $cpf;
+        private Nacionalidade $nacionalidade;
+        private DataTempo $data_de_nascimento;
+        private Email $email;
+        private string $cht; // criar um identificador para esse documento
+        private Endereco $endereco;
+        private CompanhiaAerea $companhia;
+        private SiglaAeroporto $aeroporto_base;
+        private Cargo $cargo;
+        private string $registro;
 
 
-        public function __construct(companhia$nome, $sobrenome, $cpf, $nacionalidade, $data_de_nascimento, $email, $cht, $logradouro, $numero, $bairro, $cep, $cidade, $estado, $companhia, $aeroporto_base,$cargo, $registro) {
+        public function __construct(string $nome, string $sobrenome, CPF $cpf, Nacionalidade $nacionalidade, DataTempo $data_de_nascimento, $email, $cht, Endereco $endereco, $companhia, $aeroporto_base,$cargo, $registro) {
         $this->nome = $nome;
         $this->sobrenome = $sobrenome;
         $this->cpf = $cpf;
@@ -34,7 +34,7 @@
         $this->data_de_nascimento = $data_de_nascimento;
         $this->email = $email;
         $this->cht = $cht;
-        $this->validaEndereco( $logradouro, $numero, $bairro, $cep, $cidade, $estado );       
+        $this->endereco=$endereco;
         $this->companhia = $companhia;
         $this->aeroporto_base = $aeroporto_base;
         $this->cargo = $cargo;
@@ -61,11 +61,11 @@
             return $this->data_de_nascimento; 
         }
 
-        public function getEmail() {
+        public function getEmail(): Email {
             return $this->email; 
         }
 
-        public function getCht() {
+        public function getCht(): string {
             return $this->cht; 
         }
 
@@ -105,11 +105,6 @@
             // Verifica se o bairro está vazio
             if (empty($bairro)) {
                 print_r('Por favor, insira o bairro.');
-            }
-        
-            // Verifica se o CEP está vazio ou não possui 8 dígitos
-            if (empty($cep) || strlen($cep) != 8) {
-                print_r('Por favor, insira um cep válido.');
             }
         
             // Verifica se a cidade está vazia

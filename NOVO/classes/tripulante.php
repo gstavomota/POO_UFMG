@@ -7,7 +7,6 @@
 
     use CPF;
     use Nacionalidade;
-    use DateTime;
     use Cargo;
     use Email;
 
@@ -18,7 +17,7 @@
         private Nacionalidade $nacionalidade;
         private DataTempo $data_de_nascimento;
         private Email $email;
-        private string $cht; // criar um identificador para esse documento
+        private string $cht; // esse documento ainda não possui um identificador
         private Endereco $endereco;
         private CompanhiaAerea $companhia;
         private SiglaAeroporto $aeroporto_base;
@@ -26,7 +25,7 @@
         private string $registro;
 
 
-        public function __construct(string $nome, string $sobrenome, CPF $cpf, Nacionalidade $nacionalidade, DataTempo $data_de_nascimento, $email, $cht, Endereco $endereco, $companhia, $aeroporto_base,$cargo, $registro) {
+        public function __construct(string $nome, string $sobrenome, CPF $cpf, Nacionalidade $nacionalidade, DataTempo $data_de_nascimento, Email $email, string $cht, Endereco $endereco, CompanhiaAerea $companhia, SiglaAeroporto $aeroporto_base,$cargo, string $registro) {
         $this->nome = $nome;
         $this->sobrenome = $sobrenome;
         $this->cpf = $cpf;
@@ -41,23 +40,23 @@
         $this->registro = $registro;
         }
 
-        public function getNome() {
+        public function getNome(): string {
             return $this->nome; 
         }
 
-        public function getSobrenome() {
+        public function getSobrenome(): string {
             return $this->sobrenome; 
         }
 
-        public function getCpf() {
+        public function getCpf(): CPF {
             return $this->cpf; 
         }
 
-        public function getNacionalidade() {
+        public function getNacionalidade(): Nacionalidade {
             return $this->nacionalidade; 
         }
 
-        public function getDataDeNascimento() {
+        public function getDataDeNascimento(): DataTempo {
             return $this->data_de_nascimento; 
         }
 
@@ -69,57 +68,26 @@
             return $this->cht; 
         }
 
-        public function getEndereco() {
+        public function getEndereco(): Endereco {
             return $this->endereco; 
         }
 
-        public function getCompanhia() {
+        public function getCompanhia(): CompanhiaAerea {
             return $this->companhia; 
         }
 
-        public function getAeroportoBase() {
+        public function getAeroportoBase(): SiglaAeroporto {
             return $this->aeroporto_base; 
         }
 
 
-        public function getCargo() {
+        public function getCargo(): Cargo {
             return $this->cargo; 
         }
 
 
-        public function getRegistro() {
+        public function getRegistro(): string {
             return $this->registro; 
-        }
-
-        public function validaEndereco($logradouro, $numero, $bairro, $cep, $cidade, $estado) {
-            // Verifica se o logradouro está vazio
-            if (empty($logradouro)) {
-                print_r('Por favor, insira o logradouro.');
-            }
-        
-            // Verifica se o número está vazio
-            if (empty($numero)) {
-                print_r('Por favor, insira o número da residência.');
-            }
-        
-            // Verifica se o bairro está vazio
-            if (empty($bairro)) {
-                print_r('Por favor, insira o bairro.');
-            }
-        
-            // Verifica se a cidade está vazia
-            if (empty($cidade)) {
-                print_r('Por favor, insira a cidade.');
-            }
-        
-            // Verifica se o estado está vazio ou não possui 2 caracteres
-            if (empty($estado) || strlen($estado) != 2) {
-                print_r('Por favor, insira a sigla do seu estado.');
-            }
-    
-            $p_endereco = "{$logradouro}, número: {$numero}, {$bairro}, {$cidade}, {$estado}, cep: {$cep}";
-    
-            $this->endereco = $p_endereco;
         }
     }
 

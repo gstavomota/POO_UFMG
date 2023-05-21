@@ -44,7 +44,7 @@
 
         public function setComissarios(array $comissarios){
             if ($this->comissarios != null){
-                throw new Exception("Array comissários não pode ser setado mais de uma vez.")
+                throw new Exception("Array comissários não pode ser setado mais de uma vez.");
             }
 
             $this->comissarios = $comissarios;

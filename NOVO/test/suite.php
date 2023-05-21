@@ -64,66 +64,75 @@ class TestRunner {
 }
 abstract class TestCase {
     private array $checkResults = [];
-    protected function checkGt(Comparable $a, Comparable $b): void
+    protected function checkGt(mixed $a, mixed $b): void
     {
         $symbol = ">";
-        $success = $a->gt($b);
+        $success = null;
+        if ($a instanceof Comparable && $b instanceof Comparable) {
+            $success = $a->gt($b);
+        } else {
+            $success = $a > $b;
+        }
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
         $this->checkResults[] = new CheckResult($success, "{$a} {$symbol} {$b}", $line, $file);
     }
-    protected function checkGte(Comparable $a, Comparable $b): void
+    protected function checkGte(mixed $a, mixed $b): void
     {
         $symbol = ">=";
-        $success = $a->gte($b);
+        $success = null;
+        if ($a instanceof Comparable && $b instanceof Comparable) {
+            $success = $a->gte($b);
+        } else {
+            $success = $a >= $b;
+        }
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
         $this->checkResults[] = new CheckResult($success, "{$a} {$symbol} {$b}", $line, $file);
     }
-    protected function checkSt(Comparable $a, Comparable $b): void
+    protected function checkSt(mixed $a, mixed $b): void
     {
         $symbol = "<";
-        $success = $a->st($b);
+        $success = null;
+        if ($a instanceof Comparable && $b instanceof Comparable) {
+            $success = $a->st($b);
+        } else {
+            $success = $a < $b;
+        }
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
         $this->checkResults[] = new CheckResult($success, "{$a} {$symbol} {$b}", $line, $file);
     }
-    protected function checkSte(Comparable $a, Comparable $b): void
+    protected function checkSte(mixed $a, mixed $b): void
     {
         $symbol = "<=";
-        $success = $a->ste($b);
+        $success = null;
+        if ($a instanceof Comparable && $b instanceof Comparable) {
+            $success = $a->ste($b);
+        } else {
+            $success = $a <= $b;
+        }
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
         $this->checkResults[] = new CheckResult($success, "{$a} {$symbol} {$b}", $line, $file);
     }
-    protected function checkEq(Comparable $a, Comparable $b): void
+    protected function checkEq(mixed $a, mixed $b, bool $strict = true): void
     {
-        $symbol = "==";
-        $success = $a->eq($b);
+        $symbol = $strict ? "===" : "==";
+        $success = null;
+        if ($a instanceof Equatable && $b instanceof Equatable) {
+            $success = $a->eq($b);
+        } else {
+            $success = $strict ? $a === $b : $a == $b;
+        }
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
         $this->checkResults[] = new CheckResult($success, "{$a} {$symbol} {$b}", $line, $file);
     }
-    protected function checkNSEq(mixed $a, mixed $b): void
+    protected function checkNeq(mixed $a, mixed $b, bool $strict = true): void
     {
-        $symbol = "~=";
-        $success = $a == $b;
-        [$line, $file] = $this->getLineAndFileForPreviousFunction();
-        $this->checkResults[] = new CheckResult($success, "{$a} {$symbol} {$b}", $line, $file);
-    }
-    protected function checkNSNeq(mixed $a, mixed $b): void
-    {
-        $symbol = "!~=";
-        $success = $a != $b;
-        [$line, $file] = $this->getLineAndFileForPreviousFunction();
-        $this->checkResults[] = new CheckResult($success, "{$a} {$symbol} {$b}", $line, $file);
-    }
-    protected function checkSEq(mixed $a, mixed $b): void
-    {
-        $symbol = "===";
-        $success = $a === $b;
-        [$line, $file] = $this->getLineAndFileForPreviousFunction();
-        $this->checkResults[] = new CheckResult($success, "{$a} {$symbol} {$b}", $line, $file);
-    }
-    protected function checkSNeq(mixed $a, mixed $b): void
-    {
-        $symbol = "!==";
-        $success = $a !== $b;
+        $symbol = $strict ? "!==" : "!=";
+        $success = null;
+        if ($a instanceof Equatable && $b instanceof Equatable) {
+            $success = !$a->eq($b);
+        } else {
+            $success = $strict ? $a !== $b : $a != $b;
+        }
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
         $this->checkResults[] = new CheckResult($success, "{$a} {$symbol} {$b}", $line, $file);
     }

@@ -1,51 +1,8 @@
 <?php
 
 require_once "enum_to_array.php";
-
-/** Uma exception para quando for utilizado o tipo incorreto em uma comparação
- *
- */
-class ComparableTypeException extends Exception {
-    public function __construct(string $message = "Invalid type in Comparission", int $code = 0, ?Throwable $previous = null)
-    {
-        parent::__construct($message, $code, $previous);
-    }
-}
-
-/** Uma interface que descreve classes comparaveis
- * 
- */
-interface Comparable {
-    /** Operador de comparação >
-     * @param Comparable $other
-     * @return bool
-     */
-    public function gt(self $other);
-
-    /** Operador de comparação >=
-     * @param Comparable $other
-     * @return bool
-     */
-    public function gte(self $other);
-
-    /** Operador de comparação <
-     * @param Comparable $other
-     * @return bool
-     */
-    public function st(self $other);
-
-    /** Operador de comparação <=
-     * @param Comparable $other
-     * @return bool
-     */
-    public function ste(self $other);
-
-    /** Operador de igualdade ==
-     * @param Comparable $other
-     * @return bool
-     */
-    public function eq(self $other);
-}
+require_once "Comparable.php";
+require_once "Equatable.php";
 
 /** Uma classe normalizada que determina um intervalo de tempo.
  *
@@ -58,7 +15,7 @@ class Duracao implements Comparable {
     {
         $segundosNoDia = 60*60*24;
         $segundos = $segundo + $segundosNoDia * $dia;
-        $negativo = $segundos < 0 ? true : false;
+        $negativo = $segundos < 0;
         $segundos = abs($segundos);
         $this->segundo = $segundo % $segundosNoDia;
         $this->dia = floor($segundos / $segundosNoDia);
@@ -133,7 +90,7 @@ class Duracao implements Comparable {
      * @return bool
      */
     public function gt(Comparable $outra): bool {
-        if (!$outra instanceof Duracao) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $this->emSegundos() > $outra->emSegundos();
@@ -144,7 +101,7 @@ class Duracao implements Comparable {
      * @return bool
      */
     public function gte(Comparable $outra): bool {
-        if (!$outra instanceof Duracao) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $this->gt($outra) || $this->eq($outra);
@@ -155,7 +112,7 @@ class Duracao implements Comparable {
      * @return bool
      */
     public function st(Comparable $outra): bool {
-        if (!$outra instanceof Duracao) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $this->emSegundos() < $outra->emSegundos();
@@ -166,7 +123,7 @@ class Duracao implements Comparable {
      * @return bool
      */
     public function ste(Comparable $outra): bool {
-        if (!$outra instanceof Duracao) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $this->st($outra) || $this->eq($outra);
@@ -176,9 +133,9 @@ class Duracao implements Comparable {
      * @param Duracao $outra
      * @return bool
      */
-    public function eq(Comparable $outra): bool {
-        if (!$outra instanceof Duracao) {
-            throw new ComparableTypeException();
+    public function eq(Equatable $outra): bool {
+        if (!$outra instanceof self) {
+            throw new EquatableTypeException();
         }
         return $outra->dia == $this->dia && $outra->segundo == $this->segundo && $outra->negativo == $this->negativo;
     }
@@ -358,7 +315,7 @@ class Tempo implements Comparable {
      * @return bool
      */
     public function gt(Comparable $outra): bool {
-        if (!$outra instanceof Tempo) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $outra->hora > $this->hora || $outra->hora == $this->hora && $outra->minuto > $this->minuto || $outra->hora == $this->hora && $outra->minuto == $this->minuto && $outra->segundo > $this->segundo;
@@ -369,7 +326,7 @@ class Tempo implements Comparable {
      * @return bool
      */
     public function gte(Comparable $outra): bool {
-        if (!$outra instanceof Tempo) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $this->gt($outra) || $this->eq($outra);
@@ -380,7 +337,7 @@ class Tempo implements Comparable {
      * @return bool
      */
     public function st(Comparable $outra): bool {
-        if (!$outra instanceof Tempo) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $outra->hora < $this->hora || $outra->hora == $this->hora && $outra->minuto < $this->minuto || $outra->hora == $this->hora && $outra->minuto == $this->minuto && $outra->segundo < $this->segundo;
@@ -391,7 +348,7 @@ class Tempo implements Comparable {
      * @return bool
      */
     public function ste(Comparable $outra): bool {
-        if (!$outra instanceof Tempo) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $this->st($outra) || $this->eq($outra);
@@ -401,9 +358,9 @@ class Tempo implements Comparable {
      * @param Tempo $outra
      * @return bool
      */
-    public function eq(Comparable $outra): bool {
-        if (!$outra instanceof Tempo) {
-            throw new ComparableTypeException();
+    public function eq(Equatable $outra): bool {
+        if (!$outra instanceof self) {
+            throw new EquatableTypeException();
         }
         return $outra->hora == $this->hora && $outra->minuto == $this->minuto && $outra->segundo == $this->segundo;
     }
@@ -583,7 +540,7 @@ class Data implements Comparable {
      * @return bool
      */
     public function gt(Comparable $outra): bool {
-        if (!$outra instanceof Data) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $outra->ano > $this->ano || $outra->ano == $this->ano && $outra->mes > $this->mes || $outra->ano == $this->ano && $outra->mes == $this->mes && $outra->dia > $this->dia;
@@ -594,7 +551,7 @@ class Data implements Comparable {
      * @return bool
      */
     public function gte(Comparable $outra): bool {
-        if (!$outra instanceof Data) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $this->gt($outra) || $this->eq($outra);
@@ -605,7 +562,7 @@ class Data implements Comparable {
      * @return bool
      */
     public function st(Comparable $outra): bool {
-        if (!$outra instanceof Data) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $outra->ano < $this->ano || $outra->ano == $this->ano && $outra->mes < $this->mes || $outra->ano == $this->ano && $outra->mes == $this->mes && $outra->dia < $this->dia;
@@ -616,7 +573,7 @@ class Data implements Comparable {
      * @return bool
      */
     public function ste(Comparable $outra): bool {
-        if (!$outra instanceof Data) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $this->st($outra) || $this->eq($outra);
@@ -626,9 +583,9 @@ class Data implements Comparable {
      * @param Data $outra
      * @return bool
      */
-    public function eq(Comparable $outra): bool {
-        if (!$outra instanceof Data) {
-            throw new ComparableTypeException();
+    public function eq(Equatable $outra): bool {
+        if (!$outra instanceof self) {
+            throw new EquatableTypeException();
         }
         return $outra->ano == $this->ano && $outra->mes == $this->mes && $outra->dia == $this->dia;
     }
@@ -758,7 +715,7 @@ class DataTempo implements Comparable {
      * @return bool
      */
     public function gt(Comparable $outra): bool {
-        if (!$outra instanceof DataTempo) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $outra->data->gt($this->data) || $outra->data->eq($this->data) && $outra->tempo->gt($this->tempo);
@@ -769,7 +726,7 @@ class DataTempo implements Comparable {
      * @return bool
      */
     public function gte(Comparable $outra): bool {
-        if (!$outra instanceof DataTempo) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $this->gt($outra) || $this->eq($outra);
@@ -780,7 +737,7 @@ class DataTempo implements Comparable {
      * @return bool
      */
     public function st(Comparable $outra): bool {
-        if (!$outra instanceof DataTempo) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $outra->data->st($this->data) || $outra->data->eq($this->data) && $outra->tempo->st($this->tempo);
@@ -791,7 +748,7 @@ class DataTempo implements Comparable {
      * @return bool
      */
     public function ste(Comparable $outra): bool {
-        if (!$outra instanceof DataTempo) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $this->st($outra) || $this->eq($outra);
@@ -801,9 +758,9 @@ class DataTempo implements Comparable {
      * @param DataTempo $outra
      * @return bool
      */
-    public function eq(Comparable $outra): bool {
-        if (!$outra instanceof DataTempo) {
-            throw new ComparableTypeException();
+    public function eq(Equatable $outra): bool {
+        if (!$outra instanceof self) {
+            throw new EquatableTypeException();
         }
         return $outra->data->eq($this->data) && $outra->tempo->eq($this->tempo);
     }
@@ -921,7 +878,7 @@ class IntervaloDeTempo implements Comparable {
      * @return bool
      */
     public function gt(Comparable $outra): bool {
-        if (!$outra instanceof IntervaloDeTempo) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $outra->inicio->gt($this->fim);
@@ -932,7 +889,7 @@ class IntervaloDeTempo implements Comparable {
      * @return bool
      */
     public function gte(Comparable $outra): bool {
-        if (!$outra instanceof IntervaloDeTempo) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $this->gt($outra) || $this->eq($outra);
@@ -943,7 +900,7 @@ class IntervaloDeTempo implements Comparable {
      * @return bool
      */
     public function st(Comparable $outra): bool {
-        if (!$outra instanceof IntervaloDeTempo) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $outra->fim->st($this->inicio);
@@ -954,7 +911,7 @@ class IntervaloDeTempo implements Comparable {
      * @return bool
      */
     public function ste(Comparable $outra): bool {
-        if (!$outra instanceof IntervaloDeTempo) {
+        if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
         return $this->st($outra) || $this->eq($outra);
@@ -964,9 +921,9 @@ class IntervaloDeTempo implements Comparable {
      * @param IntervaloDeTempo $outra
      * @return bool
      */
-    public function eq(Comparable $outra): bool {
-        if (!$outra instanceof IntervaloDeTempo) {
-            throw new ComparableTypeException();
+    public function eq(Equatable $outra): bool {
+        if (!$outra instanceof self) {
+            throw new EquatableTypeException();
         }
         return $outra->inicio->eq($this->inicio) && $outra->fim->eq($this->fim);
     }

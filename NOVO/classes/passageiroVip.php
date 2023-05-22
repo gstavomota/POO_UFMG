@@ -1,6 +1,12 @@
-<?
-require_once('passageiro.php');
-require_once('pontos.php');
+<?php
+require_once 'temporal.php';
+require_once 'identificadores.php';
+require_once 'passageiro.php';
+require_once 'ProgramaDeMilhagem.php';
+require_once 'pontos.php';
+require_once 'categoria.php';
+require_once 'categoria_com_data.php';
+
 class PassageiroVip extends Passageiro
 {
     private array $pontuacao;
@@ -10,44 +16,69 @@ class PassageiroVip extends Passageiro
 
     public function __construct(
         //passageiro
-        string $nome,
-        string $sobrenome,
+        string              $nome,
+        string              $sobrenome,
         DocumentoPassageiro $documento,
-        string $nacionalidade,
-        ?CPF $cpf,
-        DateTime $data_de_nascimento,
-        Email $email,
-        array $passagens,
-        
+        Nacionalidade       $nacionalidade,
+        ?CPF                $cpf,
+        Data                $data_de_nascimento,
+        Email               $email,
+        array               $passagens,
+
         //passageiro VIP
-        array $pontuacao,
-        string $numero_de_registro,
-        array $categoria_do_programa,
-        ProgramaDeMilhagem $programa_de_milhagem,
-    ) {
+        array               $pontuacao,
+        string              $numero_de_registro,
+        array               $categoria_do_programa,
+        ProgramaDeMilhagem  $programa_de_milhagem,
+    )
+    {
         parent::__construct($nome, $sobrenome, $documento, $nacionalidade, $cpf, $data_de_nascimento, $email, $passagens);
         $this->numero_de_registro = $numero_de_registro;
         $this->categoria_do_programa = $categoria_do_programa;
         $this->programa_de_milhagem = $programa_de_milhagem;
     }
 
-    public function addPontos(int $pontos){
-        array_push($this->pontuacao, new Pontos($pontos, new DateTime()));
+    public function getPontuacao(): array
+    {
+        return $this->pontuacao;
     }
-    public function getCategoriaDoPrograma(){
+
+    public function getNumeroDeRegistro(): string
+    {
+        return $this->numero_de_registro;
+    }
+
+    public function getCategoriaDoPrograma(): array
+    {
         return $this->categoria_do_programa;
     }
-    public function alterarCategoria(Categoria $categoria){
-        array_push($this->categoria_do_programa, new CategoriaComData($categoria, new DateTime()));
+
+    public function getProgramaDeMilhagem(): ProgramaDeMilhagem
+    {
+        return $this->programa_de_milhagem;
     }
-    public function getPontosValidos(){
-        $now = new DateTime();
-        $lastYear = $now->modify('-1 year');
+
+    public function addPontos(int $pontos): void
+    {
+        $this->pontuacao[] = new Pontos($pontos, DataTempo::agora());
+    }
+
+
+    public function alterarCategoria(Categoria $categoria)
+    {
+        $this->categoria_do_programa[] = new CategoriaComData($categoria, DataTempo::agora());
+    }
+
+    public function getPontosValidos(): int
+    {
+        $now = DataTempo::agora();
+        $oneYear = new Duracao(365, 0);
+        $lastYear = $now->sub($oneYear);
         $pontuacao = 0;
 
-        foreach($this->pontuacao as $ponto){
+        foreach ($this->pontuacao as $ponto) {
             $dataNoPonto = $ponto->getDataDeObtencao();
-            if($dataNoPonto->compare($lastYear) == 1){
+            if ($dataNoPonto->gte($lastYear)) {
                 $pontuacao += $ponto->getPontosGanhos();
             }
         }

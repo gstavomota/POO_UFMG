@@ -13,26 +13,26 @@ require_once 'voo.php';
 require_once 'tripulante.php';
 
 class CompanhiaAerea extends Persist {
-    public $nome;
-    public $codigo;
-    public $razao_social;
-    public $sigla;
-    public $aeronaves;
-    public $voos_planejados;
-    public $voos_em_venda;
-    public $voos_executados;
-    public $gerador_de_registro_de_viagem;
-    public $gerador_de_registro_de_passagem;
-    public $tarifa_franquia;
-    public $passagens;
-    public $passageiros;
-    public $tripulantes;
+    private string $nome;
+    private string $codigo;
+    private string $razao_social;
+    private string $sigla;
+    private array $aeronaves;
+    private array $voos_planejados;
+    private array $voos_em_venda;
+    private array $voos_executados;
+    private GeradorDeRegistroDeViagem $gerador_de_registro_de_viagem;
+    private GeradorDeRegistroDePassagem $gerador_de_registro_de_passagem;
+    private float $tarifa_franquia;
+    private array $passagens;
+    private array $passageiros;
+    private array $tripulantes;
     private static $local_filename = "companhia_aerea.txt";
 
-    public function __construct($nome, $codigo, $razao_social, $sigla,
-        $aeronaves, $voos_planejados, $voos_em_venda, $voos_executados,
-        $gerador_de_registro_de_viagem, $gerador_de_registro_de_passagem, $tarifa_franquia, 
-        $passagens, $passageiros, $tripulantes, ...$args) {
+    public function __construct(string $nome, string $codigo, string $razao_social, string $sigla,
+        array $aeronaves, array $voos_planejados, array $voos_em_venda, array $voos_executados,
+        GeradorDeRegistroDeViagem $gerador_de_registro_de_viagem, GeradorDeRegistroDePassagem $gerador_de_registro_de_passagem, 
+        float $tarifa_franquia, array $passagens, array $passageiros, array $tripulantes, ...$args) {
             
         $this->nome = $nome;
         $this->codigo = $codigo;
@@ -51,6 +51,62 @@ class CompanhiaAerea extends Persist {
         parent::__construct(...$args);
     }
 
+    public function getNome(): string {
+        return $this->nome;
+    }
+
+    public function getCodigo(): string {
+        return $this->codigo;
+    }
+
+    public function getRazaoSocial(): string {
+        return $this->razao_social;
+    }
+
+    public function getSigla(): string {
+        return $this->sigla;
+    }
+    
+    public function getAeronaves(): array {
+        return $this->aeronaves;
+    }
+
+    public function getVoosPlanejados(): array {
+        return $this->voos_planejados;
+    }
+
+    public function getVoosEmVenda(): array {
+        return $this->voos_em_venda;
+    }
+
+    public function getVoosExecutados(): array {
+        return $this->voos_executados;
+    }
+
+    public function getGeradorDeRegistroDeViagem(): GeradorDeRegistroDeViagem {
+        return $this->gerador_de_registro_de_viagem;
+    }
+
+    public function getGeradorDeRegistroDePassagem(): GeradorDeRegistroDePassagem {
+        return $this->gerador_de_registro_de_passagem;
+    }
+
+    public function getTarifaFranquia(): float {
+        return $this->tarifa_franquia;
+    }
+
+    public function getPassagens(): array {
+        return $this->passagens;
+    }
+
+    public function getPassageiros(): array {
+        return $this->passageiros;
+    }
+
+    public function getTripulantes(): array {
+        return $this->tripulantes;
+    }
+        
     public static function getFilename() {
         return self::$local_filename;
     }

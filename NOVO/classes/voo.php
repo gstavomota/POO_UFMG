@@ -23,18 +23,19 @@ class Voo
     private float $tarifa;
 
     public function __construct(
-        CodigoVoo $codigo,
-        CompanhiaAerea $companhia_aerea,
-        SiglaAeroporto $aeroporto_de_saida,
-        SiglaAeroporto $aeroporto_de_chegada,
-        Data $hora_de_partida,
-        Duracao $duracao_estimada,
-        DiaDaSemana $dias_da_semana,
+        CodigoVoo          $codigo,
+        CompanhiaAerea     $companhia_aerea,
+        SiglaAeroporto     $aeroporto_de_saida,
+        SiglaAeroporto     $aeroporto_de_chegada,
+        Data               $hora_de_partida,
+        Duracao            $duracao_estimada,
+        DiaDaSemana        $dias_da_semana,
         RegistroDeAeronave $aeronave_padrao,
-        int $capacidade_passageiros,
-        float $capacidade_carga,
-        float $tarifa
-    ) {
+        int                $capacidade_passageiros,
+        float              $capacidade_carga,
+        float              $tarifa
+    )
+    {
         $this->codigo = $codigo;
         $this->companhia_aerea = $companhia_aerea;
         $this->aeroporto_de_saida = $aeroporto_de_saida;
@@ -73,41 +74,51 @@ class Voo
     {
         return $this->companhia_aerea;
     }
+
     public function getAeroportoSaida(): SiglaAeroporto
     {
         return $this->aeroporto_de_saida;
     }
+
     public function getAeroportoChegada(): SiglaAeroporto
     {
         return $this->aeroporto_de_chegada;
     }
+
     public function getHoraDePartida(): Data
     {
         return $this->hora_de_partida;
     }
+
     public function getDuracaoEstimada(): Duracao
     {
         return $this->duracao_estimada;
     }
+
     public function getDiasDaSemana(): DiaDaSemana
     {
         return $this->dias_da_semana;
     }
+
     public function getAeronavePadrao(): RegistroDeAeronave
     {
         return $this->aeronave_padrao;
     }
+
     public function getCapacidadeDePassageiros(): int
     {
         return $this->capacidade_passageiros;
     }
+
     public function getCapacidadeCarga(): float
     {
         return $this->capacidade_carga;
     }
+
     public function getTarifa(): float
     {
         return $this->tarifa;
     }
 }
+
 ?>

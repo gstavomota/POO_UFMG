@@ -192,7 +192,7 @@ class Passagem
     public SiglaAeroporto $aeroporto_de_chegada;
     public SiglaCompanhiaAerea $companhia_aerea;
     public DocumentoPassageiro $documento_cliente;
-    public DateTime $data;
+    public Data $data;
     public float $valor;
     public float $valor_pago;
     public array $assentos;
@@ -205,7 +205,7 @@ class Passagem
         SiglaAeroporto      $aeroporto_de_chegada,
         SiglaCompanhiaAerea $companhia_aerea,
         DocumentoPassageiro $documento_cliente,
-        DateTime            $data,
+        Data                $data,
         float               $valor,
         float               $valor_pago,
         array               $assentos,
@@ -224,6 +224,86 @@ class Passagem
         $this->assentos = $assentos;
         $this->data_tempo_de_compra = $data_tempo_de_compra;
         $this->status = $status;
+    }
+
+    /**
+     * @return RegistroDePassagem
+     */
+    public function getRegistro(): RegistroDePassagem
+    {
+        return $this->registro;
+    }
+
+    /**
+     * @return SiglaAeroporto
+     */
+    public function getAeroportoDeSaida(): SiglaAeroporto
+    {
+        return $this->aeroporto_de_saida;
+    }
+
+    /**
+     * @return SiglaAeroporto
+     */
+    public function getAeroportoDeChegada(): SiglaAeroporto
+    {
+        return $this->aeroporto_de_chegada;
+    }
+
+    /**
+     * @return SiglaCompanhiaAerea
+     */
+    public function getCompanhiaAerea(): SiglaCompanhiaAerea
+    {
+        return $this->companhia_aerea;
+    }
+
+    /**
+     * @return DocumentoPassageiro
+     */
+    public function getDocumentoCliente(): DocumentoPassageiro
+    {
+        return $this->documento_cliente;
+    }
+
+    /**
+     * @return Data
+     */
+    public function getData(): Data
+    {
+        return $this->data;
+    }
+
+    /**
+     * @return float
+     */
+    public function getValor(): float
+    {
+        return $this->valor;
+    }
+
+    /**
+     * @return float
+     */
+    public function getValorPago(): float
+    {
+        return $this->valor_pago;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAssentos(): array
+    {
+        return $this->assentos;
+    }
+
+    /**
+     * @return DataTempo
+     */
+    public function getDataTempoDeCompra(): DataTempo
+    {
+        return $this->data_tempo_de_compra;
     }
 
     public function tipoDeStatus(): Tipo

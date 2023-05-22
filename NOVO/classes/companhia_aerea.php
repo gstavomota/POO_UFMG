@@ -12,36 +12,6 @@ require_once 'viagem_builder.php';
 require_once 'voo.php';
 require_once 'tripulante.php';
 
-use \Temporal\Data;
-use \Temporal\Duracao;
-use \Temporal\DataTempo;
-use \Temporal\Tempo;
-
-use \Identificadores\SiglaCompanhiaAerea;
-use \Identificadores\RegistroDeAeronave;
-use \Identificadores\CodigoVoo;
-use \Identificadores\RegistroDeViagem;
-use \Identificadores\GeradorDeRegistroDeViagem;
-use \Identificadores\SiglaAeroporto;
-use \Identificadores\DocumentoPassageiro;
-use \Identificadores\GeradorDeRegistroDePassagem;
-use \Identificadores\CodigoDoAssento;
-use \Identificadores\RegistroDePassagem;
-
-use \Passagem\Passagem;
-use \Passagem\StatusDaPassagem;
-use \Passagem\PassagemCheckInNaoAberto;
-
-use \Persist\Persist;
-
-use \Aeronave\Aeronave;
-
-use \Viagem\Viagem;
-
-use \ViagemBuilder\ViagemBuilder;
-
-use \Voo\Voo;
-
 class CompanhiaAerea extends Persist {
     public $nome;
     public $codigo;
@@ -310,15 +280,19 @@ class CompanhiaAerea extends Persist {
     }
     
     function abrir_check_in_para_passagens(...$args) {
+        $twoDays = new Duracao(2, 0);
+        $hoje = Data::hoje();
         if (!empty($args)) {
             foreach ($args as $registro_passagem) {
                 if (!isset($this->passagens[$registro_passagem])) 
                     throw new Exception("Passagem não está na companhia");
     
                 $passagem = $this->passagens[$registro_passagem];
-    
-                if ($passagem->data->diff(Data::now())->days < 2) 
+
+                $delta = $passagem->getData()->dt($hoje);
+                if ($delta->st($twoDays)) {
                     continue;
+                }
     
                 throw new Exception("Passagem está a mais de 48h de distância");
             }
@@ -330,31 +304,37 @@ class CompanhiaAerea extends Persist {
     
             return;
         }
-    
+
         foreach ($this->passagens as $passagem) {
-            if ($passagem->data->diff(Data::now())->days < 2) 
+            $delta = $passagem->getData()->dt($hoje);
+            if ($delta->st($twoDays)) {
                 $passagem->acionar_evento(Evento::ABRIR_CHECK_IN);
+            }
         }
     }
     
-    function fazer_check_in($passagem) {
-        if (!isset($this->passagens[$passagem])) 
+    function fazer_check_in(RegistroDePassagem $passagem) {
+        if (!isset($this->passagens["{$passagem}"]))
             throw new Exception("Passagem não está na companhia");
     
-        $passagem = $this->passagens[$passagem];
-    
-        if ($passagem->data->diff(Data::now())->days < 2) 
+        $passagem = $this->passagens["{$passagem}"];
+
+        $twoDays = new Duracao(2, 0);
+        $hoje = Data::hoje();
+        $delta = $passagem->getData()->dt($hoje);
+        if ($delta->st($twoDays)) {
             $passagem->acionar_evento(Evento::ABRIR_CHECK_IN);
+        }
     
         if (!$passagem->acionar_evento(Evento::FAZER_CHECK_IN))
             throw new Exception("Não é possível fazer check-in agora");
     }
-    function comprar_passagem($id_cliente, $data, $aeroporto_de_saida, $aeroporto_de_chegada, $franquias, $assento = null) {
-        if (!isset($this->passageiros[$id_cliente])) {
+    function comprar_passagem(DocumentoPassageiro $id_cliente, Data $data, SiglaAeroporto $aeroporto_de_saida, SiglaAeroporto $aeroporto_de_chegada, FranquiasDeBagagem $franquias, ?CodigoDoAssento $assento = null) {
+        if (!isset($this->passageiros["{$id_cliente}"])) {
             throw new Exception("Cliente nao cadastrado");
         }
     
-        $cliente = $this->passageiros[$id_cliente];
+        $cliente = $this->passageiros["{$id_cliente}"];
         $voos = $this->_encontrar_melhor_voo($cliente->vip, $data, $aeroporto_de_saida, $aeroporto_de_chegada, $franquias);
     
         if (count($voos) == 0) {
@@ -362,7 +342,7 @@ class CompanhiaAerea extends Persist {
         }
     
         $viagem_factories = array_map(function ($codigo_voo) use ($data) {
-            $viagem_factories = $this->voos_em_venda[$data];
+            $viagem_factories = $this->voos_em_venda["{$data}"];
     
             foreach ($viagem_factories as $viagem_factory) {
                 if ($viagem_factory->codigo_do_voo == $codigo_voo) {
@@ -401,26 +381,30 @@ class CompanhiaAerea extends Persist {
             $assento_desejado = $assento ?? $viagem_factory->codigo_assento_liberado();
             $valor = $viagem_factory->reservar_assento($cliente->vip, $registro_passagem, $franquias, $assento_desejado);
             $valor_total += $valor;
-            $viagens_assentos[$viagem_factory->registro] = $assento_desejado;
+            $viagens_assentos["{$viagem_factory->registro}"] = $assento_desejado;
         }
     
         $status = new PassagemCheckInNaoAberto();
-    
-        if ($data->diff(Data::now())->days < 2) {
+        $twoDays = new Duracao(2, 0);
+        $hoje = Data::hoje();
+        $delta = $data->dt($hoje);
+        if ($delta->st($twoDays)) {
             $status = $status->abrir_check_in();
         }
-    
+
+        $primeiro_voo = $voos[0];
+        $ultimo_voo = end($voos);
         $passagem = new Passagem(
             $registro_passagem,
-            $this->voos_planejados[$voos[0]]->aeroporto_de_saida,
-            $this->voos_planejados[end($voos)]->aeroporto_de_chegada,
+            $this->voos_planejados["{$primeiro_voo}"]->aeroporto_de_saida,
+            $this->voos_planejados["{$ultimo_voo}"]->aeroporto_de_chegada,
             $this->sigla,
             $id_cliente,
             $data,
             $valor_total,
             0,
             $viagens_assentos,
-            DataTempo::now(),
+            DataTempo::agora(),
             $status
         );
     

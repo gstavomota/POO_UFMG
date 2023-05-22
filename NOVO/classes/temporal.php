@@ -443,6 +443,34 @@ class Data implements Comparable {
         $this->dia = $dia;
     }
 
+
+    /** Converte uma data em string numa Data
+     * @param string $data
+     * @return Data
+     */
+    static function fromString(string $data): Data {
+        // Dividir a string de data nos "/"
+        $partesDeData = explode('/', $data);
+
+        // Checa se a data tem tres partes
+        if (count($partesDeData) !== 3) {
+            throw new InvalidArgumentException('Formato invalido de data');
+        }
+
+        // Extrair o dia, o mes e o ano
+        $dia = intval($partesDeData[0]);
+        $mes = intval($partesDeData[1]);
+        $ano = intval($partesDeData[2]);
+
+        // Checa se o dia, o mes e o ano são validos
+        if ($dia <= 0 || $mes <= 0 || $ano <= 0) {
+            throw new InvalidArgumentException('Formato invalido de data');
+        }
+
+        // Return the parsed date as an array
+        return new Data($ano, $mes, $dia);
+    }
+
     /** Valida uma data
      * @throws Exception se a data for invalida
      */

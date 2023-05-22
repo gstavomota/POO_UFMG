@@ -28,14 +28,14 @@ class FranquiaDeBagagem
 
 class FranquiasDeBagagem
 {
-    public array $franquias;
+    private array $franquias;
 
     public function __construct(array $franquias)
     {
         $this->franquias = FranquiasDeBagagem::validarFranquias($franquias);
     }
 
-    public static function validarFranquias(array $franquias): array
+    private static function validarFranquias(array $franquias): array
     {
         if (count($franquias) > 3) {
             throw new Exception("No máximo três franquias são suportadas");

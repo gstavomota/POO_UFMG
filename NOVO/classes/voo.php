@@ -12,12 +12,12 @@ class Voo
 {
     private CodigoVoo $codigo;
     private CompanhiaAerea $companhia_aerea;
-    private Aeroporto $aeroporto_de_saida;
-    private Aeroporto $aeroporto_de_chegada;
+    private SiglaAeroporto $aeroporto_de_saida;
+    private SiglaAeroporto $aeroporto_de_chegada;
     private Data $hora_de_partida;
     private Duracao $duracao_estimada;
     private DiaDaSemana $dias_da_semana;
-    private Aeronave $aeronave_padrao;
+    private RegistroDeAeronave $aeronave_padrao;
     private int $capacidade_passageiros;
     private float $capacidade_carga;
     private float $tarifa;
@@ -25,12 +25,12 @@ class Voo
     public function __construct(
         CodigoVoo $codigo,
         CompanhiaAerea $companhia_aerea,
-        Aeroporto $aeroporto_de_saida,
-        Aeroporto $aeroporto_de_chegada,
+        SiglaAeroporto $aeroporto_de_saida,
+        SiglaAeroporto $aeroporto_de_chegada,
         Data $hora_de_partida,
         Duracao $duracao_estimada,
         DiaDaSemana $dias_da_semana,
-        Aeronave $aeronave_padrao,
+        RegistroDeAeronave $aeronave_padrao,
         int $capacidade_passageiros,
         float $capacidade_carga,
         float $tarifa
@@ -48,12 +48,12 @@ class Voo
         $this->tarifa = $tarifa;
     }
 
-    public function calcula_tarifa($cliente_vip, $franquias, $tarifa_franquia)
+    public function calculaTarifa(bool $cliente_vip, FranquiasDeBagagem $franquias, float $tarifa_franquia)
     {
         return calculo_tarifa_strategy_for($cliente_vip, $this->tarifa, $tarifa_franquia)->calcula($franquias);
     }
 
-    public function construir_assentos()
+    public function construirAssentos(): array
     {
         $gerador = new GeradorDeCodigoDoAssento($this->capacidade_passageiros, 0.0);
         $assentos = $gerador->gerar_todos();
@@ -73,11 +73,11 @@ class Voo
     {
         return $this->companhia_aerea;
     }
-    public function getAeroportoSaida(): Aeroporto
+    public function getAeroportoSaida(): SiglaAeroporto
     {
         return $this->aeroporto_de_saida;
     }
-    public function getAeroportoChegada(): Aeroporto
+    public function getAeroportoChegada(): SiglaAeroporto
     {
         return $this->aeroporto_de_chegada;
     }
@@ -93,7 +93,7 @@ class Voo
     {
         return $this->dias_da_semana;
     }
-    public function getAeronavePadrao(): Aeronave
+    public function getAeronavePadrao(): RegistroDeAeronave
     {
         return $this->aeronave_padrao;
     }

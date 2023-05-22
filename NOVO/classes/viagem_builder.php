@@ -103,9 +103,9 @@ class ViagemBuilder
 
     function codigoAssentoLiberado(): CodigoDoAssento
     {
-        foreach ($this->assentos as $codigo => $assento) {
+        foreach ($this->assentos as $assento) {
             if ($assento->vazio()) {
-                return CodigoDoAssento::from_string($codigo);
+                return $assento->getCodigo();
             }
         }
         // TODO: Custom exception type

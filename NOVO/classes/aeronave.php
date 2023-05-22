@@ -1,7 +1,8 @@
 <?php
 require_once 'identificadores.php';
 
-class Aeronave {
+class Aeronave
+{
     private SiglaCompanhiaAerea $companhia_aerea;
     private string $fabricante;
     private string $modelo;
@@ -11,12 +12,13 @@ class Aeronave {
 
     public function __construct(
         SiglaCompanhiaAerea $companhia_aerea,
-        string $fabricante,
-        string $modelo,
-        int $capacidade_passageiros,
-        float $capacidade_carga,
-        RegistroDeAeronave $registro
-    ) {
+        string              $fabricante,
+        string              $modelo,
+        int                 $capacidade_passageiros,
+        float               $capacidade_carga,
+        RegistroDeAeronave  $registro
+    )
+    {
         $this->companhia_aerea = $companhia_aerea;
         $this->fabricante = $fabricante;
         $this->modelo = $modelo;
@@ -25,27 +27,33 @@ class Aeronave {
         $this->registro = $registro;
     }
 
-    public function getSigla() : SiglaCompanhiaAerea {
+    public function getSigla(): SiglaCompanhiaAerea
+    {
         return $this->companhia_aerea;
     }
 
-    public function getFabricante() : string {
+    public function getFabricante(): string
+    {
         return $this->fabricante;
     }
 
-    public function getModelo() : string {
+    public function getModelo(): string
+    {
         return $this->modelo;
     }
 
-    public function getCapacidadePassageiros() : int {
+    public function getCapacidadePassageiros(): int
+    {
         return $this->capacidade_passageiros;
     }
 
-    public function getCapacidadeCarga() : float {
+    public function getCapacidadeCarga(): float
+    {
         return $this->capacidade_carga;
     }
 
-    public function getRegistro() : RegistroDeAeronave {
+    public function getRegistro(): RegistroDeAeronave
+    {
         return $this->registro;
     }
 }

@@ -51,4 +51,9 @@ class FranquiasDeBagagem
         }
         return $carga;
     }
+
+    public function numeroDeFranquias(): int
+    {
+        return count($this->franquias);
+    }
 }

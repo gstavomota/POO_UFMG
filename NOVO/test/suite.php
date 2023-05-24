@@ -51,7 +51,15 @@ class CheckResult
     }
 
 }
-
+class CheckSection {
+    private string $name;
+    public function __construct(string $name) {
+        $this->name = $name;
+    }
+    public function __toString(): string {
+        return "  {$this->name}";
+    }
+}
 class TestRunner
 {
     private array $testCases = [];
@@ -75,7 +83,7 @@ class TestRunner
 
 abstract class TestCase
 {
-    private array $checkResults = [];
+    private array $checkResultsOrSections = [];
 
     private function objOrEnumToString(mixed $obj)
     {
@@ -96,7 +104,7 @@ abstract class TestCase
             $success = $a > $b;
         }
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
-        $this->checkResults[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
+        $this->checkResultsOrSections[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
     }
 
     protected function checkGte(mixed $a, mixed $b): void
@@ -109,7 +117,7 @@ abstract class TestCase
             $success = $a >= $b;
         }
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
-        $this->checkResults[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
+        $this->checkResultsOrSections[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
     }
 
     protected function checkSt(mixed $a, mixed $b): void
@@ -122,7 +130,7 @@ abstract class TestCase
             $success = $a < $b;
         }
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
-        $this->checkResults[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
+        $this->checkResultsOrSections[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
     }
 
     protected function checkSte(mixed $a, mixed $b): void
@@ -135,7 +143,7 @@ abstract class TestCase
             $success = $a <= $b;
         }
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
-        $this->checkResults[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
+        $this->checkResultsOrSections[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
     }
 
     protected function checkEq(mixed $a, mixed $b, bool $strict = true): void
@@ -150,7 +158,7 @@ abstract class TestCase
             $success = $strict ? $a === $b : $a == $b;
         }
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
-        $this->checkResults[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
+        $this->checkResultsOrSections[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
     }
 
     protected function checkNeq(mixed $a, mixed $b, bool $strict = true): void
@@ -165,42 +173,46 @@ abstract class TestCase
             $success = $strict ? $a === $b : $a == $b;
         }
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
-        $this->checkResults[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
+        $this->checkResultsOrSections[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
     }
 
     protected function checkApproximate(float $a, float $b, float $epsilon = 0.001): void
     {
         $success = abs($a - $b) < $epsilon;
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
-        $this->checkResults[] = new CheckResult($success, "|{$this->objOrEnumToString($a)} - {$this->objOrEnumToString($b)}| < {$epsilon}", $line, $file);
+        $this->checkResultsOrSections[] = new CheckResult($success, "|{$this->objOrEnumToString($a)} - {$this->objOrEnumToString($b)}| < {$epsilon}", $line, $file);
     }
 
     protected function checkTrue(bool $bool)
     {
         $success = $bool;
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
-        $this->checkResults[] = new CheckResult($success, "should be true", $line, $file);
+        $this->checkResultsOrSections[] = new CheckResult($success, "should be true", $line, $file);
     }
 
     protected function checkFalse(bool $bool)
     {
         $success = !$bool;
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
-        $this->checkResults[] = new CheckResult($success, "should be false", $line, $file);
+        $this->checkResultsOrSections[] = new CheckResult($success, "should be false", $line, $file);
     }
 
     protected function checkNotReached()
     {
         $success = false;
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
-        $this->checkResults[] = new CheckResult($success, "should not be reached", $line, $file);
+        $this->checkResultsOrSections[] = new CheckResult($success, "should not be reached", $line, $file);
     }
 
     protected function checkReached()
     {
         $success = true;
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
-        $this->checkResults[] = new CheckResult($success, "should be reached", $line, $file);
+        $this->checkResultsOrSections[] = new CheckResult($success, "should be reached", $line, $file);
+    }
+    
+    protected function startSection(string $name) {
+        $this->checkResultsOrSections[] = new CheckSection($name);
     }
 
     private static function getTestFile(): string
@@ -228,8 +240,8 @@ abstract class TestCase
     public function printResults()
     {
         echo "  {$this->getName()} Checks:\n";
-        foreach ($this->checkResults as $checkResult) {
-            echo "    {$checkResult}\n";
+        foreach ($this->checkResultsOrSections as $checkResultOrSection) {
+            echo "    {$checkResultOrSection}\n";
         }
     }
 }

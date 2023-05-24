@@ -17,13 +17,13 @@ class Duracao implements Comparable {
         $segundos = $segundo + $segundosNoDia * $dia;
         $negativo = $segundos < 0;
         $segundos = abs($segundos);
-        $this->segundo = $segundo % $segundosNoDia;
+        $this->segundo = $segundos % $segundosNoDia;
         $this->dia = floor($segundos / $segundosNoDia);
         $this->negativo = $negativo;
     }
 
     /** Retorna o valor em segundos
-     * @return int
+     * @return float
      */
     private function emSegundos(): float {
         $segundosNoDia = 60*60*24;
@@ -198,7 +198,7 @@ class Duracao implements Comparable {
         $segundosEmUmaHora = $segundosEmUmMinuto*60;
         $microssegundosEmUmSegundo = 1000000;
 
-        $sinal = $dateInterval->invert == 0 ? 1 : -1;
+        $sinal = $dateInterval->invert == 0 ? -1 : 1;
         $dias = abs($dateInterval->days);
         $segundos = $dateInterval->s + $dateInterval->i * $segundosEmUmMinuto + $dateInterval->h * $segundosEmUmaHora;
         $microssegundos = $dateInterval->f * $microssegundosEmUmSegundo;
@@ -229,21 +229,44 @@ class Tempo implements Comparable {
     {
         $segundosInMinuto = 60;
         $segundosInHora = $segundosInMinuto * 60;
-        $timeInSegundos = $segundo + $minuto * $segundosInMinuto + $hora * $segundosInHora;
-        $this->hora = Tempo::validateHora(floor($timeInSegundos / $segundosInHora));
-        $this->minuto = floor($timeInSegundos / $segundosInMinuto - $this->hora * $segundosInHora);
-        $this->segundo = $timeInSegundos - $this->hora * $segundosInHora - $this->minuto * $segundosInMinuto;
+        $timeInSegundos = Tempo::validaTempoEmSegundos($segundo + $minuto * $segundosInMinuto + $hora * $segundosInHora);
+
+        $this->hora = floor($timeInSegundos / $segundosInHora);
+        $remainingSeconds = $timeInSegundos % $segundosInHora;
+
+        $this->minuto = floor($remainingSeconds / $segundosInMinuto);
+        $this->segundo = $remainingSeconds % $segundosInMinuto;
+    }
+
+    /** Valida o tempo em segundos
+     * @throws Exception quando o tempo for negativo
+     */
+    private static function validaTempoEmSegundos(float $tempoEmSegundos) {
+        if ($tempoEmSegundos < 0) {
+            throw new Exception("O tempo deve ser positivo");
+        }
+        return $tempoEmSegundos;
     }
 
     /** Valida uma hora
      * @throws Exception when hora is more than 24
      */
-    private static function validateHora(int $hora): int {
+    private static function validaHora(int $hora): int {
         if ($hora >= 24) {
             throw new Exception("Hora is more than 24 on time");
         }
         return $hora;
     }
+
+    /** Retorna o valor em segundos
+     * @return float
+     */
+    private function emSegundos(): float {
+        $segundosNoMinuto = 60;
+        $segundosNaHora = $segundosNoMinuto*60;
+        return $this->hora * $segundosNaHora + $this->minuto * $segundosNoMinuto + $this->segundo;
+    }
+
     /** Retorna o numero de horas
      * @return int
      */
@@ -318,7 +341,8 @@ class Tempo implements Comparable {
         if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
-        return $outra->hora > $this->hora || $outra->hora == $this->hora && $outra->minuto > $this->minuto || $outra->hora == $this->hora && $outra->minuto == $this->minuto && $outra->segundo > $this->segundo;
+
+        return $this->emSegundos() > $outra->emSegundos();
     }
 
     /** Operador de comparação >=
@@ -340,7 +364,8 @@ class Tempo implements Comparable {
         if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
-        return $outra->hora < $this->hora || $outra->hora == $this->hora && $outra->minuto < $this->minuto || $outra->hora == $this->hora && $outra->minuto == $this->minuto && $outra->segundo < $this->segundo;
+
+        return $this->emSegundos() < $outra->emSegundos();
     }
 
     /** Operador de comparação <=
@@ -571,7 +596,10 @@ class Data implements Comparable {
         if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
-        return $outra->ano > $this->ano || $outra->ano == $this->ano && $outra->mes > $this->mes || $outra->ano == $this->ano && $outra->mes == $this->mes && $outra->dia > $this->dia;
+
+        return $this->ano > $outra->ano ||
+            ($this->ano == $outra->ano && $this->mes > $outra->mes) ||
+            ($this->ano == $outra->ano && $this->mes == $outra->mes && $this->dia > $outra->dia);
     }
 
     /** Operador de comparação >=
@@ -593,7 +621,10 @@ class Data implements Comparable {
         if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
-        return $outra->ano < $this->ano || $outra->ano == $this->ano && $outra->mes < $this->mes || $outra->ano == $this->ano && $outra->mes == $this->mes && $outra->dia < $this->dia;
+
+        return $this->ano < $outra->ano ||
+            ($this->ano == $outra->ano && $this->mes < $outra->mes) ||
+            ($this->ano == $outra->ano && $this->mes == $outra->mes && $this->dia < $outra->dia);
     }
 
     /** Operador de comparação <=
@@ -746,7 +777,8 @@ class DataTempo implements Comparable {
         if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
-        return $outra->data->gt($this->data) || $outra->data->eq($this->data) && $outra->tempo->gt($this->tempo);
+        return $this->data->gt($outra->data) ||
+            ($this->data->eq($outra->data) && $this->tempo->gt($outra->tempo));
     }
 
     /** Operador de comparação >=
@@ -768,7 +800,8 @@ class DataTempo implements Comparable {
         if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
-        return $outra->data->st($this->data) || $outra->data->eq($this->data) && $outra->tempo->st($this->tempo);
+        return $this->data->st($outra->data) ||
+            ($this->data->eq($outra->data) && $this->tempo->st($outra->tempo));
     }
 
     /** Operador de comparação <=
@@ -909,7 +942,7 @@ class IntervaloDeTempo implements Comparable {
         if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
-        return $outra->inicio->gt($this->fim);
+        return $this->inicio->gt($outra->fim);
     }
 
     /** Operador de comparação >=
@@ -931,7 +964,7 @@ class IntervaloDeTempo implements Comparable {
         if (!$outra instanceof self) {
             throw new ComparableTypeException();
         }
-        return $outra->fim->st($this->inicio);
+        return $this->fim->st($outra->inicio);
     }
 
     /** Operador de comparação <=
@@ -969,7 +1002,7 @@ class IntervaloDeTempo implements Comparable {
      * @return bool
      */
     public function contem(DataTempo $outra): bool {
-        return $this->inicio->gte($outra) && $this->fim->ste($outra);
+        return $this->inicio->ste($outra) && $this->fim->gte($outra);
     }
 }
 ?>

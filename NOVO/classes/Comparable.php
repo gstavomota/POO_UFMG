@@ -1,5 +1,6 @@
 <?php
 
+require_once "Equatable.php";
 
 /** Uma exception para quando for utilizado o tipo incorreto em uma comparação
  *

@@ -292,24 +292,42 @@ class SiglaAeroportoTestCase extends TestCase {
         # Constructor
         $this->startSection("Constructor");
         try {
-            // TODO
+            new SiglaAeroporto("");
             $this->checkNotReached();
         } catch (InvalidArgumentException $e) {
             $this->checkReached();
         }
         try {
-            // TODO
+            new SiglaAeroporto("aaa");
+            $this->checkNotReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkReached();
+        }
+        try {
+            new SiglaAeroporto("111");
+            $this->checkNotReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkReached();
+        }
+        try {
+            new SiglaAeroporto("AAA");
             $this->checkReached();
         } catch (InvalidArgumentException $e) {
             $this->checkNotReached();
         }
         # Stringfication
-        // TODO
+        $siglaAAA = new SiglaAeroporto("AAA");
+        $siglaBBB = new SiglaAeroporto("BBB");
         $this->startSection("Stringfication");
-        // TODO
+        $this->checkEq("{$siglaAAA}", "AAA");
+        $this->checkEq("{$siglaBBB}", "BBB");
         # Equality
         $this->startSection("Equality");
-        // TODO
+        $siglaAAA_2 = new SiglaAeroporto("AAA");
+        $siglaBBB_2 = new SiglaAeroporto("BBB");
+        $this->checkEq($siglaAAA, $siglaAAA_2);
+        $this->checkEq($siglaBBB, $siglaBBB_2);
+        $this->checkNeq($siglaAAA, $siglaBBB);
     }
 }
 class RegistroDeTripulanteTestCase extends TestCase {
@@ -324,24 +342,30 @@ class RegistroDeTripulanteTestCase extends TestCase {
         # Constructor
         $this->startSection("Constructor");
         try {
-            // TODO
+            new RegistroDeTripulante(-1);
             $this->checkNotReached();
         } catch (InvalidArgumentException $e) {
             $this->checkReached();
         }
         try {
-            // TODO
+            new RegistroDeTripulante(0);
             $this->checkReached();
         } catch (InvalidArgumentException $e) {
             $this->checkNotReached();
         }
         # Stringfication
-        // TODO
+        $registro0 = new RegistroDeTripulante(0);
+        $registro1 = new RegistroDeTripulante(1);
         $this->startSection("Stringfication");
-        // TODO
+        $this->checkEq("{$registro0}", "0");
+        $this->checkEq("{$registro1}", "1");
         # Equality
         $this->startSection("Equality");
-        // TODO
+        $registro0_2 = new RegistroDeTripulante(0);
+        $registro1_2 = new RegistroDeTripulante(1);
+        $this->checkEq($registro0, $registro0_2);
+        $this->checkEq($registro1, $registro1_2);
+        $this->checkNeq($registro0, $registro1);
     }
 }
 class GeradorDeRegistroDeTripulanteTestCase extends TestCase {
@@ -353,27 +377,15 @@ class GeradorDeRegistroDeTripulanteTestCase extends TestCase {
 
     public function run()
     {
-        # Constructor
-        $this->startSection("Constructor");
-        try {
-            // TODO
-            $this->checkNotReached();
-        } catch (InvalidArgumentException $e) {
-            $this->checkReached();
-        }
-        try {
-            // TODO
-            $this->checkReached();
-        } catch (InvalidArgumentException $e) {
-            $this->checkNotReached();
-        }
-        # Stringfication
-        // TODO
-        $this->startSection("Stringfication");
-        // TODO
-        # Equality
-        $this->startSection("Equality");
-        // TODO
+        # Gerador
+        $gerador = new GeradorDeRegistroDeTripulante();
+        $registro0 = $gerador->gerar();
+        $registro1 = $gerador->gerar();
+        $registro0_2 = new RegistroDeTripulante(0);
+        $registro1_2 = new RegistroDeTripulante(1);
+        $this->startSection("Gerador");
+        $this->checkEq($registro0, $registro0_2);
+        $this->checkEq($registro1, $registro1_2);
     }
 }
 class RGTestCase extends TestCase {

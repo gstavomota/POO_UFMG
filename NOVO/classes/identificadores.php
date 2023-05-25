@@ -237,7 +237,7 @@ class SiglaAeroporto implements Equatable
         if (strlen($v) != 3) {
             throw new InvalidArgumentException("A sigla deve ter 3 caracteres");
         }
-        if ($v != strtoupper($v)) {
+        if (!ctype_upper($v)) {
             throw new InvalidArgumentException("A sigla deve ser uppercase");
         }
         if (!ctype_alpha($v)) {
@@ -259,9 +259,27 @@ class RegistroDeTripulante implements Equatable
 {
     private int $idTripulante;
 
+
+    /** Valida um id
+     * @param int $idTripulante
+     * @throws InvalidArgumentException if $idTripulante is negative
+     */
     public function __construct(int $idTripulante)
     {
-        $this->idTripulante = $idTripulante;
+        $this->idTripulante = RegistroDeTripulante::validaIdTripulante($idTripulante);
+    }
+
+    /** Valida um id
+     * @param int $idTripulante
+     * @return int
+     * @throws InvalidArgumentException if $idTripulante is negative
+     */
+    private static function validaIdTripulante(int $idTripulante): int
+    {
+        if ($idTripulante < 0) {
+            throw new InvalidArgumentException("Id de tripulante invalido");
+        }
+        return $idTripulante;
     }
 
     public function __toString(): string

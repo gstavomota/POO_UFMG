@@ -29,7 +29,11 @@ function absolute_to_relative_path(string $absolute_path, string $base_path)
     return $relative_path;
 }
 
-class CheckResult
+interface CheckResultOrSection {
+    public function getSuccess(): ?bool;
+}
+
+class CheckResult implements CheckResultOrSection
 {
     private bool $success;
     private string $stringRepresentation;
@@ -50,8 +54,12 @@ class CheckResult
         return "{$this->file}:{$this->line}[{$check}] {$this->stringRepresentation}";
     }
 
+    public function getSuccess(): ?bool
+    {
+        return $this->success;
+    }
 }
-class CheckSection {
+class CheckSection implements CheckResultOrSection {
     private string $name;
     public function __construct(string $name) {
         $this->name = $name;
@@ -59,10 +67,41 @@ class CheckSection {
     public function __toString(): string {
         return "  {$this->name}";
     }
+
+    public function getSuccess(): ?bool
+    {
+        return null;
+    }
+}
+enum CheckShowPolicy: string {
+    case ALL = "all";
+    case SUCCESS = "success";
+    case FAILURE = "failure";
 }
 class TestRunner
 {
+    /**
+     * @var CheckResultOrSection[]
+     */
     private array $testCases = [];
+    private bool $showSections = true;
+    private CheckShowPolicy $checkShowPolicy = CheckShowPolicy::FAILURE;
+
+    /**
+     * @param CheckShowPolicy $checkShowPolicy
+     */
+    public function setCheckShowPolicy(CheckShowPolicy $checkShowPolicy): void
+    {
+        $this->checkShowPolicy = $checkShowPolicy;
+    }
+
+    /**
+     * @param bool $showSections
+     */
+    public function setShowSections(bool $showSections): void
+    {
+        $this->showSections = $showSections;
+    }
 
     public function addCase(TestCase $case): self
     {
@@ -75,7 +114,8 @@ class TestRunner
         echo "BEGIN TESTS:\n";
         foreach ($this->testCases as $case) {
             $case->run();
-            $case->printResults();
+            $case->printResults($this->showSections, $this->checkShowPolicy);
+            echo "\n";
         }
         echo "END TESTS;\n";
     }
@@ -237,11 +277,75 @@ abstract class TestCase
 
     abstract public function run();
 
-    public function printResults()
+    public function printResults(bool $showSections, CheckShowPolicy $checkShowPolicy)
     {
         echo "  {$this->getName()} Checks:\n";
+        // Filter out the unwanted checks
+        $baseCheckResultsOrSections = [];
         foreach ($this->checkResultsOrSections as $checkResultOrSection) {
+            $successOrNull = $checkResultOrSection->getSuccess();
+            switch ($checkShowPolicy) {
+                case CheckShowPolicy::ALL:
+                    $baseCheckResultsOrSections[] = $checkResultOrSection;
+                case CheckShowPolicy::SUCCESS:
+                    if ($successOrNull === null || $successOrNull === true)
+                    $baseCheckResultsOrSections[] = $checkResultOrSection;
+                case CheckShowPolicy::FAILURE:
+                    if ($successOrNull === null || $successOrNull === false)
+                        $baseCheckResultsOrSections[] = $checkResultOrSection;
+            }
+        }
+        $checkResultsOrSectionsWithNormalizedSections = [];
+        $previousIsSection = false;
+
+        // Removes
+        foreach ($baseCheckResultsOrSections as $index => $item) {
+            if (is_null($item->getSuccess())) {
+                // Check if the current item is a section
+                if (!$previousIsSection) {
+                    $checkResultsOrSectionsWithNormalizedSections[] = $item;
+                    $previousIsSection = true;
+                }
+            } else {
+                // Check if the current item is a check result
+                $checkResultsOrSectionsWithNormalizedSections[] = $item;
+                $previousIsSection = false;
+            }
+
+            // Check if the last item is an empty section
+            if ($index === count($baseCheckResultsOrSections) - 1 && is_null($item->getSuccess())) {
+                array_pop($checkResultsOrSectionsWithNormalizedSections);
+            }
+        }
+        $checkResultsOrSections = [];
+        if ($showSections) {
+            $checkResultsOrSections = $checkResultsOrSectionsWithNormalizedSections;
+        } else {
+            foreach ($checkResultsOrSectionsWithNormalizedSections as $checkResultOrSection) {
+                if ($checkResultOrSection->getSuccess() === null) {
+                    continue;
+                }
+                $checkResultOrSection[] = $checkResultOrSection;
+            }
+        }
+
+
+        $success = 0;
+        $failure = 0;
+        foreach ($this->checkResultsOrSections as $checkResultOrSection) {
+            $successOrNot = $checkResultOrSection->getSuccess();
+            if ($successOrNot === true) {
+                $success++;
+            }
+            if ($successOrNot === false) {
+                $failure++;
+            }
+        }
+        foreach ($checkResultsOrSections as $checkResultOrSection) {
             echo "    {$checkResultOrSection}\n";
         }
+        echo "    SUMMARY:\n".
+             "      SUCCESS[✅] = {$success}\n".
+             "      FAILURE[❌] = {$failure}\n";
     }
 }

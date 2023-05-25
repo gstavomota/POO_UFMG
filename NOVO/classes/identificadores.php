@@ -324,32 +324,22 @@ class RG implements Equatable
 
     private static function valida_rg(string $rg): string
     {
+        $rg = str_replace('.', '', $rg);
         $numeros = substr($rg, 2);
         $estado = substr($rg, 0, 2);
 
         if (!in_array($estado, Estado::names())) {
-            throw new InvalidArgumentException("Estado invalido");
+            throw new InvalidArgumentException("Estado inválido");
         }
 
         if (!ctype_digit($numeros)) {
-            throw new InvalidArgumentException("Resto do rg não é numero");
+            throw new InvalidArgumentException("Resto do RG não é numérico");
         }
 
-        if (strlen($numeros) != 9) {
-            throw new InvalidArgumentException("Não são 9 numeros");
-        }
 
-        $digitos = str_split($numeros);
-        $weights = [2, 3, 4, 5, 6, 7, 8, 9];
-        $sum_ = array_sum(array_map(function ($d, $w) {
-            return $d * $w;
-        }, array_slice($digitos, 0, -1), $weights));
-        $dv = ($sum_ % 11);
-        if ($dv == 0) {
-            $dv = 11;
-        }
-        if ($dv != $digitos[8]) {
-            throw new InvalidArgumentException('Numero de RG invalido');
+        // Check if the RG number has a valid length
+        if (strlen($numeros) !== 8) {
+            throw new InvalidArgumentException("Resto do RG não tem 8 digitos");
         }
 
         return $rg;
@@ -357,7 +347,9 @@ class RG implements Equatable
 
     public function __toString()
     {
-        return $this->rg;
+        $rg = $this->rg;
+        $state = substr($rg, 0, 2);
+        return $state . '/' . substr($rg, 2, 2) . '.' . substr($rg, 4, 3) . '.' . substr($rg, 7);
     }
 
     public function eq(Equatable $outro): bool

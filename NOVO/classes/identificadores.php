@@ -431,7 +431,13 @@ class DocumentoPassageiro implements Equatable
         if (!$outro instanceof self) {
             throw new EquatableTypeException();
         }
-        return $this->passaporte == null && $outro->passaporte == null && $this->documento()->eq($outro->documento());
+        if ($this->passaporte === null && $outro->passaporte === null) {
+            return $this->rg->eq($outro->rg);
+        }
+        if ($this->rg === null && $outro->rg === null) {
+            return $this->passaporte->eq($outro->passaporte);
+        }
+        return false;
     }
 }
 

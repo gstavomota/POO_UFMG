@@ -467,24 +467,42 @@ class PassaporteTestCase extends TestCase {
         # Constructor
         $this->startSection("Constructor");
         try {
-            // TODO
+            new Passaporte("---------");
             $this->checkNotReached();
         } catch (InvalidArgumentException $e) {
             $this->checkReached();
         }
         try {
-            // TODO
+            new Passaporte("aaaaaaaaaa");
+            $this->checkNotReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkReached();
+        }
+        try {
+            new Passaporte("Aaaaaaaaa");
+            $this->checkReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkNotReached();
+        }
+        try {
+            new Passaporte("A99999999");
             $this->checkReached();
         } catch (InvalidArgumentException $e) {
             $this->checkNotReached();
         }
         # Stringfication
-        // TODO
+        $passaporte0 = new Passaporte("A00000000");
+        $passaporte1 = new Passaporte("A00000001");
         $this->startSection("Stringfication");
-        // TODO
+        $this->checkEq("{$passaporte0}", "A00000000");
+        $this->checkEq("{$passaporte1}", "A00000001");
         # Equality
+        $passaporte0_2 = new Passaporte("A00000000");
+        $passaporte1_2 = new Passaporte("A00000001");
         $this->startSection("Equality");
-        // TODO
+        $this->checkEq($passaporte0, $passaporte0_2);
+        $this->checkEq($passaporte1, $passaporte1_2);
+        $this->checkNeq($passaporte0, $passaporte1);
     }
 }
 class DocumentoPassageiroTestCase extends TestCase {
@@ -498,25 +516,45 @@ class DocumentoPassageiroTestCase extends TestCase {
     {
         # Constructor
         $this->startSection("Constructor");
+        $passaporte = new Passaporte("A11111111");
+        $rg = new RG("MG11.111.111");
         try {
-            // TODO
+            new DocumentoPassageiro($passaporte, $rg);
             $this->checkNotReached();
         } catch (InvalidArgumentException $e) {
             $this->checkReached();
         }
         try {
-            // TODO
+            new DocumentoPassageiro();
+            $this->checkNotReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkReached();
+        }
+        try {
+            new DocumentoPassageiro($passaporte);
+            $this->checkReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkNotReached();
+        }
+        try {
+            new DocumentoPassageiro(null, $rg);
             $this->checkReached();
         } catch (InvalidArgumentException $e) {
             $this->checkNotReached();
         }
         # Stringfication
-        // TODO
+        $documentoPassaporte = new DocumentoPassageiro($passaporte);
+        $documentoRg = new DocumentoPassageiro(null, $rg);
         $this->startSection("Stringfication");
-        // TODO
+        $this->checkEq("{$documentoPassaporte}", "{$passaporte}");
+        $this->checkEq("{$documentoRg}", "{$rg}");
         # Equality
         $this->startSection("Equality");
-        // TODO
+        $documentoPassaporte_2 = new DocumentoPassageiro($passaporte);
+        $documentoRg_2 = new DocumentoPassageiro(null, $rg);
+        $this->checkEq($documentoPassaporte, $documentoPassaporte_2);
+        $this->checkEq($documentoRg, $documentoRg_2);
+        $this->checkNeq($documentoRg, $documentoPassaporte);
     }
 }
 

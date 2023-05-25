@@ -1,9 +1,10 @@
 <?php
 include_once("enum_to_array.php");
 
-enum Nacionalidade: string {
+enum Nacionalidade: string
+{
     use EnumToArray;
-    
+
     case AFGANISTAO = "Afegão";
     case AFRICA_DO_SUL = "Sul-Africano";
     case ALBANIA = "Albanês";
@@ -55,7 +56,6 @@ enum Nacionalidade: string {
     case CUBA = "Cubano";
     case DINAMARCA = "Dinamarquês";
     case DJIBUTI = "Djiboutiano";
-    case DOMINICA = "Dominicano";
     case EGITO = "Egípcio";
     case EL_SALVADOR = "Salvadorenho";
     case EMIRADOS_ARABES_UNIDOS = "Emirati";
@@ -167,7 +167,6 @@ enum Nacionalidade: string {
     case LISTA_DOS_PAISES_DE_SAINT_KITTS_E_NEVIS = "São-cristovense";
     case LISTA_DOS_PAISES_DE_SANTA_LUCIA = "Santa-lucense";
     case LISTA_DOS_PAISES_DE_SAO_VICENTE_E_GRANADINAS = "São-vicentino";
-    case SALVADOR = "Salvadorenho";
     case SAMOA = "Samoano";
     case LISTA_DOS_PAISES_DE_SAN_MARINO = "Sanmarinense";
     case LISTA_DOS_PAISES_DE_SAO_TOME_E_PRINCIPE = "Santomense";
@@ -181,9 +180,6 @@ enum Nacionalidade: string {
     case SOMALIA = "Somali";
     case SRI_LANKA = "Sri-lankês";
     case LISTA_DOS_PAISES_DE_SAINT_PIERRE_E_MIQUELON = "Miquelonense";
-    case LISTA_DOS_PAISES_DA_ESTONIA = "Estoniano";
-    case LISTA_DOS_PAISES_DA_ESLOVAQUIA = "Eslovaco";
-    case LISTA_DOS_PAISES_DA_ESLOVENIA = "Esloveno";
     case SUDAO = "Sudanês";
     case SUDAO_DO_SUL = "Sul-sudanês";
     case LISTA_DOS_PAISES_DA_SUECIA = "Sueco";
@@ -212,7 +208,6 @@ enum Nacionalidade: string {
     case VENEZUELA = "Venezuelano";
     case VIETNAME = "Vietnamita";
     case WALLIS_E_FUTUNA = "Wallis";
-    case LISTA_DOS_PAISES_DE_YEMEN = "Iemenita";
     case LISTA_DOS_PAISES_DA_ZAMBIA = "Zambiano";
     case LISTA_DOS_PAISES_DO_ZIMBABUE = "Zimbabuano";
 }

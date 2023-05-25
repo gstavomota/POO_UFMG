@@ -23,6 +23,12 @@ class SiglaCompanhiaAerea implements Equatable
         if (strlen($v) !== 2) {
             throw new InvalidArgumentException("Sigla invalida");
         }
+        if (!ctype_alpha($v)) {
+            throw new InvalidArgumentException("Sigla invalida");
+        }
+        if (!ctype_upper($v)) {
+            throw new InvalidArgumentException("Sigla invalida");
+        }
         return $v;
     }
 
@@ -51,7 +57,7 @@ class CodigoVoo implements Equatable
 
     public function __toString(): string
     {
-        return $this->sigla_da_companhia->__toString() .
+        return "{$this->sigla_da_companhia}" .
             sprintf('%04d', $this->numero);
     }
 
@@ -87,7 +93,7 @@ enum PrefixoRegistroDeAeronave: string
 }
 
 
-class RegistroDeAeronave
+class RegistroDeAeronave implements Equatable
 {
     public PrefixoRegistroDeAeronave $prefixo;
     public string $sufixo;
@@ -174,7 +180,7 @@ class RegistroDeViagem implements Equatable
 
     public function __toString(): string
     {
-        return "{$this->prefixo}{$this->numero}";
+        return "{$this->prefixo}".sprintf('%04d', $this->numero);
     }
 
     private static function valida_prefixo(string $v): string
@@ -531,25 +537,22 @@ class CodigoDoAssento implements Equatable
 class GeradorDeCodigoDoAssento
 {
     private int $passenger_count;
-    private float $executive_ratio;
     private int $executive_count;
     private int $standard_count;
     private int $seats_per_row;
-    private int $rows_executive;
-    private int $rows_standard;
     private int $current_index = 1;
 
     public function __construct(int $passenger_count, float $executive_ratio = 0.2)
     {
         $this->passenger_count = $passenger_count;
-        $this->executive_ratio = $executive_ratio;
         $this->executive_count = (int)($passenger_count * $executive_ratio);
         $this->standard_count = $passenger_count - $this->executive_count;
         $this->seats_per_row = $this->_calculate_seats_per_row();
-        $this->rows_executive = ceil($this->executive_count / $this->seats_per_row);
-        $this->rows_standard = ceil($this->standard_count / $this->seats_per_row);
     }
 
+    /** Retorna o numero de assentos por fileira
+     * @return int
+     */
     private function _calculate_seats_per_row(): int
     {
         $standard_seats_per_row = 10;
@@ -567,6 +570,9 @@ class GeradorDeCodigoDoAssento
         }
     }
 
+    /** Gera um codigo do assento desse gerador
+     * @return CodigoDoAssento
+     */
     public function gerar(): CodigoDoAssento
     {
         if ($this->current_index <= $this->executive_count) {
@@ -584,6 +590,9 @@ class GeradorDeCodigoDoAssento
         return new CodigoDoAssento($classe, $fileira, $row);
     }
 
+    /** Gera todos os codigos do assento desse gerador
+     * @return CodigoDoAssento[]
+     */
     public function gerar_todos(): array
     {
         if ($this->current_index != 1) {
@@ -733,7 +742,7 @@ class CEP implements Equatable
 
     public function __toString(): string
     {
-        return $this->cep;
+        return substr($this->cep, 0, 5) . '-' . substr($this->cep, 5);
     }
 
     /** Retorna o cep

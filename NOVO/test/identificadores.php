@@ -399,25 +399,60 @@ class RGTestCase extends TestCase {
     {
         # Constructor
         $this->startSection("Constructor");
+        $invalidState = "AA";
+        $validState = "MG";
+        $validState_2 = "SP";
+        $validDigits = "11.111.111";
+        $validDigits_no_sep = "11111111";
         try {
-            // TODO
+            new RG($invalidState.$validDigits);
             $this->checkNotReached();
         } catch (InvalidArgumentException $e) {
             $this->checkReached();
         }
         try {
-            // TODO
+            new RG($invalidState.$validDigits_no_sep);
+            $this->checkNotReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkReached();
+        }
+        try {
+            new RG($validState."aaaaaaaa");
+            $this->checkNotReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkReached();
+        }
+        try {
+            new RG($validState."111111111");
+            $this->checkNotReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkReached();
+        }
+        try {
+            new RG($validState.$validDigits);
+            $this->checkReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkNotReached();
+        }
+        try {
+            new RG($validState_2.$validDigits_no_sep);
             $this->checkReached();
         } catch (InvalidArgumentException $e) {
             $this->checkNotReached();
         }
         # Stringfication
-        // TODO
+        $rgValido = new RG($validState.$validDigits);
+        $rgValidoSp = new RG($validState_2.$validDigits);
         $this->startSection("Stringfication");
-        // TODO
+        $this->checkEq("{$rgValido}", "MG/11.111.111");
+        $this->checkEq("{$rgValidoSp}", "SP/11.111.111");
         # Equality
+        $rgValido_2 = new RG($validState.$validDigits_no_sep);
+        $rgValidoSp_2 = new RG($validState_2.$validDigits);
         $this->startSection("Equality");
-        // TODO
+        $this->checkEq($rgValido, $rgValido_2);
+        $this->checkEq($rgValidoSp, $rgValidoSp_2);
+        $this->checkNeq($rgValido, $rgValidoSp);
     }
 }
 class PassaporteTestCase extends TestCase {

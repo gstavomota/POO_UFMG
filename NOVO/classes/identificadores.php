@@ -454,9 +454,13 @@ class GeradorDeRegistroDeViagem
     {
         $this->ultimo_id += 1;
         $id = $this->ultimo_id;
-        $numero = $id % 10000;
-        $prefixo = chr(ord('A') + ($id - 1) / 26) . chr(ord('A') + ($id - 1) % 26);
-        return new RegistroDeViagem($prefixo, $numero);
+
+        $prefixIndex = floor($id / 10000);
+        $numberPart = $id % 10000;
+
+        $prefix = chr(($prefixIndex / 26) + 65) . chr(($prefixIndex % 26) + 65);
+
+        return new RegistroDeViagem($prefix, $numberPart);
     }
 }
 

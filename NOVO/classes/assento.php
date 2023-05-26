@@ -2,7 +2,7 @@
 require_once 'franquia_de_bagagem.php';
 require_once 'identificadores.php';
 
-class Assento
+class Assento    
 {
     private CodigoDoAssento $codigo;
     private ?RegistroDePassagem $passagem;

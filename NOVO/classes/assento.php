@@ -15,7 +15,7 @@ class Assento
         $this->franquias = null;
     }
 
-    public function classe(): string
+    public function classe(): Classe
     {
         return $this->codigo->getClasse();
     }

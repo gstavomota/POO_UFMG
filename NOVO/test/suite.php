@@ -73,6 +73,13 @@ class CheckSection implements CheckResultOrSection {
         return null;
     }
 }
+
+class ReflectionException extends Exception {
+    public function __construct(string $message, int $code = 0, ?Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
+}
 enum CheckShowPolicy: string {
     case ALL = "all";
     case SUCCESS = "success";
@@ -85,7 +92,7 @@ class TestRunner
      */
     private array $testCases = [];
     private bool $showSections = true;
-    private CheckShowPolicy $checkShowPolicy = CheckShowPolicy::FAILURE;
+    private CheckShowPolicy $checkShowPolicy = CheckShowPolicy::ALL;
 
     /**
      * @param CheckShowPolicy $checkShowPolicy
@@ -249,6 +256,41 @@ abstract class TestCase
         $success = true;
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
         $this->checkResultsOrSections[] = new CheckResult($success, "should be reached", $line, $file);
+    }
+
+    protected function runNonPublicStaticMethod(string $class, string $method, mixed ...$args): mixed {
+        $reflectionMethod = new ReflectionMethod($class, $method);
+        if (!$reflectionMethod->isStatic()) {
+            throw new ReflectionException("The method is not static");
+        }
+        if ($reflectionMethod->isPublic()) {
+            throw new ReflectionException("The method is public");
+        }
+        $reflectionMethod->setAccessible(true);
+        return $reflectionMethod->invoke(null, ...$args);
+    }
+    protected function runNonPublicMethod(object $object, string $method, mixed ...$args): mixed {
+        $reflectionMethod = new ReflectionMethod($object, $method);
+        if ($reflectionMethod->isStatic()) {
+            throw new ReflectionException("The method is static");
+        }
+        if ($reflectionMethod->isPublic()) {
+            throw new ReflectionException("The method is public");
+        }
+        $reflectionMethod->setAccessible(true);
+        return $reflectionMethod->invoke($object, ...$args);
+    }
+    protected function getNonPublicProperty(object $object, string $property): mixed {
+        $reflectionProperty = new ReflectionProperty($object, $property);
+        if ($reflectionProperty->isPublic()) {
+            throw new ReflectionException("The property is public");
+        }
+        $reflectionProperty->setAccessible(true);
+        return $reflectionProperty->getValue($object);
+    }
+    protected function getPropertyDefault(string $class, string $property): mixed {
+        $reflectionProperty = new ReflectionProperty($class, $property);
+        return $reflectionProperty->getDefaultValue();
     }
     
     protected function startSection(string $name) {

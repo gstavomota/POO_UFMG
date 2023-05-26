@@ -219,21 +219,14 @@ class RegistroDeViagem implements Equatable
 }
 
 class RegistroDeVeiculo implements Equatable {
-    public int $ultimo_id;
+    public int $number;
 
-    public function __construct(int $ultimo_id = null){
-        $this->ultimo_id = $ultimo_id ?? -1;
+    public function __construct(int $number){
+        $this->number = $number;
     }
 
     public function __toString(): string {
-        return "{$this->ultimo_id}";
-    }
-
-    public function gerar(): RegistroDeVeiculo
-    {
-        $this->ultimo_id += 1;
-        $id = $this->ultimo_id;
-        return new RegistroDeVeiculo($id);
+        return "{$this->number}";
     }
 
     public function eq(Equatable $outro): bool {
@@ -241,7 +234,22 @@ class RegistroDeVeiculo implements Equatable {
             throw new EquatableTypeException();
         }
 
-        return $this->ultimo_id == $outro->ultimo_id;
+        return $this->number == $outro->number;
+    }
+}
+
+class GeradorDeRegistroDeVeiculo {
+    private int $ultimo_id;
+
+    public function __construct(int $ultimo_id = null) {
+        $this->ultimo_id = $ultimo_id  ?? -1;
+    }
+    
+    public function gerar(): RegistroDeVeiculo 
+    {
+        $this->ultimo_id += 1;
+        $id = $this->ultimo_id;
+        return new RegistroDeVeiculo($id);
     }
 }
 

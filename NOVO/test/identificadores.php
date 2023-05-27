@@ -567,27 +567,22 @@ class GeradorDeRegistroDeViagemTestCase extends TestCase {
 
     public function run()
     {
-        # Constructor
-        $this->startSection("Constructor");
-        try {
-            // TODO
-            $this->checkNotReached();
-        } catch (InvalidArgumentException $e) {
-            $this->checkReached();
+        $gerador = new GeradorDeRegistroDeViagem();
+        $codigo0 =  $gerador->gerar();
+        $codigo1 =  $gerador->gerar();
+        $this->startSection("Gerador");
+        $this->checkEq($codigo0, new RegistroDeViagem("AA", 0));
+        $this->checkEq($codigo1, new RegistroDeViagem("AA", 1));
+        for ($i = 0; $i < 10000 - 2; $i++) {
+            $gerador->gerar();
         }
-        try {
-            // TODO
-            $this->checkReached();
-        } catch (InvalidArgumentException $e) {
-            $this->checkNotReached();
+        $codigoAB0 = $gerador->gerar();
+        $this->checkEq($codigoAB0, new RegistroDeViagem("AB", 0));
+        for ($i = 0; $i < 10000 * 25 - 1; $i++) {
+            $gerador->gerar();
         }
-        # Stringfication
-        // TODO
-        $this->startSection("Stringfication");
-        // TODO
-        # Equality
-        $this->startSection("Equality");
-        // TODO
+        $codigoBA0 = $gerador->gerar();
+        $this->checkEq($codigoBA0, new RegistroDeViagem("BA", 0));
     }
 }
 class GeradorDeRegistroDePassagemTestCase extends TestCase {

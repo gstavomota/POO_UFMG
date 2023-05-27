@@ -1,5 +1,6 @@
 <?php
 require_once "suite.php";
+require_once "suite_test.php";
 require_once "temporal.php";
 require_once "identificadores.php";
 
@@ -26,6 +27,9 @@ require_once "identificadores.php";
     ->addCase(new CEPTestCase())
     ->addCase(new EnderecoTestCase())
     // Fim identificadores.php
+    // Inicio suite_test.php
+    ->addCase(new TestSuiteTestCase())
+    // Fim suite_test.php
     // Inicio temporal.php
     ->addCase(new DuracaoTestCase())
     ->addCase(new TempoTestCase())
@@ -33,4 +37,5 @@ require_once "identificadores.php";
     ->addCase(new DataTempoTestCase())
     ->addCase(new IntervaloDeTempoTestCase())
     // Fim temporal.php
+    ->setCheckShowPolicy(CheckShowPolicy::FAILURE)
     ->run();

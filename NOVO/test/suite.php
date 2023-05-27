@@ -1,4 +1,26 @@
 <?php
+
+/** An interface for logging the output of the tests
+ *
+ */
+interface TestOutputLogger {
+    /** Add an string to the output
+     * @param string $string
+     * @return void
+     */
+    public function echo(string $string): void;
+}
+
+/** An TestOutputLogger that logs to the Stdout
+ *
+ */
+class StdoutTestOutputLogger implements  TestOutputLogger {
+    public function echo(string $string): void
+    {
+        echo $string;
+    }
+}
+
 function absolute_to_relative_path(string $absolute_path, string $base_path)
 {
     // Get the real, canonicalized paths
@@ -73,34 +95,54 @@ class CheckSection implements CheckResultOrSection {
         return null;
     }
 }
+
 enum CheckShowPolicy: string {
     case ALL = "all";
     case SUCCESS = "success";
     case FAILURE = "failure";
+    case NONE = "none";
 }
 class TestRunner
 {
     /**
-     * @var CheckResultOrSection[]
+     * @var TestCase[]
      */
     private array $testCases = [];
     private bool $showSections = true;
-    private CheckShowPolicy $checkShowPolicy = CheckShowPolicy::FAILURE;
+    private CheckShowPolicy $checkShowPolicy = CheckShowPolicy::ALL;
+
+    private TestOutputLogger $testOutputLogger;
+
+    public function __construct() {
+        $this->testOutputLogger = new StdoutTestOutputLogger();
+    }
 
     /**
      * @param CheckShowPolicy $checkShowPolicy
      */
-    public function setCheckShowPolicy(CheckShowPolicy $checkShowPolicy): void
+    public function setCheckShowPolicy(CheckShowPolicy $checkShowPolicy): self
     {
         $this->checkShowPolicy = $checkShowPolicy;
+        return $this;
     }
 
     /**
      * @param bool $showSections
      */
-    public function setShowSections(bool $showSections): void
+    public function setShowSections(bool $showSections): self
     {
         $this->showSections = $showSections;
+        return $this;
+    }
+
+    /** Sets the TestOutputLogger to be used
+     * @param TestOutputLogger $testOutputLogger
+     * @return TestRunner
+     */
+    public function setTestOutputLogger(TestOutputLogger $testOutputLogger): self
+    {
+        $this->testOutputLogger = $testOutputLogger;
+        return $this;
     }
 
     public function addCase(TestCase $case): self
@@ -111,13 +153,15 @@ class TestRunner
 
     public function run()
     {
-        echo "BEGIN TESTS:\n";
-        foreach ($this->testCases as $case) {
+        $this->testOutputLogger->echo("BEGIN TESTS:\n");
+        foreach ($this->testCases as $i => $case) {
             $case->run();
-            $case->printResults($this->showSections, $this->checkShowPolicy);
-            echo "\n";
+            $case->printResults($this->showSections, $this->checkShowPolicy, $this->testOutputLogger);
+            if ($i != count($this->testCases) - 1) {
+                $this->testOutputLogger->echo("\n");
+            }
         }
-        echo "END TESTS;\n";
+        $this->testOutputLogger->echo("END TESTS;\n");
     }
 }
 
@@ -210,7 +254,7 @@ abstract class TestCase
         } else if (is_string($a) && is_string($b)) {
             $success = strcmp($a, $b) !== 0;
         } else {
-            $success = $strict ? $a === $b : $a == $b;
+            $success = $strict ? $a !== $b : $a != $b;
         }
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
         $this->checkResultsOrSections[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
@@ -250,6 +294,41 @@ abstract class TestCase
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
         $this->checkResultsOrSections[] = new CheckResult($success, "should be reached", $line, $file);
     }
+
+    protected function runNonPublicStaticMethod(string $class, string $method, mixed ...$args): mixed {
+        $reflectionMethod = new ReflectionMethod($class, $method);
+        if (!$reflectionMethod->isStatic()) {
+            throw new ReflectionException("The method is not static");
+        }
+        if ($reflectionMethod->isPublic()) {
+            throw new ReflectionException("The method is public");
+        }
+        $reflectionMethod->setAccessible(true);
+        return $reflectionMethod->invoke(null, ...$args);
+    }
+    protected function runNonPublicMethod(object $object, string $method, mixed ...$args): mixed {
+        $reflectionMethod = new ReflectionMethod($object, $method);
+        if ($reflectionMethod->isStatic()) {
+            throw new ReflectionException("The method is static");
+        }
+        if ($reflectionMethod->isPublic()) {
+            throw new ReflectionException("The method is public");
+        }
+        $reflectionMethod->setAccessible(true);
+        return $reflectionMethod->invoke($object, ...$args);
+    }
+    protected function getNonPublicProperty(object $object, string $property): mixed {
+        $reflectionProperty = new ReflectionProperty($object, $property);
+        if ($reflectionProperty->isPublic()) {
+            throw new ReflectionException("The property is public");
+        }
+        $reflectionProperty->setAccessible(true);
+        return $reflectionProperty->getValue($object);
+    }
+    protected function getPropertyDefault(string $class, string $property): mixed {
+        $reflectionProperty = new ReflectionProperty($class, $property);
+        return $reflectionProperty->getDefaultValue();
+    }
     
     protected function startSection(string $name) {
         $this->checkResultsOrSections[] = new CheckSection($name);
@@ -277,28 +356,36 @@ abstract class TestCase
 
     abstract public function run();
 
-    public function printResults(bool $showSections, CheckShowPolicy $checkShowPolicy)
+    public function printResults(bool $showSections, CheckShowPolicy $checkShowPolicy, TestOutputLogger $testOutputLogger)
     {
-        echo "  {$this->getName()} Checks:\n";
+
+        $testOutputLogger->echo("  {$this->getName()} Checks:\n");
+
         // Filter out the unwanted checks
         $baseCheckResultsOrSections = [];
         foreach ($this->checkResultsOrSections as $checkResultOrSection) {
             $successOrNull = $checkResultOrSection->getSuccess();
+
             switch ($checkShowPolicy) {
                 case CheckShowPolicy::ALL:
                     $baseCheckResultsOrSections[] = $checkResultOrSection;
+                    break;
                 case CheckShowPolicy::SUCCESS:
-                    if ($successOrNull === null || $successOrNull === true)
-                    $baseCheckResultsOrSections[] = $checkResultOrSection;
-                case CheckShowPolicy::FAILURE:
-                    if ($successOrNull === null || $successOrNull === false)
+                    if ($successOrNull === null || $successOrNull === true) {
                         $baseCheckResultsOrSections[] = $checkResultOrSection;
+                    }
+                    break;
+                case CheckShowPolicy::FAILURE:
+                    if ($successOrNull === null || $successOrNull === false) {
+                        $baseCheckResultsOrSections[] = $checkResultOrSection;
+                    }
+                    break;
             }
         }
+
         $checkResultsOrSectionsWithNormalizedSections = [];
         $previousIsSection = false;
 
-        // Removes
         foreach ($baseCheckResultsOrSections as $index => $item) {
             if (is_null($item->getSuccess())) {
                 // Check if the current item is a section
@@ -317,7 +404,9 @@ abstract class TestCase
                 array_pop($checkResultsOrSectionsWithNormalizedSections);
             }
         }
+
         $checkResultsOrSections = [];
+
         if ($showSections) {
             $checkResultsOrSections = $checkResultsOrSectionsWithNormalizedSections;
         } else {
@@ -325,7 +414,7 @@ abstract class TestCase
                 if ($checkResultOrSection->getSuccess() === null) {
                     continue;
                 }
-                $checkResultOrSection[] = $checkResultOrSection;
+                $checkResultsOrSections[] = $checkResultOrSection;
             }
         }
 
@@ -342,10 +431,10 @@ abstract class TestCase
             }
         }
         foreach ($checkResultsOrSections as $checkResultOrSection) {
-            echo "    {$checkResultOrSection}\n";
+            $testOutputLogger->echo("    {$checkResultOrSection}\n");
         }
-        echo "    SUMMARY:\n".
+        $testOutputLogger->echo( "    SUMMARY:\n".
              "      SUCCESS[✅] = {$success}\n".
-             "      FAILURE[❌] = {$failure}\n";
+             "      FAILURE[❌] = {$failure}\n");
     }
 }

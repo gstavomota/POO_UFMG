@@ -218,6 +218,41 @@ class RegistroDeViagem implements Equatable
     }
 }
 
+class RegistroDeVeiculo implements Equatable {
+    public int $number;
+
+    public function __construct(int $number){
+        $this->number = $number;
+    }
+
+    public function __toString(): string {
+        return "{$this->number}";
+    }
+
+    public function eq(Equatable $outro): bool {
+        if (!$outro instanceof self) {
+            throw new EquatableTypeException();
+        }
+
+        return $this->number == $outro->number;
+    }
+}
+
+class GeradorDeRegistroDeVeiculo {
+    private int $ultimo_id;
+
+    public function __construct(int $ultimo_id = null) {
+        $this->ultimo_id = $ultimo_id  ?? -1;
+    }
+    
+    public function gerar(): RegistroDeVeiculo 
+    {
+        $this->ultimo_id += 1;
+        $id = $this->ultimo_id;
+        return new RegistroDeVeiculo($id);
+    }
+}
+
 class SiglaAeroporto implements Equatable
 {
     public string $sigla;
@@ -454,9 +489,13 @@ class GeradorDeRegistroDeViagem
     {
         $this->ultimo_id += 1;
         $id = $this->ultimo_id;
-        $numero = $id % 10000;
-        $prefixo = chr(ord('A') + ($id - 1) / 26) . chr(ord('A') + ($id - 1) % 26);
-        return new RegistroDeViagem($prefixo, $numero);
+
+        $prefixIndex = floor($id / 10000);
+        $numberPart = $id % 10000;
+
+        $prefix = chr(($prefixIndex / 26) + 65) . chr(($prefixIndex % 26) + 65);
+
+        return new RegistroDeViagem($prefix, $numberPart);
     }
 }
 

@@ -2,7 +2,7 @@
 require_once 'franquia_de_bagagem.php';
 require_once 'identificadores.php';
 
-class Assento
+class Assento    
 {
     private CodigoDoAssento $codigo;
     private ?RegistroDePassagem $passagem;
@@ -15,7 +15,7 @@ class Assento
         $this->franquias = null;
     }
 
-    public function classe(): string
+    public function classe(): Classe
     {
         return $this->codigo->getClasse();
     }

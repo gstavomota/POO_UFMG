@@ -1,9 +1,7 @@
 <?php
 require_once ("estado.php");
 require_once ("identificadores.php");
-require_once ("coordenada.php");
-
-use Coordenada;
+require_once 'coordenada.php';
 
 class Aeroporto
 {
@@ -11,19 +9,15 @@ class Aeroporto
     private string $cidade;
     private Estado $estado;
 
-    private Coordenada $local_aeroporto;
-
     public function __construct(
         SiglaAeroporto $sigla,
         string $cidade,
         Estado $estado,
-        Coordenada $local_aeroporto
     )
     {
         $this->sigla = $sigla;
         $this->cidade = $cidade;
         $this->estado = $estado;
-        $this->local_aeroporto = $local_aeroporto;
     }
 
     public function getSigla(): SiglaAeroporto
@@ -41,8 +35,6 @@ class Aeroporto
         return $this->estado;
     }
 
-    public function getCoordenada(): Coordenada
-    {
-        return $this->local_aeroporto;
-    }
+
+
 }

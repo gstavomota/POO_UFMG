@@ -64,9 +64,9 @@ class PassageiroVip extends Passageiro
     }
 
 
-    public function alterarCategoria(Categoria $categoria)
+    public function alterarCategoria(Categoria $categoria, DataTempo $dataTempoParaTeste = null)
     {
-        $this->categoria_do_programa[] = new CategoriaComData($categoria, DataTempo::agora());
+        $this->categoria_do_programa[] = new CategoriaComData($categoria, $dataTempoParaTeste??DataTempo::agora());
     }
 
     public function getPontosValidos(): int

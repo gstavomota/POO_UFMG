@@ -18,6 +18,11 @@ class Tripulacao
         $this->trancado = false;
     }
 
+    public function getTrancado() 
+    {
+        return $this->trancado;
+    }
+    
     public function getPiloto()
     {
         return $this->piloto;
@@ -39,7 +44,7 @@ class Tripulacao
             throw new Exception("A tripulação está trancada");
         }
         if ($this->piloto != null) {
-            throw new Exception("Piloto só pode ser setado mais de uma vez.");
+            throw new Exception("Piloto só pode ser setado uma vez.");
         }
         $this->piloto = $piloto;
     }
@@ -50,7 +55,7 @@ class Tripulacao
             throw new Exception("A tripulação está trancada");
         }
         if ($this->copiloto != null) {
-            throw new Exception("Copiloto só pode ser setado mais de uma vez.");
+            throw new Exception("Copiloto só pode ser setado uma vez.");
         }
         $this->copiloto = $copiloto;
     }

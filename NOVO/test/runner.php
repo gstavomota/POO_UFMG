@@ -37,5 +37,7 @@ require_once "identificadores.php";
     ->addCase(new DataTempoTestCase())
     ->addCase(new IntervaloDeTempoTestCase())
     // Fim temporal.php
+    ->addCase(new PassageiroTestCase())
+    ->addCase(new AssentoTestCase())
     ->setCheckShowPolicy(CheckShowPolicy::FAILURE)
     ->run();

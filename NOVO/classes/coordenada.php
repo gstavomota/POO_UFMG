@@ -16,11 +16,13 @@ class Coordenada implements Equatable {
         $this->x = $x;
         $this->y = $y;
 
-        $this->checkEq();
     }
 
-    public function eq(self $other): bool {
-        return $this->x === $other->x && $this->y === $other->y;
+    public function eq(Equatable $outro): bool {
+        if (!$outro instanceof self) {
+            throw new EquatableTypeException();
+        }
+        return $this->x == $outro->x && $this->y == $outro->y;
     }
 
     public function get_x(){
@@ -31,10 +33,4 @@ class Coordenada implements Equatable {
         return $this->y;
     }
 
-    private function checkEq() : void {
-        $check = new Coordenada();
-        if($this->eq($check)){
-            throw new EquatableTypeException('As coordenadas fornecidas são iguais');
-        }
-    }
 }

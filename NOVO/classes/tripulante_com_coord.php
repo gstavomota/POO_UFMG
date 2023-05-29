@@ -6,10 +6,12 @@
 
     class TripulanteComCoordenada extends Tripulante {
         private RegistroDeTripulante $id;
-        private Coordenada $coordenada;
+        private Coordenada $estadia;
+        private Coordenada $aeroporto_de_origem;
 
-        public function __construct(Coordenada $coordenada, RegistroDeTripulante $id){
-            $this->coordenada = $coordenada;
+        public function __construct(Coordenada $estadia, Coordenada $aeroporto_de_origem ,RegistroDeTripulante $id){
+            $this->estadia = $estadia;
+            $this->aeroporto_de_origem = $aeroporto_de_origem;
             $this->id = $id;
         }
 
@@ -18,9 +20,13 @@
             return $this->id;
         }
 
-        public function getCoordenada(): Coordenada
+        public function getEstadia(): Coordenada
         {
-            return $this->coordenada;
+            return $this->estadia;
+        }
+
+        public function getAeroportoOrigem() : Coordenada{
+            return $this->aeroporto_de_origem;
         }
     }
 ?>

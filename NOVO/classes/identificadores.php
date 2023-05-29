@@ -665,6 +665,7 @@ class GeradorDeCodigoDoAssento
 class Email implements Equatable
 {
     private const EMAIL_REGEX = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i';
+    private const AT_REGEX = '/@/';
     private string $email;
 
     public function __construct(string $email)
@@ -680,6 +681,9 @@ class Email implements Equatable
     private static function validaEmail(string $email): string
     {
         if (!preg_match(Email::EMAIL_REGEX, $email)) {
+            throw new InvalidArgumentException("Email invalido");
+        }
+        if (preg_match_all(EMAIL::AT_REGEX, $email) != 1) {
             throw new InvalidArgumentException("Email invalido");
         }
         return $email;
@@ -716,7 +720,7 @@ class CPF implements Equatable
         $cpf = str_replace('.', '', $cpf);
         $cpf = str_replace('-', '', $cpf);
 
-        if (!is_numeric($cpf) || strlen($cpf) != 11) {
+        if (!ctype_digit($cpf) || strlen($cpf) != 11) {
             throw new InvalidArgumentException("CPF inválido");
         }
 
@@ -743,7 +747,6 @@ class CPF implements Equatable
         } else {
             $digit_2 = 11 - ($sum % 11);
         }
-
         // Conferir os dois dígitos
         if (substr($cpf, -2) !== "{$digit_1}{$digit_2}") {
             throw new InvalidArgumentException("CPF inválido");
@@ -757,7 +760,7 @@ class CPF implements Equatable
         if (!$outro instanceof self) {
             throw new EquatableTypeException();
         }
-        return $this->email == $outro->email;
+        return $this->cpf == $outro->cpf;
     }
 }
 

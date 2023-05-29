@@ -722,27 +722,93 @@ class EmailTestCase extends TestCase {
 
     public function run()
     {
+        $invalidEmails = [
+            # One @
+            "user@example",
+            "user@.com",
+            "@example.com",
+            "user@example..com",
+            "user@-example.com",
+            "user@example_com",
+            "user#example.com",
+            "user@example..com",
+            "user@example_com",
+            "user@example#com",
+            "user@example..com",
+            "user@[example].com",
+            "user@example_com",
+            "user@example_",
+            "user@example,com",
+            "user@example..com",
+            "user@example.com-",
+            "user@example_com",
+            "user@example!",
+            # Two @
+            "user@@example.com",
+            "user@example@@com",
+            "@example.com@",
+            "user@example@com",
+            "user@@example@@com",
+            "user@example@.com",
+            "user@example.com@",
+            "user@example@com@",
+            "user@example@.com@",
+            "user@@example.com@",
+        ];
+        $validEmails = [
+            "user@example.com",
+            "john.doe@example.com",
+            "jane.smith123@example.com",
+            "info@company.com",
+            "first.last@example.com",
+            "sales@company.co.uk",
+            "john+smith@example.com",
+            "jane.doe1234@example.com",
+            "support@website.com",
+            "johndoe1980@example.com",
+            "admin@domain.com",
+            "mary-ann@example.com",
+            "jsmith@example.net",
+            "test.email@example.com",
+            "user123@example.com",
+            "john.doe@subdomain.example.com",
+            "info1234@example.com",
+            "marketing@example.org",
+            "jdoe@example.us",
+            "contact@business.io",
+        ];
         # Constructor
         $this->startSection("Constructor");
-        try {
-            // TODO
-            $this->checkNotReached();
-        } catch (InvalidArgumentException $e) {
-            $this->checkReached();
+        foreach ($invalidEmails as $invalidEmail) {
+            try {
+                new Email($invalidEmail);
+                $this->checkNotReached();
+            } catch (InvalidArgumentException $e) {
+                $this->checkReached();
+            }
         }
-        try {
-            // TODO
-            $this->checkReached();
-        } catch (InvalidArgumentException $e) {
-            $this->checkNotReached();
+        foreach ($validEmails as $validEmail) {
+            try {
+                new Email($validEmail);
+                $this->checkReached();
+            } catch (InvalidArgumentException $e) {
+                $this->checkNotReached();
+            }
         }
-        # Stringfication
-        // TODO
+        $validEmailStr1 = $validEmails[0];
+        $validEmailStr2 = $validEmails[1];
+        $email1 = new Email($validEmailStr1);
+        $email2 = new Email($validEmailStr2);
         $this->startSection("Stringfication");
-        // TODO
+        $this->checkEq("{$email1}", $validEmailStr1);
+        $this->checkEq("{$email2}", $validEmailStr2);
         # Equality
+        $email1_2 = new Email($validEmailStr1);
+        $email2_2 = new Email($validEmailStr2);
         $this->startSection("Equality");
-        // TODO
+        $this->checkEq($email1, $email1_2);
+        $this->checkEq($email2, $email2_2);
+        $this->checkNeq($email1, $email2);
     }
 }
 class CPFTestCase extends TestCase {
@@ -757,24 +823,42 @@ class CPFTestCase extends TestCase {
         # Constructor
         $this->startSection("Constructor");
         try {
-            // TODO
+            new CPF("");
             $this->checkNotReached();
         } catch (InvalidArgumentException $e) {
             $this->checkReached();
         }
         try {
-            // TODO
+            new CPF("aaaaaaaaaaa");
+            $this->checkNotReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkReached();
+        }
+        try {
+            new CPF("11111111110");
+            $this->checkNotReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkReached();
+        }
+        try {
+            new CPF("11111111111");
             $this->checkReached();
         } catch (InvalidArgumentException $e) {
             $this->checkNotReached();
         }
         # Stringfication
-        // TODO
+        $cpf1 = new CPF("11111111111");
+        $cpf2 = new CPF("22222222222");
         $this->startSection("Stringfication");
-        // TODO
+        $this->checkEq("{$cpf1}", "111.111.111-11");
+        $this->checkEq("{$cpf2}", "222.222.222-22");
         # Equality
         $this->startSection("Equality");
-        // TODO
+        $cpf1_2 = new CPF("111.111.111-11");
+        $cpf2_2 = new CPF("222.222.222-22");
+        $this->checkEq($cpf1, $cpf1_2);
+        $this->checkEq($cpf2, $cpf2_2);
+        $this->checkNeq($cpf1, $cpf2);
     }
 }
 class CEPTestCase extends TestCase {

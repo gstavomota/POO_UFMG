@@ -22,16 +22,13 @@ class PassageiroVipTestCase extends TestCase{
         $validPassagens = array(0);
         $pontuacaoVazia = [];
         $numero_de_registro = '12345';
-        $categorias = [
-            new Categoria('bronze', 2000),
-            new Categoria('prata', 3000),
-            new Categoria('ouro', 4000),
-            new Categoria('diamante', 5000)
-        ];
+        $categorias = [];
+        $dataTempoParaTeste = null;
         $programaDeMilhagem = new ProgramaDeMilhagem($categorias, "Programa Teste");
 
+        $this->startSection("metodos");
         #método addPontos
-        $passageiroTeste = new PassageiroVip('Raphael', 'Amaral', $documentoPassageiro, $validNacionalidade, $validCPF, 
+        $passageiroTeste = new PassageiroVip($validNome, $validSobrenome, $documentoPassageiro, $validNacionalidade, $validCPF, 
         $validDataNascimento, $validEmail, $validPassagens, $pontuacaoVazia, $numero_de_registro, $categorias, $programaDeMilhagem);
         $pontos = 10;
         $passageiroTeste->addPontos($pontos);
@@ -43,6 +40,15 @@ class PassageiroVipTestCase extends TestCase{
         }
 
         #método alterarCategoria
+        try {
+            $categoria1 = new Categoria('ouro', 100);
+            $categorias = $categoria1;
+            $categoria2 = new Categoria('prata', 50);
+            $passageiroTeste->alterarCategoria($categoria2, $dataTempoParaTeste);
+            $this->checkEq($categorias, $categoria2, true);
+        } catch (InvalidArgumentException $e) {
+            echo 'Método alterarCategoria não funciona';
+        }
     }
 }
 ?>

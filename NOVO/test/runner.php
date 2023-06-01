@@ -39,7 +39,11 @@ require_once "identificadores.php";
     // Fim temporal.php
     ->addCase(new PassageiroTestCase())
     ->addCase(new AssentoTestCase())
+<<<<<<< HEAD
     ->addCase(new ProgramaDeMilhagemTestCase())
     ->addCase(new TripulacaoTestCase())
+=======
+    ->addCase(new PassageiroVipTestCase())
+>>>>>>> 8393b4bfdad057ca2169394fb1f890a553d33782
     ->setCheckShowPolicy(CheckShowPolicy::FAILURE)
     ->run();

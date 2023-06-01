@@ -36,13 +36,33 @@ class AssentoTestCase extends TestCase {
 
     # Liberar
     $this->startSection("Liberar");
-    $this->checkEq("O assento não está preenchido", $assentoTeste->liberar());
+    try {
+        $assentoTeste->liberar();
+        $this->checkNotReached();
+    } catch (PreenchimentoDeAssentoException $e) {
+        $this->checkReached();
+    }
+    $assentoTeste->reservar($registro, $franquias);
+    [$registro_2, $franquias_2] = $assentoTeste->liberar();
+    $this->checkEq($registro_2, $registro);
+    $this->checkEq($franquias_2, $franquias);
 
     # Reservar
     $this->startSection("Reservar");
-    $this->checkNeq("O assento está preenchido", $assentoTeste->reservar($registro, $franquias));
+    try {
+        $assentoTeste->reservar($registro, $franquias);
+        $this->checkReached();
+    } catch (PreenchimentoDeAssentoException $e) {
+        $this->checkNotReached();
+    }
     $this->checkEq($registro, $assentoTeste->getPassagem());
     $this->checkEq($franquias, $assentoTeste->getFranquias());
+    try {
+        $assentoTeste->reservar($registro, $franquias);
+        $this->checkNotReached();
+    } catch (PreenchimentoDeAssentoException $e) {
+        $this->checkReached();
+    }
     }
 
 }

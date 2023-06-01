@@ -2,18 +2,22 @@
     require_once("identificadores.php");
     require_once("coordenada.php");
     require_once("temporal.php");
+    require_once("calcula_distancia_aproximada_strategy.php");
 
     class Veiculo {
         private RegistroDeVeiculo $id;
         private Coordenada $coordenada;
-        private DataTempo $hora_saida;
-        private Endereco $endereco;
+        private array $tripulantesComCoordenada; 
 
-        public function __construct(RegistroDeVeiculo $id, Coordenada $coordenada, DataTempo $hora_saida, Endereco $endereco){
+        public function __construct(RegistroDeVeiculo $id, Coordenada $coordenadaAeroporto, 
+        array $tripulantesComCoordenada){
             $this->id = $id;
-            $this->coordenada = $coordenada;
-            $this->hora_saida = $hora_saida;
-            $this->endereco = $endereco;
+            $this->coordenadaAeroporto = $coordenadaAeroporto;
+            $this->tripulantesComCoordenada = $tripulantesComCoordenada;
+        }
+
+        public function calculaHoraDePartida(CalculaDistanciaStrategy ){
+
         }
     }
 ?>

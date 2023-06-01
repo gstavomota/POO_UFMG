@@ -39,6 +39,8 @@ require_once "identificadores.php";
     // Fim temporal.php
     ->addCase(new PassageiroTestCase())
     ->addCase(new AssentoTestCase())
+    ->addCase(new ProgramaDeMilhagemTestCase())
+    ->addCase(new TripulacaoTestCase())
     // Inicio PassageiroVip.php
     ->addCase(new PassageiroVipTestCase())
     // Fim PassageiroVip.php

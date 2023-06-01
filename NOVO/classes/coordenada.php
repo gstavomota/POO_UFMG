@@ -6,7 +6,19 @@ use EquatableTypeException;
 
 require_once ('Equatable.php');
 
-class Coordenada implements Equatable {
+interface ICoordenada extends Equatable {
+    /** Retorna a coordenada X
+     * @return float
+     */
+    public function getX(): float;
+
+    /** Retorna a coordenada Y
+     * @return float
+     */
+    public function getY(): float;
+}
+
+class Coordenada implements ICoordenada {
 
     private float $x;
     private float $y;
@@ -25,12 +37,11 @@ class Coordenada implements Equatable {
         return $this->x == $outro->x && $this->y == $outro->y;
     }
 
-    public function get_x(){
+    public function getX(): float{
         return $this->x;
     }
 
-    public function get_y(){
+    public function getY(): float{
         return $this->y;
     }
-
 }

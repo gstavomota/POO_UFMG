@@ -39,6 +39,8 @@ require_once "identificadores.php";
     // Fim temporal.php
     ->addCase(new PassageiroTestCase())
     ->addCase(new AssentoTestCase())
+    // Inicio PassageiroVip.php
     ->addCase(new PassageiroVipTestCase())
+    // Fim PassageiroVip.php
     ->setCheckShowPolicy(CheckShowPolicy::FAILURE)
     ->run();

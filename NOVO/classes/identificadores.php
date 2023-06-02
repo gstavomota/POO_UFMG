@@ -254,14 +254,16 @@ class GeradorDeRegistroDeVeiculo {
 }
 
 class RegistroDeCartaoDeEmbarque {
+    private SiglaCompanhiaAerea $sigla;
     public int $number;
 
-    public function __construct(int $number) {
+    public function __construct(SiglaCompanhiaAerea $sigla, int $number) {
+        $this->sigla = $sigla;
         $this->number = $number;
     }
 
     public function __toString(): string {
-        return "{$this->number}";
+        return "{$this->sigla}{$this->number}";
     }
 
     public function eq(Equatable $outro): bool {
@@ -269,21 +271,23 @@ class RegistroDeCartaoDeEmbarque {
             throw new EquatableTypeException();
         }
 
-        return $this->number == $outro->number;
+        return $this->number == $outro->number && $this->sigla->eq($outro->sigla);
     }
 }
 
 class GeradorDeRegistroDeCartaoDeEmbarque {
-    private int $ultimo_id; 
+    private SiglaCompanhiaAerea $sigla;
+    private int $ultimo_id;
 
-    public function __construct(int $ultimo_id = null) {
+    public function __construct(SiglaCompanhiaAerea $sigla, int $ultimo_id = null) {
+        $this->sigla = $sigla;
         $this->ultimo_id = $ultimo_id ?? -1;
     }
 
     public function gerar(): RegistroDeCartaoDeEmbarque {
         $this->ultimo_id += 1;
         $id = $this->ultimo_id;
-        return new RegistroDeCartaoDeEmbarque($id);
+        return new RegistroDeCartaoDeEmbarque($this->sigla, $id);
     }
 }
 

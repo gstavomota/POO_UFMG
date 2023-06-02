@@ -1,10 +1,14 @@
 <?php
+require_once "endereco.php";
+require_once "identificadores.php";
 require_once "suite.php";
 require_once "suite_test.php";
 require_once "temporal.php";
-require_once "identificadores.php";
 
 (new TestRunner())
+    // Inicio endereco.php
+    ->addCase(new EnderecoTestCase())
+    // Fim identificadores.php
     // Inicio identificadores.php
     ->addCase(new GeradorDeRegistroNumericoTestCase())
     ->addCase(new SiglaCompanhiaAereaTestCase())
@@ -26,7 +30,6 @@ require_once "identificadores.php";
     ->addCase(new EmailTestCase())
     ->addCase(new CPFTestCase())
     ->addCase(new CEPTestCase())
-    ->addCase(new EnderecoTestCase())
     // Fim identificadores.php
     // Inicio suite_test.php
     ->addCase(new TestSuiteTestCase())

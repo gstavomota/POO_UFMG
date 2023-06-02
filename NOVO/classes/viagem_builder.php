@@ -11,8 +11,11 @@ require_once('voo.php');
 class ViagemBuilder
 {
     private float $carga, $tarifa, $tarifa_franquia;
-    private int $passageiros, $valorDeMilhagem;
-    private array $assentos = array();
+    private int $passageiros, $pontuacaoMilhagem;
+    /**
+     * @var array<string, Assento>
+     */
+    private array $assentos;
     private GeradorDeRegistroDeViagem $gerador_de_registro;
     private RegistroDeViagem $registro;
     private RegistroDeAeronave $aeronave;
@@ -57,6 +60,7 @@ class ViagemBuilder
         $this->aeroporto_de_saida = $voo->getAeroportoSaida();
         $this->aeroporto_de_chegada = $voo->getAeroportoChegada();
         $this->assentos = $voo->construirAssentos();
+        $this->pontuacaoMilhagem = $voo->getPontuacaoMilhagem();
         return $this;
     }
 

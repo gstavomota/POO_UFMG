@@ -24,6 +24,7 @@ class Voo
     private int $capacidade_passageiros;
     private float $capacidade_carga;
     private float $tarifa;
+    private int $pontuacaoMilhagem;
 
     public function __construct(
         CodigoVoo           $codigo,
@@ -36,7 +37,8 @@ class Voo
         RegistroDeAeronave  $aeronave_padrao,
         int                 $capacidade_passageiros,
         float               $capacidade_carga,
-        float               $tarifa
+        float               $tarifa,
+        int                 $pontuacaoMilhagem
     )
     {
         $this->codigo = $codigo;
@@ -50,6 +52,7 @@ class Voo
         $this->capacidade_passageiros = $capacidade_passageiros;
         $this->capacidade_carga = $capacidade_carga;
         $this->tarifa = $tarifa;
+        $this->pontuacaoMilhagem = $pontuacaoMilhagem;
     }
 
     /** Getters
@@ -142,6 +145,14 @@ class Voo
     public function getTarifa(): float
     {
         return $this->tarifa;
+    }
+
+    /** Retorna a pontuacao de milhagem desse Voo
+     * @return int
+     */
+    public function getPontuacaoMilhagem(): int
+    {
+        return $this->pontuacaoMilhagem;
     }
 
     /** Methods

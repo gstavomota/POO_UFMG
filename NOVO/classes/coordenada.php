@@ -1,12 +1,23 @@
 <?php
 
-namespace Coordenada;
-use Equatable;
-use EquatableTypeException;
 
-require_once ('Equatable.php');
+require_once 'Equatable.php';
 
-class Coordenada implements Equatable {
+interface ICoordenada extends Equatable
+{
+    /** Retorna a coordenada X
+     * @return float
+     */
+    public function getX(): float;
+
+    /** Retorna a coordenada Y
+     * @return float
+     */
+    public function getY(): float;
+}
+
+class Coordenada implements ICoordenada
+{
 
     private float $x;
     private float $y;
@@ -18,19 +29,21 @@ class Coordenada implements Equatable {
 
     }
 
-    public function eq(Equatable $outro): bool {
+    public function eq(Equatable $outro): bool
+    {
         if (!$outro instanceof self) {
             throw new EquatableTypeException();
         }
         return $this->x == $outro->x && $this->y == $outro->y;
     }
 
-    public function get_x(){
+    public function getX(): float
+    {
         return $this->x;
     }
 
-    public function get_y(){
+    public function getY(): float
+    {
         return $this->y;
     }
-
 }

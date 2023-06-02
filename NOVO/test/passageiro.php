@@ -20,7 +20,7 @@
             $validData = new Data(2023, 05, 01);
             $passaporte = new Passaporte('A00000000');
             $documentoCliente = new DocumentoPassageiro($passaporte);
-            $validPassagens = array(0);
+            $validPassagens = [new RegistroDePassagem(0)];
 
             try {
                 // nome vazio

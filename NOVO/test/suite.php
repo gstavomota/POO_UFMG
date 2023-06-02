@@ -175,7 +175,14 @@ abstract class TestCase
         if (is_object($obj) && property_exists($obj, "value")) {
             return $obj->value;
         }
-        return "{$obj}";
+        try {
+            $quotes = is_string($obj) ? "\"" : "";
+            return "$quotes{$obj}$quotes";
+        } catch (Error $e) {
+            $class = get_class($obj);
+            $hash = dechex(spl_object_hash($obj));
+            return "{$class}#{$hash}";
+        }
     }
 
     protected function checkGt(mixed $a, mixed $b): void

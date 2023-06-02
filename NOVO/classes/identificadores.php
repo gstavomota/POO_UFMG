@@ -273,6 +273,44 @@ class GeradorDeRegistroDeVeiculo extends GeradorDeRegistroNumerico{
     }
 }
 
+class RegistroDeCartaoDeEmbarque {
+    private SiglaCompanhiaAerea $sigla;
+    public int $number;
+
+    public function __construct(SiglaCompanhiaAerea $sigla, int $number) {
+        $this->sigla = $sigla;
+        $this->number = $number;
+    }
+
+    public function __toString(): string {
+        return "{$this->sigla}{$this->number}";
+    }
+
+    public function eq(Equatable $outro): bool {
+        if (!$outro instanceof self) {
+            throw new EquatableTypeException();
+        }
+
+        return $this->number == $outro->number && $this->sigla->eq($outro->sigla);
+    }
+}
+
+class GeradorDeRegistroDeCartaoDeEmbarque {
+    private SiglaCompanhiaAerea $sigla;
+    private int $ultimo_id;
+
+    public function __construct(SiglaCompanhiaAerea $sigla, int $ultimo_id = null) {
+        $this->sigla = $sigla;
+        $this->ultimo_id = $ultimo_id ?? -1;
+    }
+
+    public function gerar(): RegistroDeCartaoDeEmbarque {
+        $this->ultimo_id += 1;
+        $id = $this->ultimo_id;
+        return new RegistroDeCartaoDeEmbarque($this->sigla, $id);
+    }
+}
+
 class SiglaAeroporto implements Equatable
 {
     public string $sigla;

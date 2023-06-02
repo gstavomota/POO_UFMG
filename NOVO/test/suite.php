@@ -317,8 +317,8 @@ abstract class TestCase
         $reflectionMethod->setAccessible(true);
         return $reflectionMethod->invoke($object, ...$args);
     }
-    protected function getNonPublicProperty(object $object, string $property): mixed {
-        $reflectionProperty = new ReflectionProperty($object, $property);
+    protected function getNonPublicProperty(object $object, string $property, string $class = null): mixed {
+        $reflectionProperty = new ReflectionProperty($class ?? $object, $property);
         if ($reflectionProperty->isPublic()) {
             throw new ReflectionException("The property is public");
         }

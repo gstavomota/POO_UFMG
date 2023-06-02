@@ -651,27 +651,17 @@ class ClasseTestCase extends TestCase {
 
     public function run()
     {
-        # Constructor
-        $this->startSection("Constructor");
+        # Prefixo
+        $this->startSection("Prefixo");
+        $this->checkEq(Classe::prefixo(Classe::EXECUTIVA), "E");
+        $this->checkEq(Classe::prefixo(Classe::STANDARD), "S");
         try {
-            // TODO
+            Classe::prefixo("outra");
             $this->checkNotReached();
-        } catch (InvalidArgumentException $e) {
+        } catch (TypeError $e) {
             $this->checkReached();
         }
-        try {
-            // TODO
-            $this->checkReached();
-        } catch (InvalidArgumentException $e) {
-            $this->checkNotReached();
-        }
-        # Stringfication
-        // TODO
-        $this->startSection("Stringfication");
-        // TODO
-        # Equality
-        $this->startSection("Equality");
-        // TODO
+
     }
 }
 class CodigoDoAssentoTestCase extends TestCase {

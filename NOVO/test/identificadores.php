@@ -2,6 +2,43 @@
 include_once "suite.php";
 include_once "../classes/identificadores.php";
 
+class GeradorDeRegistroInteiro extends GeradorDeRegistroNumerico {
+    public function __construct(int $ultimo_id = null)
+    {
+        parent::__construct($ultimo_id);
+    }
+    public function gerar(): int {
+        return $this->gerarNumero();
+    }
+}
+
+class GeradorDeRegistroNumericoTestCase extends TestCase {
+
+    protected function getName(): string
+    {
+        return "GeradorDeRegistroNumerico";
+    }
+
+    public function run()
+    {
+        $this->startSection("Constructor");
+        $geradorComInicioZero = new GeradorDeRegistroInteiro();
+        $geradorComInicioUm = new GeradorDeRegistroInteiro(0);
+        $this->checkEq($geradorComInicioZero->getUltimoId(), -1);
+        $this->checkEq($geradorComInicioUm->getUltimoId(), 0);
+        $this->startSection("Geracao");
+        $this->checkEq($geradorComInicioZero->gerar(), 0);
+        $this->checkEq($geradorComInicioZero->gerar(), 1);
+        $this->checkEq($geradorComInicioZero->gerar(), 2);
+        $this->checkEq($geradorComInicioUm->gerar(), 1);
+        $this->checkEq($geradorComInicioUm->gerar(), 2);
+        $this->checkEq($geradorComInicioUm->gerar(), 3);
+        $this->startSection("Ultimo id");
+        $this->checkEq($geradorComInicioZero->getUltimoId(), 2);
+        $this->checkEq($geradorComInicioUm->getUltimoId(), 3);
+    }
+}
+
 class SiglaCompanhiaAereaTestCase extends TestCase {
     protected function getName(): string
     {

@@ -4,6 +4,28 @@ include_once("estado.php");
 include_once("enum_to_array.php");
 include_once("Equatable.php");
 
+
+abstract class GeradorDeRegistroNumerico {
+
+    private int $ultimo_id;
+
+    public function __construct(int $ultimo_id = null)
+    {
+        $this->ultimo_id = $ultimo_id ?? -1;
+    }
+
+    protected function gerarNumero(): int
+    {
+        $this->ultimo_id += 1;
+        $id = $this->ultimo_id;
+        return $id;
+    }
+
+    public function getUltimoId(): int {
+        return $this->ultimo_id;
+    }
+}
+
 class SiglaCompanhiaAerea implements Equatable
 {
     public string $sigla;
@@ -238,17 +260,15 @@ class RegistroDeVeiculo implements Equatable {
     }
 }
 
-class GeradorDeRegistroDeVeiculo {
-    private int $ultimo_id;
-
-    public function __construct(int $ultimo_id = null) {
-        $this->ultimo_id = $ultimo_id  ?? -1;
-    }
-    
-    public function gerar(): RegistroDeVeiculo 
+class GeradorDeRegistroDeVeiculo extends GeradorDeRegistroNumerico{
+    public function __construct(int $ultimo_id = null)
     {
-        $this->ultimo_id += 1;
-        $id = $this->ultimo_id;
+        parent::__construct($ultimo_id);
+    }
+
+    public function gerar(): RegistroDeVeiculo
+    {
+        $id = $this->gerarNumero();
         return new RegistroDeVeiculo($id);
     }
 }
@@ -331,19 +351,16 @@ class RegistroDeTripulante implements Equatable
     }
 }
 
-class GeradorDeRegistroDeTripulante
+class GeradorDeRegistroDeTripulante extends GeradorDeRegistroNumerico
 {
-    private int $ultimo_id;
-
     public function __construct(int $ultimo_id = null)
     {
-        $this->ultimo_id = $ultimo_id ?? -1;
+        parent::__construct($ultimo_id);
     }
 
     public function gerar(): RegistroDeTripulante
     {
-        $this->ultimo_id += 1;
-        $id = $this->ultimo_id;
+        $id = $this->gerarNumero();
         return new RegistroDeTripulante($id);
     }
 }
@@ -476,19 +493,16 @@ class DocumentoPassageiro implements Equatable
     }
 }
 
-class GeradorDeRegistroDeViagem
+class GeradorDeRegistroDeViagem extends GeradorDeRegistroNumerico
 {
-    private int $ultimo_id;
-
     public function __construct(int $ultimo_id = null)
     {
-        $this->ultimo_id = $ultimo_id ?? -1;
+        parent::__construct($ultimo_id);
     }
 
     public function gerar(): RegistroDeViagem
     {
-        $this->ultimo_id += 1;
-        $id = $this->ultimo_id;
+        $id = $this->gerarNumero();
 
         $prefixIndex = floor($id / 10000);
         $numberPart = $id % 10000;
@@ -499,20 +513,17 @@ class GeradorDeRegistroDeViagem
     }
 }
 
-class GeradorDeRegistroDePassagem
-{
-    private int $ultimo_id;
 
+class GeradorDeRegistroDePassagem extends GeradorDeRegistroNumerico
+{
     public function __construct(int $ultimo_id = null)
     {
-        $this->ultimo_id = $ultimo_id ?? -1;
+        parent::__construct($ultimo_id);
     }
 
     public function gerar(): RegistroDePassagem
     {
-        $this->ultimo_id += 1;
-        $id = $this->ultimo_id;
-        return new RegistroDePassagem($id);
+        return new RegistroDePassagem($this->gerarNumero());
     }
 }
 
@@ -523,11 +534,11 @@ enum Classe: string
 
     public static function prefixo(Classe $classe): string
     {
-        match ($classe) {
+        return match ($classe) {
             Classe::EXECUTIVA => 'E',
             Classe::STANDARD => 'S',
         };
-        throw new InvalidArgumentException("Classe desconhecida");
+
     }
 }
 
@@ -589,20 +600,20 @@ class CodigoDoAssento implements Equatable
 
 }
 
-class GeradorDeCodigoDoAssento
+class GeradorDeCodigoDoAssento extends GeradorDeRegistroNumerico
 {
     private int $passenger_count;
     private int $executive_count;
     private int $standard_count;
     private int $seats_per_row;
-    private int $current_index = 1;
 
-    public function __construct(int $passenger_count, float $executive_ratio = 0.2)
+    public function __construct(int $passenger_count, float $executive_ratio = 0.2, int $ultimo_id = 0)
     {
         $this->passenger_count = $passenger_count;
         $this->executive_count = (int)($passenger_count * $executive_ratio);
         $this->standard_count = $passenger_count - $this->executive_count;
         $this->seats_per_row = $this->_calculate_seats_per_row();
+        parent::__construct($ultimo_id);
     }
 
     /** Retorna o numero de assentos por fileira
@@ -630,18 +641,17 @@ class GeradorDeCodigoDoAssento
      */
     public function gerar(): CodigoDoAssento
     {
-        if ($this->current_index <= $this->executive_count) {
-            $row = (int)(($this->current_index - 1) / $this->seats_per_row) + 1;
-            $coluna = ($this->current_index - 1) % $this->seats_per_row + 1;
+        $current_index = $this->gerarNumero();
+        if ($current_index <= $this->executive_count) {
+            $row = (int)(($current_index - 1) / $this->seats_per_row) + 1;
+            $coluna = ($current_index - 1) % $this->seats_per_row + 1;
             $classe = Classe::EXECUTIVA;
         } else {
-            $row = (int)(($this->current_index - $this->executive_count - 1) / $this->seats_per_row) + 1;
-            $coluna = ($this->current_index - $this->executive_count - 1) % $this->seats_per_row + 1;
+            $row = (int)(($current_index - $this->executive_count - 1) / $this->seats_per_row) + 1;
+            $coluna = ($current_index - $this->executive_count - 1) % $this->seats_per_row + 1;
             $classe = Classe::STANDARD;
         }
         $fileira = chr(ord('A') + $coluna - 1);
-        $this->current_index += 1;
-        $passengers_left = $this->passenger_count - ($this->current_index - 1);
         return new CodigoDoAssento($classe, $fileira, $row);
     }
 
@@ -650,11 +660,11 @@ class GeradorDeCodigoDoAssento
      */
     public function gerar_todos(): array
     {
-        if ($this->current_index != 1) {
+        if ($this->getUltimoId() != 0) {
             throw new InvalidArgumentException("O gerador deve iniciar vazio");
         }
         $codigos = [];
-        while ($this->passenger_count - ($this->current_index - 1) != 0) {
+        while ($this->passenger_count - $this->getUltimoId() != 0) {
             $codigos[] = $this->gerar();
         }
         return $codigos;

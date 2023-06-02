@@ -6,6 +6,7 @@ require_once "identificadores.php";
 
 (new TestRunner())
     // Inicio identificadores.php
+    ->addCase(new GeradorDeRegistroNumericoTestCase())
     ->addCase(new SiglaCompanhiaAereaTestCase())
     ->addCase(new CodigoVooTestCase())
     ->addCase(new RegistroDeAeronaveTestCase())

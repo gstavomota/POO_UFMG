@@ -631,27 +631,15 @@ class GeradorDeRegistroDePassagemTestCase extends TestCase {
 
     public function run()
     {
-        # Constructor
-        $this->startSection("Constructor");
-        try {
-            // TODO
-            $this->checkNotReached();
-        } catch (InvalidArgumentException $e) {
-            $this->checkReached();
-        }
-        try {
-            // TODO
-            $this->checkReached();
-        } catch (InvalidArgumentException $e) {
-            $this->checkNotReached();
-        }
-        # Stringfication
-        // TODO
-        $this->startSection("Stringfication");
-        // TODO
-        # Equality
-        $this->startSection("Equality");
-        // TODO
+        # Gerador
+        $gerador = new GeradorDeRegistroDePassagem();
+        $registro0 = $gerador->gerar();
+        $registro1 = $gerador->gerar();
+        $registro0_2 = new RegistroDePassagem(0);
+        $registro1_2 = new RegistroDePassagem(1);
+        $this->startSection("Gerador");
+        $this->checkEq($registro0, $registro0_2);
+        $this->checkEq($registro1, $registro1_2);
     }
 }
 class ClasseTestCase extends TestCase {

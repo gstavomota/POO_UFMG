@@ -1,14 +1,34 @@
 <?php
+require_once "assento.php";
+require_once "calculo_tarifa_strategy.php";
 require_once "endereco.php";
+require_once "franquia_de_bagagem.php";
 require_once "identificadores.php";
+require_once "passageiro.php";
+require_once "passageiroVip.php";
+require_once "passagem.php";
+require_once "programaDeMilhagem.php";
 require_once "suite.php";
 require_once "suite_test.php";
 require_once "temporal.php";
+require_once "tripulacao.php";
+require_once "voo.php";
 
 (new TestRunner())
+    // Inicio assento.php
+    ->addCase(new AssentoTestCase())
+    // Fim assento.php
+    // Inicio calculo_tarifa_strategy.php
+    ->addCase(new PassageiroComumCalculoTarifaStrategyTestCase())
+    ->addCase(new PassageiroVipCalculoTarifaStrategyTestCase())
+    // Fim calculo_tarifa_strategy.php
     // Inicio endereco.php
     ->addCase(new EnderecoTestCase())
     // Fim identificadores.php
+    // Inicio franquia_de_bagagem.php
+    ->addCase(new FranquiaDeBagagemTestCase())
+    ->addCase(new FranquiasDeBagagemTestCase())
+    // Fim franquia_de_bagagem.php
     // Inicio identificadores.php
     ->addCase(new GeradorDeRegistroNumericoTestCase())
     ->addCase(new SiglaCompanhiaAereaTestCase())
@@ -31,6 +51,18 @@ require_once "temporal.php";
     ->addCase(new CPFTestCase())
     ->addCase(new CEPTestCase())
     // Fim identificadores.php
+    // Inicio passageiro.php
+    ->addCase(new PassageiroTestCase())
+    // Fim passageiro.php
+    // Inicio passageiroVip.php
+    ->addCase(new PassageiroVipTestCase())
+    // Fim passageiroVip.php
+    // Inicio passagem.php
+    ->addCase(new PassagemTestCase())
+    // Fim passagem.php
+    // Inicio programaDeMilhagem.php
+    ->addCase(new ProgramaDeMilhagemTestCase())
+    // Fim programaDeMilhagem.php
     // Inicio suite_test.php
     ->addCase(new TestSuiteTestCase())
     // Fim suite_test.php
@@ -41,16 +73,11 @@ require_once "temporal.php";
     ->addCase(new DataTempoTestCase())
     ->addCase(new IntervaloDeTempoTestCase())
     // Fim temporal.php
-    ->addCase(new PassageiroTestCase())
-    ->addCase(new AssentoTestCase())
-    // Inicio ProgramaDeMilhagem.php
-    ->addCase(new ProgramaDeMilhagemTestCase())
-    // Fim ProgramaDeMilhagem.php
-    // Inicio Tripulacao.php
+    // Inicio tripulacao.php
     ->addCase(new TripulacaoTestCase())
-    // Fim Tripulacao.php
-    // Inicio PassageiroVip.php
-    ->addCase(new PassageiroVipTestCase())
-    // Fim PassageiroVip.php
+    // Fim tripulacao.php
+    // Inicio voo.php
+    ->addCase(new VooTestCase())
+    // Fim voo.php
     ->setCheckShowPolicy(CheckShowPolicy::FAILURE)
     ->run();

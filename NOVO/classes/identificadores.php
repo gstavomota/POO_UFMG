@@ -927,8 +927,8 @@ class Endereco implements Equatable
 
     private static function validaNumero(int $v): int
     {
-        if (empty($v))
-            throw new InvalidArgumentException('Por favor, insira o número da residência.');
+        if ($v < 0)
+            throw new InvalidArgumentException('O número da residência não pode ser negativo.');
         return $v;
     }
 
@@ -946,10 +946,13 @@ class Endereco implements Equatable
         return $v;
     }
 
-    private static function validaReferencia(string $v): string
+    private static function validaReferencia(?string $v): ?string
     {
+        if (is_null($v)) {
+            return $v;
+        }
         if (empty($v))
-            throw new InvalidArgumentException('Por favor, insira uma referência.');
+            throw new InvalidArgumentException('Por favor, insira uma referência ou passe nulo.');
         return $v;
     }
 

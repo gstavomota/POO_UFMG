@@ -175,12 +175,20 @@ abstract class TestCase
         if (is_object($obj) && property_exists($obj, "value")) {
             return $obj->value;
         }
+        $quotes = is_string($obj) ? "\"" : "";
+        if (is_array($obj)) {
+            $arr = $obj;
+            $obj = "{";
+            foreach ($arr as $key => $value) {
+                $obj = $obj. $key . ": " . $this->objOrEnumToString($value) .", ";
+            }
+            $obj = $obj."}";
+        }
         try {
-            $quotes = is_string($obj) ? "\"" : "";
             return "$quotes{$obj}$quotes";
         } catch (Error $e) {
             $class = get_class($obj);
-            $hash = dechex(spl_object_hash($obj));
+            $hash = spl_object_hash($obj);
             return "{$class}#{$hash}";
         }
     }

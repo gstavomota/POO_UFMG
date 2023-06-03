@@ -3,6 +3,7 @@ require_once "assento.php";
 require_once "calculo_tarifa_strategy.php";
 require_once "endereco.php";
 require_once "franquia_de_bagagem.php";
+require_once "HashMap.php";
 require_once "identificadores.php";
 require_once "passageiro.php";
 require_once "passageiroVip.php";
@@ -29,6 +30,9 @@ require_once "voo.php";
     ->addCase(new FranquiaDeBagagemTestCase())
     ->addCase(new FranquiasDeBagagemTestCase())
     // Fim franquia_de_bagagem.php
+    // Inicio HashMap.php
+    ->addCase(new HashMapTestCase())
+    // Fim HashMap.php
     // Inicio identificadores.php
     ->addCase(new GeradorDeRegistroNumericoTestCase())
     ->addCase(new SiglaCompanhiaAereaTestCase())

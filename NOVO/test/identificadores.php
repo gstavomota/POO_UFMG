@@ -676,24 +676,30 @@ class CodigoDoAssentoTestCase extends TestCase {
         # Constructor
         $this->startSection("Constructor");
         try {
-            // TODO
+            new CodigoDoAssento(Classe::STANDARD, "A", 0);
             $this->checkNotReached();
         } catch (InvalidArgumentException $e) {
             $this->checkReached();
         }
         try {
-            // TODO
+            new CodigoDoAssento(Classe::STANDARD, "A", 1);
             $this->checkReached();
         } catch (InvalidArgumentException $e) {
             $this->checkNotReached();
         }
         # Stringfication
-        // TODO
+        $codigo1 = new CodigoDoAssento(Classe::STANDARD, "A", 1);
+        $codigo2 = new CodigoDoAssento(Classe::STANDARD, "B", 1);
         $this->startSection("Stringfication");
-        // TODO
+        $this->checkEq("{$codigo1}", "SA01");
+        $this->checkEq("{$codigo2}", "SB01");
         # Equality
+        $codigo1_2 = new CodigoDoAssento(Classe::STANDARD, "A", 1);
+        $codigo2_2 = new CodigoDoAssento(Classe::STANDARD, "B", 1);
         $this->startSection("Equality");
-        // TODO
+        $this->checkEq($codigo1, $codigo1_2);
+        $this->checkEq($codigo2, $codigo2_2);
+        $this->checkNeq($codigo1, $codigo2);
     }
 }
 class GeradorDeCodigoDoAssentoTestCase extends TestCase {
@@ -705,27 +711,31 @@ class GeradorDeCodigoDoAssentoTestCase extends TestCase {
 
     public function run()
     {
-        # Constructor
-        $this->startSection("Constructor");
-        try {
-            // TODO
-            $this->checkNotReached();
-        } catch (InvalidArgumentException $e) {
-            $this->checkReached();
-        }
-        try {
-            // TODO
-            $this->checkReached();
-        } catch (InvalidArgumentException $e) {
-            $this->checkNotReached();
-        }
-        # Stringfication
-        // TODO
-        $this->startSection("Stringfication");
-        // TODO
-        # Equality
-        $this->startSection("Equality");
-        // TODO
+        # Gerador
+        $gerador = new GeradorDeCodigoDoAssento(8);
+        $codigos = [
+            new CodigoDoAssento(Classe::STANDARD, "A", 1),
+            new CodigoDoAssento(Classe::STANDARD, "B", 1),
+            new CodigoDoAssento(Classe::STANDARD, "C", 1),
+            new CodigoDoAssento(Classe::STANDARD, "D", 1),
+            new CodigoDoAssento(Classe::STANDARD, "E", 1),
+            new CodigoDoAssento(Classe::STANDARD, "F", 1),
+            new CodigoDoAssento(Classe::STANDARD, "G", 1),
+            new CodigoDoAssento(Classe::STANDARD, "H", 1),
+        ];
+        $this->startSection("Gerador");
+        $this->checkEq($gerador->gerar(), $codigos[0]);
+        $this->checkEq($gerador->gerar(), $codigos[1]);
+        $this->checkEq($gerador->gerar(), $codigos[2]);
+        $this->checkEq($gerador->gerar(), $codigos[3]);
+        $this->checkEq($gerador->gerar(), $codigos[4]);
+        $this->checkEq($gerador->gerar(), $codigos[5]);
+        $this->checkEq($gerador->gerar(), $codigos[6]);
+        $this->checkEq($gerador->gerar(), $codigos[7]);
+        # Gerar todos
+        $this->startSection("Gerar Todos");
+        $gerador = new GeradorDeCodigoDoAssento(8);
+        $this->checkEq($gerador->gerar_todos(), $codigos);
     }
 }
 class EmailTestCase extends TestCase {
@@ -888,23 +898,47 @@ class CEPTestCase extends TestCase {
         # Constructor
         $this->startSection("Constructor");
         try {
-            // TODO
+            new CEP("");
             $this->checkNotReached();
         } catch (InvalidArgumentException $e) {
             $this->checkReached();
         }
         try {
-            // TODO
+            new CEP("--------");
+            $this->checkNotReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkReached();
+        }
+        try {
+            new CEP("aaaaaaaa");
+            $this->checkNotReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkReached();
+        }
+        try {
+            new CEP("11111111");
+            $this->checkReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkNotReached();
+        }
+        try {
+            new CEP("11111-111");
             $this->checkReached();
         } catch (InvalidArgumentException $e) {
             $this->checkNotReached();
         }
         # Stringfication
-        // TODO
+        $cep1 = new CEP("11111-111");
+        $cep2 = new CEP("22222-222");
         $this->startSection("Stringfication");
-        // TODO
+        $this->checkEq("{$cep1}", "11111-111");
+        $this->checkEq("{$cep2}", "22222-222");
         # Equality
+        $cep1_2 = new CEP("11111-111");
+        $cep2_2 = new CEP("22222-222");
         $this->startSection("Equality");
-        // TODO
+        $this->checkEq($cep1, $cep1_2);
+        $this->checkEq($cep2, $cep2_2);
+        $this->checkNeq($cep1, $cep2);
     }
 }

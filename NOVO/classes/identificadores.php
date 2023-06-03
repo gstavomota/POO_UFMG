@@ -586,6 +586,12 @@ class CodigoDoAssento implements Equatable
     private string $coluna;
     private int $fileira;
 
+    /**
+     * @param Classe $classe
+     * @param string $coluna
+     * @param int $fileira
+     * @throws InvalidArgumentException se fileira for menor que 1
+     */
     public function __construct(
         Classe $classe,
         string $coluna,
@@ -594,7 +600,19 @@ class CodigoDoAssento implements Equatable
     {
         $this->classe = $classe;
         $this->coluna = $coluna;
-        $this->fileira = $fileira;
+        $this->fileira = CodigoDoAssento::validaFileira($fileira);
+    }
+
+    /** Valida uma fileira
+     * @param int $fileira
+     * @return int
+     * @throws InvalidArgumentException se fileira for menor que 1
+     */
+    private static function validaFileira(int $fileira): int {
+        if ($fileira < 1) {
+            throw new InvalidArgumentException("A fileira começa com 1");
+        }
+        return $fileira;
     }
 
     /**
@@ -645,7 +663,7 @@ class GeradorDeCodigoDoAssento extends GeradorDeRegistroNumerico
     private int $standard_count;
     private int $seats_per_row;
 
-    public function __construct(int $passenger_count, float $executive_ratio = 0.2, int $ultimo_id = 0)
+    public function __construct(int $passenger_count, float $executive_ratio = 0.0, int $ultimo_id = 0)
     {
         $this->passenger_count = $passenger_count;
         $this->executive_count = (int)($passenger_count * $executive_ratio);
@@ -838,8 +856,12 @@ class CEP implements Equatable
         // Remove caracteres não numéricos
         $cep = preg_replace('/[^0-9]/', '', $cep);
 
-        // Verifica se o CEP possui 8 dígitos
+        // Verifica se o CEP possui 8 caracteres
         if (strlen($cep) !== 8) {
+            throw new InvalidArgumentException('CEP inválido');
+        }
+
+        if (!ctype_digit($cep)) {
             throw new InvalidArgumentException('CEP inválido');
         }
 

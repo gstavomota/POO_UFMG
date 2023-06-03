@@ -10,7 +10,8 @@
         public function run() {
             $cpf = new CPF('123.456.789-09');
             $nacionalidade = Nacionalidade::BRASIL;
-            $documentoPassageiro = new DocumentoPassageiro(null, null);
+            $rg = new RG("MG"."11.111.111");
+            $documentoPassageiro = new DocumentoPassageiro(null, $rg);
             $data = Data::fromString("11/03/2003");
             $email = new Email("mariaeduardamrs0@gmail.com");
             $passagens = [];

@@ -33,6 +33,7 @@ class PassageiroVip extends Passageiro
     )
     {
         parent::__construct($nome, $sobrenome, $documento, $nacionalidade, $cpf, $data_de_nascimento, $email, $passagens);
+        $this->pontuacao = $pontuacao;
         $this->numero_de_registro = $numero_de_registro;
         $this->categoria_do_programa = $categoria_do_programa;
         $this->programa_de_milhagem = $programa_de_milhagem;

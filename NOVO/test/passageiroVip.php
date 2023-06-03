@@ -1,5 +1,5 @@
 <?php
-include_once("passageiroVip.php");
+include_once("../classes/passageiroVip.php");
 include_once "suite.php";
 
 class PassageiroVipTestCase extends TestCase{
@@ -14,7 +14,7 @@ class PassageiroVipTestCase extends TestCase{
         $validSobrenome = 'Amaral';
         $validNacionalidade = Nacionalidade::BRASIL;
         $invalidNacionalidade = Nacionalidade::ALEMANHA;
-        $validCPF = new CPF("123.456.789-99");
+        $validCPF = new CPF("111.111.111-11");
         $validEmail = new Email('raphael@gmail.com');
         $validDataNascimento = new Data(2021, 07, 06);
         $passaporte = new Passaporte('A00000000');

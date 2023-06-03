@@ -1,7 +1,6 @@
 <?php
 require_once('identificadores.php');
 require_once('nacionalidades.php');
-require_once('companhia_area.php');
 require_once('aeroporto.php');
 require_once('cargo.php');
 
@@ -15,24 +14,25 @@ class Tripulante
     private Email $email;
     private string $cht; // esse documento ainda não possui um identificador
     private Endereco $endereco;
-    private CompanhiaAerea $companhia;
+    private SiglaCompanhiaAerea $companhia;
     private SiglaAeroporto $aeroporto_base;
     private Cargo $cargo;
     private string $registro;
 
 
-    public function __construct(string         $nome,
-                                string         $sobrenome,
-                                CPF            $cpf,
-                                Nacionalidade  $nacionalidade,
-                                DataTempo      $data_de_nascimento,
-                                Email          $email,
-                                string         $cht,
-                                Endereco       $endereco,
-                                CompanhiaAerea $companhia,
-                                SiglaAeroporto $aeroporto_base,
-                                Cargo          $cargo,
-                                string         $registro)
+    public function __construct(
+        string              $nome,
+        string              $sobrenome,
+        CPF                 $cpf,
+        Nacionalidade       $nacionalidade,
+        DataTempo           $data_de_nascimento,
+        Email               $email,
+        string              $cht,
+        Endereco            $endereco,
+        SiglaCompanhiaAerea $companhia,
+        SiglaAeroporto      $aeroporto_base,
+        Cargo               $cargo,
+        string              $registro)
     {
         $this->nome = $nome;
         $this->sobrenome = $sobrenome;
@@ -88,7 +88,7 @@ class Tripulante
         return $this->endereco;
     }
 
-    public function getCompanhia(): CompanhiaAerea
+    public function getCompanhia(): SiglaCompanhiaAerea
     {
         return $this->companhia;
     }

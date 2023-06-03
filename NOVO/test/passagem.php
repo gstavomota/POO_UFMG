@@ -20,7 +20,7 @@ class PassagemTestCase extends TestCase
         $companhiaAerea = new SiglaCompanhiaAerea('GOL');
         $passaporte = new Passaporte('123456789');
         $documentoCliente = new DocumentoPassageiro($passaporte);
-        $data = new Data(2023, 09, 23);
+        $data = new Data(2023, 9, 23);
         $valor = 100.0;
         $valorPago = 50.0;
         $assentos = ['A1', 'A2'];

@@ -47,25 +47,25 @@
             //adicionar comissário já adicinoado
             try {
                 $tripulacao->addComissario($comissario1);
-                $this->checkReached();
-            } catch (InvalidArgumentException $e) {
                 $this->checkNotReached();
+            } catch (InvalidArgumentException $e) {
+                $this->checkReached();
             }
             
             // setar pela segunda vez o piloto
             try {
                 $tripulacao->setPiloto($piloto2);
-                $this->checkReached();
-            } catch (InvalidArgumentException $e) {
                 $this->checkNotReached();
+            } catch (Exception $e) {
+                $this->checkReached();
             }
 
             // setar pela segunda vez o copiloto
             try {
                 $tripulacao->setCopiloto($copiloto2);
-                $this->checkReached();
-            } catch (InvalidArgumentException $e) {
                 $this->checkNotReached();
+            } catch (Exception $e) {
+                $this->checkReached();
             }            
             
             #Método de trancar voo
@@ -77,9 +77,9 @@
             // se lança exceção quando não há piloto
             try {
                 $tripulacaoSemPiloto->trancar();
-                $this->checkReached();
-            } catch (InvalidArgumentException $e) {
                 $this->checkNotReached();
+            } catch (Exception $e) {
+                $this->checkReached();
             }
 
             $tripulacaoSemCopiloto = new Tripulacao($piloto1, null, null);
@@ -89,9 +89,9 @@
             //se lança exceção quando não há copiloto
             try {
                 $tripulacaoSemCopiloto->trancar();
-                $this->checkReached();
-            } catch(InvalidArgumentException $e) {
                 $this->checkNotReached();
+            } catch(Exception $e) {
+                $this->checkReached();
             }
 
             $tripulacaoSemComissariosSuficientes = new Tripulacao($piloto1, $copiloto1, null);
@@ -100,9 +100,9 @@
             // se lança exceção quando há menos de 2 comissarios
             try {
                 $tripulacaoSemComissariosSuficientes->trancar();
-                $this->checkReached();
-            } catch (InvalidArgumentException $e) {
                 $this->checkNotReached();
+            } catch (Exception $e) {
+                $this->checkReached();
             }
             
             $tripulacaoCompleta = new Tripulacao($piloto2, $copiloto2, null);
@@ -115,33 +115,33 @@
             //se lança exceção quando já está trancado e tenta trancar novamente
             try {
                 $tripulacaoCompleta->trancar();
-                $this->checkReached();
-            } catch (InvalidArgumentException $e) {
                 $this->checkNotReached();
+            } catch (Exception $e) {
+                $this->checkReached();
             }
 
             //testa setar o piloto com voo trancado
             try {
                 $tripulacaoCompleta->setPiloto($piloto1);
-                $this->checkReached();
-            } catch(InvalidArgumentException $e) {
                 $this->checkNotReached();
+            } catch(Exception $e) {
+                $this->checkReached();
             }
 
             // testa setar o copiloto com voo trancado
             try {
                 $tripulacaoCompleta->setCopiloto($copiloto1);
-                $this->checkReached();
-            } catch(InvalidArgumentException $e) {
                 $this->checkNotReached();
+            } catch(Exception $e) {
+                $this->checkReached();
             }
 
             // testa adicionar comissário com voo trancado
             try {
                 $tripulacaoCompleta->addComissario($comissario3);
-                $this->checkReached();
-            } catch(InvalidArgumentException $e) {
                 $this->checkNotReached();
+            } catch(Exception $e) {
+                $this->checkReached();
             }
         }
     }

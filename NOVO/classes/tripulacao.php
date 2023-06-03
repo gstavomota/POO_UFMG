@@ -3,8 +3,8 @@ require_once("identificadores.php");
 
 class Tripulacao
 {
-    private RegistroDeTripulante $piloto;
-    private RegistroDeTripulante $copiloto;
+    private ?RegistroDeTripulante $piloto;
+    private ?RegistroDeTripulante $copiloto;
     private array $comissarios;
     private bool $trancado;
 
@@ -70,7 +70,7 @@ class Tripulacao
                 throw new InvalidArgumentException("Comissario já presente");
             }
         }
-        $this->comissarios[] = $comissario;
+        $this->comissarios[] = $comissario_novo;
     }
 
 

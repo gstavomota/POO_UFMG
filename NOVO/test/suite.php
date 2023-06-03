@@ -3,7 +3,8 @@
 /** An interface for logging the output of the tests
  *
  */
-interface TestOutputLogger {
+interface TestOutputLogger
+{
     /** Add an string to the output
      * @param string $string
      * @return void
@@ -14,7 +15,8 @@ interface TestOutputLogger {
 /** An TestOutputLogger that logs to the Stdout
  *
  */
-class StdoutTestOutputLogger implements  TestOutputLogger {
+class StdoutTestOutputLogger implements TestOutputLogger
+{
     public function echo(string $string): void
     {
         echo $string;
@@ -51,7 +53,8 @@ function absolute_to_relative_path(string $absolute_path, string $base_path)
     return $relative_path;
 }
 
-interface CheckResultOrSection {
+interface CheckResultOrSection
+{
     public function getSuccess(): ?bool;
 }
 
@@ -81,12 +84,18 @@ class CheckResult implements CheckResultOrSection
         return $this->success;
     }
 }
-class CheckSection implements CheckResultOrSection {
+
+class CheckSection implements CheckResultOrSection
+{
     private string $name;
-    public function __construct(string $name) {
+
+    public function __construct(string $name)
+    {
         $this->name = $name;
     }
-    public function __toString(): string {
+
+    public function __toString(): string
+    {
         return "  {$this->name}";
     }
 
@@ -96,12 +105,14 @@ class CheckSection implements CheckResultOrSection {
     }
 }
 
-enum CheckShowPolicy: string {
+enum CheckShowPolicy: string
+{
     case ALL = "all";
     case SUCCESS = "success";
     case FAILURE = "failure";
     case NONE = "none";
 }
+
 class TestRunner
 {
     /**
@@ -113,7 +124,8 @@ class TestRunner
 
     private TestOutputLogger $testOutputLogger;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->testOutputLogger = new StdoutTestOutputLogger();
     }
 
@@ -154,14 +166,22 @@ class TestRunner
     public function run()
     {
         $this->testOutputLogger->echo("BEGIN TESTS:\n");
+        $success = 0;
+        $failure = 0;
         foreach ($this->testCases as $i => $case) {
             $case->run();
             $case->printResults($this->showSections, $this->checkShowPolicy, $this->testOutputLogger);
             if ($i != count($this->testCases) - 1) {
                 $this->testOutputLogger->echo("\n");
             }
+            [$caseSuccess, $caseFailure] = $case->getSuccessesAndFailures();
+            $success += $caseSuccess;
+            $failure += $caseFailure;
         }
         $this->testOutputLogger->echo("END TESTS;\n");
+        $this->testOutputLogger->echo("SUMMARY:\n" .
+            "SUCCESS[✅] = {$success}\n" .
+            "FAILURE[❌] = {$failure}\n");
     }
 }
 
@@ -180,9 +200,9 @@ abstract class TestCase
             $arr = $obj;
             $obj = "{";
             foreach ($arr as $key => $value) {
-                $obj = $obj. $key . ": " . $this->objOrEnumToString($value) .", ";
+                $obj = $obj . $key . ": " . $this->objOrEnumToString($value) . ", ";
             }
-            $obj = $obj."}";
+            $obj = $obj . "}";
         }
         try {
             return "$quotes{$obj}$quotes";
@@ -245,17 +265,46 @@ abstract class TestCase
         $this->checkResultsOrSections[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
     }
 
+    private function equals(mixed $a, mixed $b, bool $strict): bool
+    {
+        if ($a instanceof Equatable && $b instanceof Equatable) {
+            return $a->eq($b);
+        }
+        if (is_string($a) && is_string($b)) {
+            return strcmp($a, $b) === 0;
+        }
+        if (is_array($a) && is_array($b)) {
+            $a_keys = array_keys($a);
+            $b_keys = array_keys($b);
+
+            if (count($a_keys) !== count($b_keys)) {
+                return false;
+            }
+
+            sort($a_keys);
+            sort($b_keys);
+
+            for ($i = 0; $i < count($a_keys); $i++) {
+                if (!$this->equals($a_keys[$i], $b_keys[$i], $strict)) {
+                    return false;
+                }
+            }
+
+            foreach ($a_keys as $key) {
+                if (!$this->equals($a[$key], $b[$key], $strict)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        return $strict ? $a === $b : $a == $b;
+    }
+
     protected function checkEq(mixed $a, mixed $b, bool $strict = true): void
     {
         $symbol = $strict ? "===" : "==";
-        $success = null;
-        if ($a instanceof Equatable && $b instanceof Equatable) {
-            $success = $a->eq($b);
-        } else if (is_string($a) && is_string($b)) {
-            $success = strcmp($a, $b) === 0;
-        } else {
-            $success = $strict ? $a === $b : $a == $b;
-        }
+        $success = $this->equals($a, $b, $strict);
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
         $this->checkResultsOrSections[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
     }
@@ -310,7 +359,8 @@ abstract class TestCase
         $this->checkResultsOrSections[] = new CheckResult($success, "should be reached", $line, $file);
     }
 
-    protected function runNonPublicStaticMethod(string $class, string $method, mixed ...$args): mixed {
+    protected function runNonPublicStaticMethod(string $class, string $method, mixed ...$args): mixed
+    {
         $reflectionMethod = new ReflectionMethod($class, $method);
         if (!$reflectionMethod->isStatic()) {
             throw new ReflectionException("The method is not static");
@@ -321,7 +371,9 @@ abstract class TestCase
         $reflectionMethod->setAccessible(true);
         return $reflectionMethod->invoke(null, ...$args);
     }
-    protected function runNonPublicMethod(object $object, string $method, mixed ...$args): mixed {
+
+    protected function runNonPublicMethod(object $object, string $method, mixed ...$args): mixed
+    {
         $reflectionMethod = new ReflectionMethod($object, $method);
         if ($reflectionMethod->isStatic()) {
             throw new ReflectionException("The method is static");
@@ -332,7 +384,9 @@ abstract class TestCase
         $reflectionMethod->setAccessible(true);
         return $reflectionMethod->invoke($object, ...$args);
     }
-    protected function getNonPublicProperty(object $object, string $property, string $class = null): mixed {
+
+    protected function getNonPublicProperty(object $object, string $property, string $class = null): mixed
+    {
         $reflectionProperty = new ReflectionProperty($class ?? $object, $property);
         if ($reflectionProperty->isPublic()) {
             throw new ReflectionException("The property is public");
@@ -340,12 +394,15 @@ abstract class TestCase
         $reflectionProperty->setAccessible(true);
         return $reflectionProperty->getValue($object);
     }
-    protected function getPropertyDefault(string $class, string $property): mixed {
+
+    protected function getPropertyDefault(string $class, string $property): mixed
+    {
         $reflectionProperty = new ReflectionProperty($class, $property);
         return $reflectionProperty->getDefaultValue();
     }
-    
-    protected function startSection(string $name) {
+
+    protected function startSection(string $name)
+    {
         $this->checkResultsOrSections[] = new CheckSection($name);
     }
 
@@ -370,6 +427,25 @@ abstract class TestCase
     abstract protected function getName(): string;
 
     abstract public function run();
+
+    /** Returns the number of successes and failures
+     * @return int[]
+     */
+    public function getSuccessesAndFailures(): array
+    {
+        $success = 0;
+        $failure = 0;
+        foreach ($this->checkResultsOrSections as $checkResultOrSection) {
+            $successOrNot = $checkResultOrSection->getSuccess();
+            if ($successOrNot === true) {
+                $success++;
+            }
+            if ($successOrNot === false) {
+                $failure++;
+            }
+        }
+        return [$success, $failure];
+    }
 
     public function printResults(bool $showSections, CheckShowPolicy $checkShowPolicy, TestOutputLogger $testOutputLogger)
     {
@@ -434,22 +510,12 @@ abstract class TestCase
         }
 
 
-        $success = 0;
-        $failure = 0;
-        foreach ($this->checkResultsOrSections as $checkResultOrSection) {
-            $successOrNot = $checkResultOrSection->getSuccess();
-            if ($successOrNot === true) {
-                $success++;
-            }
-            if ($successOrNot === false) {
-                $failure++;
-            }
-        }
+        [$success, $failure] = $this->getSuccessesAndFailures();
         foreach ($checkResultsOrSections as $checkResultOrSection) {
             $testOutputLogger->echo("    {$checkResultOrSection}\n");
         }
-        $testOutputLogger->echo( "    SUMMARY:\n".
-             "      SUCCESS[✅] = {$success}\n".
-             "      FAILURE[❌] = {$failure}\n");
+        $testOutputLogger->echo("    SUMMARY:\n" .
+            "      SUCCESS[✅] = {$success}\n" .
+            "      FAILURE[❌] = {$failure}\n");
     }
 }

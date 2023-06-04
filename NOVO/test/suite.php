@@ -180,8 +180,8 @@ class TestRunner
         }
         $this->testOutputLogger->echo("END TESTS;\n");
         $this->testOutputLogger->echo("SUMMARY:\n" .
-            "SUCCESS[✅] = {$success}\n" .
-            "FAILURE[❌] = {$failure}\n");
+            "  SUCCESS[✅] = {$success}\n" .
+            "  FAILURE[❌] = {$failure}\n");
     }
 }
 

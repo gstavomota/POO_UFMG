@@ -259,6 +259,9 @@ class TestSuiteTestCase extends TestCase {
       SUCCESS[✅] = 1
       FAILURE[❌] = 0
 END TESTS;
+SUMMARY:
+  SUCCESS[✅] = 1
+  FAILURE[❌] = 0
 ");
         $testOutputLogger->clear();
         $runner = (new TestRunner())
@@ -275,6 +278,9 @@ END TESTS;
       SUCCESS[✅] = 1
       FAILURE[❌] = 0
 END TESTS;
+SUMMARY:
+  SUCCESS[✅] = 1
+  FAILURE[❌] = 0
 ");
         $testOutputLogger->clear();
         $runner = (new TestRunner())
@@ -292,6 +298,9 @@ END TESTS;
       SUCCESS[✅] = 1
       FAILURE[❌] = 1
 END TESTS;
+SUMMARY:
+  SUCCESS[✅] = 1
+  FAILURE[❌] = 1
 ");
         $testOutputLogger->clear();
         $runner = (new TestRunner())
@@ -307,6 +316,9 @@ END TESTS;
       SUCCESS[✅] = 1
       FAILURE[❌] = 1
 END TESTS;
+SUMMARY:
+  SUCCESS[✅] = 1
+  FAILURE[❌] = 1
 ");
         $testOutputLogger->clear();
         $runner = (new TestRunner())
@@ -322,6 +334,9 @@ END TESTS;
       SUCCESS[✅] = 1
       FAILURE[❌] = 1
 END TESTS;
+SUMMARY:
+  SUCCESS[✅] = 1
+  FAILURE[❌] = 1
 ");
         $testOutputLogger->clear();
         $runner = (new TestRunner())
@@ -336,6 +351,9 @@ END TESTS;
       SUCCESS[✅] = 1
       FAILURE[❌] = 1
 END TESTS;
+SUMMARY:
+  SUCCESS[✅] = 1
+  FAILURE[❌] = 1
 ");
         $this->startSection("Comparissions");
 
@@ -363,18 +381,18 @@ END TESTS;
     suite_test.php:87[✅] 0 <= 1
     suite_test.php:88[✅] 0 <= 0
       Raw successful string comparissions
-    suite_test.php:90[✅] a === a
-    suite_test.php:91[✅] b === b
-    suite_test.php:92[✅] A === A
-    suite_test.php:93[✅] a !== b
-    suite_test.php:94[✅] b !== A
-    suite_test.php:95[✅] A !== a
-    suite_test.php:96[✅] b > a
-    suite_test.php:97[✅] b >= a
-    suite_test.php:98[✅] a >= a
-    suite_test.php:99[✅] a < b
-    suite_test.php:100[✅] a <= b
-    suite_test.php:101[✅] a <= a
+    suite_test.php:90[✅] \"a\" === \"a\"
+    suite_test.php:91[✅] \"b\" === \"b\"
+    suite_test.php:92[✅] \"A\" === \"A\"
+    suite_test.php:93[✅] \"a\" !== \"b\"
+    suite_test.php:94[✅] \"b\" !== \"A\"
+    suite_test.php:95[✅] \"A\" !== \"a\"
+    suite_test.php:96[✅] \"b\" > \"a\"
+    suite_test.php:97[✅] \"b\" >= \"a\"
+    suite_test.php:98[✅] \"a\" >= \"a\"
+    suite_test.php:99[✅] \"a\" < \"b\"
+    suite_test.php:100[✅] \"a\" <= \"b\"
+    suite_test.php:101[✅] \"a\" <= \"a\"
       Raw unsuccessful int comparissions
     suite_test.php:103[❌] -1 !== -1
     suite_test.php:104[❌] 0 !== 0
@@ -387,16 +405,16 @@ END TESTS;
     suite_test.php:111[❌] 0 > 1
     suite_test.php:112[❌] 0 >= 1
       Raw unsuccessful string comparissions
-    suite_test.php:114[❌] a !== a
-    suite_test.php:115[❌] b !== b
-    suite_test.php:116[❌] A !== A
-    suite_test.php:117[❌] a === b
-    suite_test.php:118[❌] b === A
-    suite_test.php:119[❌] A === a
-    suite_test.php:120[❌] b < a
-    suite_test.php:121[❌] b <= a
-    suite_test.php:122[❌] a > b
-    suite_test.php:123[❌] a >= b
+    suite_test.php:114[❌] \"a\" !== \"a\"
+    suite_test.php:115[❌] \"b\" !== \"b\"
+    suite_test.php:116[❌] \"A\" !== \"A\"
+    suite_test.php:117[❌] \"a\" === \"b\"
+    suite_test.php:118[❌] \"b\" === \"A\"
+    suite_test.php:119[❌] \"A\" === \"a\"
+    suite_test.php:120[❌] \"b\" < \"a\"
+    suite_test.php:121[❌] \"b\" <= \"a\"
+    suite_test.php:122[❌] \"a\" > \"b\"
+    suite_test.php:123[❌] \"a\" >= \"b\"
       Wrapped successful int comparissions
     suite_test.php:125[✅] -1 === -1
     suite_test.php:126[✅] 0 === 0
@@ -449,6 +467,9 @@ END TESTS;
       SUCCESS[✅] = 48
       FAILURE[❌] = 40
 END TESTS;
+SUMMARY:
+  SUCCESS[✅] = 48
+  FAILURE[❌] = 40
 ");
         $this->startSection("Reflection");
         $this->checkEq($this->getPropertyDefault(ClassWithPrivateStuff::class, "fieldWithDefault"), "default");

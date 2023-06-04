@@ -76,6 +76,9 @@ class DuracaoTestCase extends TestCase {
         $duracaoMenosUmMenosUm = new Duracao(-1,-1);
         $this->checkEq($duracaoMenosUmMenosUm->getDia(), -1);
         $this->checkEq($duracaoMenosUmMenosUm->getSegundo(), -1.0);
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($duracaoUm->hashCode(), $duracaoUmDia->hashCode());
     }
 }
 class TempoTestCase extends TestCase {
@@ -131,6 +134,9 @@ class TempoTestCase extends TestCase {
         $this->checkEq($duracaoUmaHora->getDia(), 0);
         $this->checkApproximate($duracaoMenosUmaHora->getSegundo(), -$umaHoraEmSegundos);
         $this->checkEq($duracaoMenosUmaHora->getDia(), 0);
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($tempoMeiaNoite->hashCode(), $tempoUmaDaManha->hashCode());
     }
 }
 
@@ -235,6 +241,9 @@ class DataTestCase extends TestCase {
         $duracaoMenosUmDia = new Duracao(-1, 0);
         $duracaoMenosUmDia_2 = $data240523->dt($data250523);
         $this->checkEq($duracaoMenosUmDia, $duracaoMenosUmDia_2);
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($data250523->hashCode(), $data240523->hashCode());
     }
 }
 class DataTempoTestCase extends TestCase {
@@ -285,6 +294,9 @@ class DataTempoTestCase extends TestCase {
         $this->startSection("Delta");
         $this->checkEq($dataTempo250523_meioDia->dt($dataTempo240523_meiaNoite), $duracaoUmDiaEDozeHoras);
         $this->checkEq($dataTempo240523_meiaNoite->dt($dataTempo250523_meioDia), $duracaoUmDiaEDozeHoras->mul(-1));
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($dataTempo240523_meiaNoite->hashCode(), $dataTempo250523_meioDia->hashCode());
     }
 }
 class IntervaloDeTempoTestCase extends TestCase {
@@ -332,6 +344,8 @@ class IntervaloDeTempoTestCase extends TestCase {
         $this->checkSte($intervalo220523_meiaNoite_ate_230523_meiaNoite, $intervalo240523_meiaNoite_ate_260523_meiaNoite);
         $this->checkSte($intervalo240523_meiaNoite_ate_260523_meiaNoite, $intervalo240523_meiaNoite_ate_260523_meiaNoite_2);
         $this->checkEq($intervalo240523_meiaNoite_ate_260523_meiaNoite, $intervalo240523_meiaNoite_ate_260523_meiaNoite_2);
-
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($intervalo240523_meiaNoite_ate_260523_meiaNoite->hashCode(), $intervalo220523_meiaNoite_ate_230523_meiaNoite->hashCode());
     }
 }

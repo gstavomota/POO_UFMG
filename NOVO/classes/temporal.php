@@ -7,7 +7,7 @@ require_once "Equatable.php";
 /** Uma classe normalizada que determina um intervalo de tempo.
  *
  */
-class Duracao implements Comparable {
+class Duracao implements HashableAndComparable {
     private float $segundo;
     private int $dia;
     private bool $negativo;
@@ -212,12 +212,17 @@ class Duracao implements Comparable {
     public function abs(): Duracao {
         return new Duracao(0, abs($this->emSegundos()));
     }
+
+    public function hashCode(): int
+    {
+        return combineHash([$this->dia, $this->segundo, $this->negativo]);
+    }
 }
 
 /** Uma classe normalizada que determina um tempo em um dia.
  *
  */
-class Tempo implements Comparable {
+class Tempo implements HashableAndComparable {
     private int $hora;
     private int $minuto;
     private float $segundo;
@@ -433,6 +438,11 @@ class Tempo implements Comparable {
     public static function meiaNoite(): Tempo {
         return new Tempo(0,0,0);
     }
+
+    public function hashCode(): int
+    {
+        return combineHash([$this->hora, $this->minuto, $this->segundo]);
+    }
 }
 
 /** Um Enum com os dias da semana. Ele possui a trait EnumToArray pra ter acesso a metodos estaticos uteis.
@@ -452,7 +462,7 @@ enum DiaDaSemana: string {
 /** Uma classe normalizada que determina uma data.
  *
  */
-class Data implements Comparable {
+class Data implements HashableAndComparable {
     private int $ano;
     private int $mes;
     private int $dia;
@@ -682,13 +692,18 @@ class Data implements Comparable {
         $meiaNoite = Tempo::meiaNoite();
         return $this->comTempo($meiaNoite)->dt($outra->comTempo($meiaNoite));
     }
+
+    public function hashCode(): int
+    {
+        return combineHash([$this->dia, $this->mes, $this->ano]);
+    }
 }
 
 
 /** Uma classe normalizada que determina um dia e um tempo nele.
  *
  */
-class DataTempo implements Comparable {
+class DataTempo implements HashableAndComparable {
     private Data $data;
     private Tempo $tempo;
     public function __construct(Data $data, Tempo $tempo)
@@ -868,12 +883,17 @@ class DataTempo implements Comparable {
     public function ate(DataTempo $outra): IntervaloDeTempo {
         return new IntervaloDeTempo($this, $outra);
     }
+
+    public function hashCode(): int
+    {
+        return combineHash([$this->data, $this->tempo]);
+    }
 }
 
 /** Uma classe que representa um intervalo de tempo com inicio e fim.
  *
  */
-class IntervaloDeTempo implements Comparable {
+class IntervaloDeTempo implements HashableAndComparable {
     private DataTempo $inicio;
     private DataTempo $fim;
 
@@ -1003,6 +1023,11 @@ class IntervaloDeTempo implements Comparable {
      */
     public function contem(DataTempo $outra): bool {
         return $this->inicio->ste($outra) && $this->fim->gte($outra);
+    }
+
+    public function hashCode(): int
+    {
+        return combineHash([$this->inicio, $this->fim]);
     }
 }
 ?>

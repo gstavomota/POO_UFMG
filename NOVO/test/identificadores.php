@@ -90,6 +90,9 @@ class SiglaCompanhiaAereaTestCase extends TestCase {
         $this->startSection("Comparission");
         $this->checkEq($siglaAA, $siglaAA_2);
         $this->checkNeq($siglaAA, $siglaBB);
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($siglaAA->hashCode(), $siglaBB->hashCode());
     }
 }
 class CodigoVooTestCase extends TestCase {
@@ -146,6 +149,9 @@ class CodigoVooTestCase extends TestCase {
         $this->checkEq($codigo0, $codigo0_2);
         $this->checkEq($codigo9999, $codigo9999_2);
         $this->checkNeq($codigo0, $codigo9999);
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($codigo0->hashCode(), $codigo9999->hashCode());
     }
 }
 class RegistroDeAeronaveTestCase extends TestCase {
@@ -202,6 +208,9 @@ class RegistroDeAeronaveTestCase extends TestCase {
         $this->checkEq($registroaaa, $registroaaa_2);
         $this->checkEq($registrobbb, $registrobbb_2);
         $this->checkNeq($registroaaa, $registrobbb);
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($registrobbb->hashCode(), $registroaaa->hashCode());
     }
 }
 
@@ -247,6 +256,9 @@ class RegistroDePassagemTestCase extends TestCase {
         $this->checkEq($registro0, $registro0_2);
         $this->checkEq($registro1, $registro1_2);
         $this->checkNeq($registro0, $registro1);
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($registro0->hashCode(), $registro1->hashCode());
     }
 }
 class RegistroDeViagemTestCase extends TestCase {
@@ -315,6 +327,9 @@ class RegistroDeViagemTestCase extends TestCase {
         $this->checkEq($registroAA0, $registroAA0_2);
         $this->checkEq($registroBB9999, $registroBB9999_2);
         $this->checkNeq($registroAA0, $registroBB9999);
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($registroAA0->hashCode(), $registroBB9999->hashCode());
     }
 }
 class SiglaAeroportoTestCase extends TestCase {
@@ -403,6 +418,9 @@ class RegistroDeTripulanteTestCase extends TestCase {
         $this->checkEq($registro0, $registro0_2);
         $this->checkEq($registro1, $registro1_2);
         $this->checkNeq($registro0, $registro1);
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($registro0->hashCode(), $registro1->hashCode());
     }
 }
 class GeradorDeRegistroDeTripulanteTestCase extends TestCase {
@@ -490,6 +508,9 @@ class RGTestCase extends TestCase {
         $this->checkEq($rgValido, $rgValido_2);
         $this->checkEq($rgValidoSp, $rgValidoSp_2);
         $this->checkNeq($rgValido, $rgValidoSp);
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($rgValido->hashCode(), $rgValidoSp->hashCode());
     }
 }
 class PassaporteTestCase extends TestCase {
@@ -540,6 +561,9 @@ class PassaporteTestCase extends TestCase {
         $this->checkEq($passaporte0, $passaporte0_2);
         $this->checkEq($passaporte1, $passaporte1_2);
         $this->checkNeq($passaporte0, $passaporte1);
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($passaporte0->hashCode(), $passaporte1->hashCode());
     }
 }
 class DocumentoPassageiroTestCase extends TestCase {
@@ -592,6 +616,9 @@ class DocumentoPassageiroTestCase extends TestCase {
         $this->checkEq($documentoPassaporte, $documentoPassaporte_2);
         $this->checkEq($documentoRg, $documentoRg_2);
         $this->checkNeq($documentoRg, $documentoPassaporte);
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($documentoRg->hashCode(), $documentoPassaporte->hashCode());
     }
 }
 
@@ -700,6 +727,9 @@ class CodigoDoAssentoTestCase extends TestCase {
         $this->checkEq($codigo1, $codigo1_2);
         $this->checkEq($codigo2, $codigo2_2);
         $this->checkNeq($codigo1, $codigo2);
+        # Hash
+        $this->startSection("Hash");
+        $this->checkNeq($codigo1->hashCode(), $codigo2->hashCode());
     }
 }
 class GeradorDeCodigoDoAssentoTestCase extends TestCase {

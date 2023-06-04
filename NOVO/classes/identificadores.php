@@ -3,7 +3,7 @@
 include_once("estado.php");
 include_once("enum_to_array.php");
 include_once("Equatable.php");
-
+include_once "HashableAndEquatable.php";
 
 abstract class GeradorDeRegistroNumerico {
 
@@ -26,7 +26,7 @@ abstract class GeradorDeRegistroNumerico {
     }
 }
 
-class SiglaCompanhiaAerea implements Equatable
+class SiglaCompanhiaAerea implements HashableAndEquatable
 {
     public string $sigla;
 
@@ -61,9 +61,14 @@ class SiglaCompanhiaAerea implements Equatable
         }
         return $this->sigla == $outro->sigla;
     }
+
+    public function hashCode(): int
+    {
+        return hashObject($this->sigla);
+    }
 }
 
-class CodigoVoo implements Equatable
+class CodigoVoo implements HashableAndEquatable
 {
     public SiglaCompanhiaAerea $sigla_da_companhia;
     public int $numero;
@@ -102,6 +107,11 @@ class CodigoVoo implements Equatable
         return $this->sigla_da_companhia->eq($outro->sigla_da_companhia) &&
             $this->numero == $outro->numero;
     }
+
+    public function hashCode(): int
+    {
+        return combineHash([$this->sigla_da_companhia, $this->numero]);
+    }
 }
 
 enum PrefixoRegistroDeAeronave: string
@@ -115,7 +125,7 @@ enum PrefixoRegistroDeAeronave: string
 }
 
 
-class RegistroDeAeronave implements Equatable
+class RegistroDeAeronave implements HashableAndEquatable
 {
     public PrefixoRegistroDeAeronave $prefixo;
     public string $sufixo;
@@ -156,9 +166,14 @@ class RegistroDeAeronave implements Equatable
         return $this->prefixo == $outro->prefixo &&
             $this->sufixo == $outro->sufixo;
     }
+
+    public function hashCode(): int
+    {
+        return combineHash([$this->prefixo->value, $this->sufixo]);
+    }
 }
 
-class RegistroDePassagem implements Equatable
+class RegistroDePassagem implements HashableAndEquatable
 {
     public int $number;
 
@@ -187,9 +202,14 @@ class RegistroDePassagem implements Equatable
         }
         return $this->number == $outro->number;
     }
+
+    public function hashCode(): int
+    {
+        return hashObject($this->number);
+    }
 }
 
-class RegistroDeViagem implements Equatable
+class RegistroDeViagem implements HashableAndEquatable
 {
     public string $prefixo;
     public int $numero;
@@ -237,6 +257,11 @@ class RegistroDeViagem implements Equatable
         }
         return $this->prefixo == $outro->prefixo &&
             $this->numero == $outro->numero;
+    }
+
+    public function hashCode(): int
+    {
+        return combineHash([$this->prefixo, $this->numero]);
     }
 }
 
@@ -348,7 +373,7 @@ class SiglaAeroporto implements Equatable
     }
 }
 
-class RegistroDeTripulante implements Equatable
+class RegistroDeTripulante implements HashableAndEquatable
 {
     private int $idTripulante;
 
@@ -387,6 +412,11 @@ class RegistroDeTripulante implements Equatable
         }
         return $this->idTripulante == $outro->idTripulante;
     }
+
+    public function hashCode(): int
+    {
+        return hashObject($this->idTripulante);
+    }
 }
 
 class GeradorDeRegistroDeTripulante extends GeradorDeRegistroNumerico
@@ -403,7 +433,7 @@ class GeradorDeRegistroDeTripulante extends GeradorDeRegistroNumerico
     }
 }
 
-class RG implements Equatable
+class RG implements HashableAndEquatable
 {
     public string $rg;
 
@@ -449,9 +479,14 @@ class RG implements Equatable
         }
         return $this->rg == $outro->rg;
     }
+
+    public function hashCode(): int
+    {
+        return hashObject($this->rg);
+    }
 }
 
-class Passaporte implements Equatable
+class Passaporte implements HashableAndEquatable
 {
     public string $passaporte;
 
@@ -486,9 +521,14 @@ class Passaporte implements Equatable
         }
         return $this->passaporte == $outro->passaporte;
     }
+
+    public function hashCode(): int
+    {
+        return hashObject($this->passaporte);
+    }
 }
 
-class DocumentoPassageiro implements Equatable
+class DocumentoPassageiro implements HashableAndEquatable
 {
     private ?Passaporte $passaporte;
     private ?RG $rg;
@@ -528,6 +568,11 @@ class DocumentoPassageiro implements Equatable
             return $this->passaporte->eq($outro->passaporte);
         }
         return false;
+    }
+
+    public function hashCode(): int
+    {
+        return combineHash([$this->passaporte, $this->rg]);
     }
 }
 
@@ -580,7 +625,7 @@ enum Classe: string
     }
 }
 
-class CodigoDoAssento implements Equatable
+class CodigoDoAssento implements HashableAndEquatable
 {
     private Classe $classe;
     private string $coluna;
@@ -654,6 +699,14 @@ class CodigoDoAssento implements Equatable
             $this->fileira == $outro->fileira;
     }
 
+    public function hashCode(): int
+    {
+        return combineHash([
+            $this->classe->value,
+            $this->coluna,
+            $this->fileira
+        ]);
+    }
 }
 
 class GeradorDeCodigoDoAssento extends GeradorDeRegistroNumerico

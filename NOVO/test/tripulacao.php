@@ -42,7 +42,7 @@
 
             // adicionar comissário
             $tripulacao->addComissario($comissario1);
-            $this->checkEq($tripulacao->getComissarios(), $comissario1);
+            $this->checkEq($tripulacao->getComissarios(), [$comissario1]);
 
             //adicionar comissário já adicinoado
             try {

@@ -49,23 +49,25 @@ class CompanhiaAerea extends Persist
      * @var HashMap<RegistroDeTripulante, Tripulante>
      */
     private HashMap $tripulantes;
+    private GeradorDeRegistroDeTripulante $gerador_de_registro_de_tripulante;
     private static $local_filename = "companhia_aerea.txt";
 
-    public function __construct(string                      $nome,
-                                string                      $codigo,
-                                string                      $razao_social,
-                                SiglaCompanhiaAerea         $sigla,
-                                HashMap                     $aeronaves,
-                                HashMap                     $voos_planejados,
-                                HashMap                     $voos_em_venda,
-                                HashMap                     $voos_executados,
-                                GeradorDeRegistroDeViagem   $gerador_de_registro_de_viagem,
-                                GeradorDeRegistroDePassagem $gerador_de_registro_de_passagem,
-                                float                       $tarifa_franquia,
-                                HashMap                     $passagens,
-                                HashMap                     $passageiros,
-                                HashMap                     $tripulantes,
-                                                            ...$args)
+    public function __construct(string                        $nome,
+                                string                        $codigo,
+                                string                        $razao_social,
+                                SiglaCompanhiaAerea           $sigla,
+                                HashMap                       $aeronaves,
+                                HashMap                       $voos_planejados,
+                                HashMap                       $voos_em_venda,
+                                HashMap                       $voos_executados,
+                                GeradorDeRegistroDeViagem     $gerador_de_registro_de_viagem,
+                                GeradorDeRegistroDePassagem   $gerador_de_registro_de_passagem,
+                                float                         $tarifa_franquia,
+                                HashMap                       $passagens,
+                                HashMap                       $passageiros,
+                                HashMap                       $tripulantes,
+                                GeradorDeRegistroDeTripulante $gerador_de_registro_de_tripulante,
+                                                              ...$args)
     {
 
         $this->nome = $nome;
@@ -82,6 +84,7 @@ class CompanhiaAerea extends Persist
         $this->passagens = $passagens;
         $this->passageiros = $passageiros;
         $this->tripulantes = $tripulantes;
+        $this->gerador_de_registro_de_tripulante = $gerador_de_registro_de_tripulante;
         parent::__construct(...$args);
     }
 
@@ -163,25 +166,25 @@ class CompanhiaAerea extends Persist
     public function registrar_que_viagem_aconteceu(DataTempo $hora_de_partida, DataTempo $hora_de_chegada, RegistroDeViagem $registro_de_viagem)
     {
         /**
-         * @var null|ViagemBuilder $fabrica
+         * @var null|ViagemBuilder $builder
          */
-        $fabrica = null;
+        $builder = null;
         /**
-         * @var HashMap<Data, ViagemBuilder> $registro_fabrica
+         * @var HashMap<RegistroDeViagem, ViagemBuilder> $registro_builder
          */
-        foreach ($this->voos_em_venda->values() as $registro_fabrica) {
-            if ($registro_fabrica->containsKey($registro_de_viagem)) {
-                $fabrica = $registro_fabrica->get($registro_de_viagem);
-                $registro_fabrica->remove($registro_de_viagem);
+        foreach ($this->voos_em_venda->values() as $registro_builder) {
+            if ($registro_builder->containsKey($registro_de_viagem)) {
+                $builder = $registro_builder->get($registro_de_viagem);
+                $registro_builder->remove($registro_de_viagem);
                 break;
             }
         }
-        if (is_null($fabrica)) {
+        if (is_null($builder)) {
             throw new Exception("Fabrica não encontrada");
         }
 
-        $fabrica->addHoraDePartidaEHoraDeChegada($hora_de_partida, $hora_de_chegada);
-        $viagem = $fabrica->build();
+        $builder->addHoraDePartidaEHoraDeChegada($hora_de_partida, $hora_de_chegada);
+        $viagem = $builder->build();
         $this->voos_executados->put($viagem->getRegistro(), $viagem);
         /**
          * @var Assento $assento
@@ -608,7 +611,7 @@ class CompanhiaAerea extends Persist
          * @var ViagemBuilder[] $viagem_builders
          */
         $viagem_builders = array_map(function (CodigoVoo $codigoVoo) use ($data) {
-                return $this->findViagemBuilderByCodigoVoo($codigoVoo, $data);
+            return $this->findViagemBuilderByCodigoVoo($codigoVoo, $data);
         }, $voos);
 
         foreach ($viagem_builders as $viagem_builder) {
@@ -666,6 +669,111 @@ class CompanhiaAerea extends Persist
         $passageiro->addPassagem($registro_passagem);
         $this->passagens->put($registro_passagem, $passagem);
         return $registro_passagem;
+    }
+
+    public function adicionarVoo(Voo $voo): void
+    {
+        if ($this->voos_planejados->containsKey($voo->getCodigo())) {
+            throw new Exception("Voo já presente");
+        }
+        # Adicionar aos voos planejados
+        $this->voos_planejados->put($voo->getCodigo(), $voo);
+        # Adicionar aos voos em venda que já estão presentes
+        foreach ($this->voos_em_venda->entries() as $entry) {
+            $data = $entry->key;
+            $viagem_builders = $entry->value;
+            if (!in_array($data->getDiaDaSemana(), $voo->getDiasDaSemana())) {
+                continue;
+            }
+            $viagem_builder = (new ViagemBuilder())
+                ->addTarifaFranquia($this->tarifa_franquia)
+                ->adicionarGeradorDeRegistro($this->gerador_de_registro_de_viagem)
+                ->gerarRegistro()
+                ->addData($data)
+                ->addVoo($voo);
+
+            $registro_da_viagem = $viagem_builder->getRegistro();
+            $viagem_builders->put($registro_da_viagem, $viagem_builder);
+        }
+    }
+
+    public function encontrarVoo(CodigoVoo $voo): ?Voo
+    {
+        return $this->voos_planejados->get($voo);
+    }
+
+    public function adicionarPassageiro(Passageiro $passageiro): void
+    {
+        if ($this->passageiros->containsKey($passageiro->getDocumento())) {
+            throw new Exception("Passageiro já presente");
+        }
+        $this->passageiros->put($passageiro->getDocumento(), $passageiro);
+    }
+
+    public function encontrarPassageiro(DocumentoPassageiro $passageiro): ?Passageiro
+    {
+        return $this->passageiros->get($passageiro);
+    }
+
+    public function registrarTripulante(
+        string              $nome,
+        string              $sobrenome,
+        CPF                 $cpf,
+        Nacionalidade       $nacionalidade,
+        DataTempo           $data_de_nascimento,
+        Email               $email,
+        string              $cht,
+        Endereco            $endereco,
+        SiglaCompanhiaAerea $companhia,
+        SiglaAeroporto      $aeroporto_base,
+        Cargo               $cargo): Tripulante
+    {
+        $registro = $this->gerador_de_registro_de_tripulante->gerar();
+        $tripulante = new Tripulante(
+            $nome,
+            $sobrenome,
+            $cpf,
+            $nacionalidade,
+            $data_de_nascimento,
+            $email,
+            $cht,
+            $endereco,
+            $companhia,
+            $aeroporto_base,
+            $cargo,
+            $registro,
+        );
+        $this->tripulantes->put($registro, $tripulante);
+        return $tripulante;
+    }
+
+    public function encontrarTripulante(RegistroDeTripulante $tripulante): ?Tripulante
+    {
+        return $this->tripulantes->get($tripulante);
+    }
+
+    public function registrarAeronave(
+        string             $fabricante,
+        string             $modelo,
+        int                $capacidade_passageiros,
+        float              $capacidade_carga,
+        RegistroDeAeronave $registro)
+    {
+        if ($this->aeronaves->containsKey($registro)) {
+            throw new Exception("Aeronave já presente");
+        }
+        $aeronave = new Aeronave(
+            $this->sigla,
+            $fabricante,
+            $modelo,
+            $capacidade_passageiros,
+            $capacidade_carga, $registro
+        );
+        $this->aeronaves->put($registro, $aeronave);
+        return $aeronave;
+    }
+    public function encontrarAeronave(RegistroDeAeronave $registro): ?Aeronave {
+        return $this->aeronaves->get($registro);
     }
 }
 

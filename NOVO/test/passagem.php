@@ -14,16 +14,16 @@ class PassagemTestCase extends TestCase
     {
         # Constructor
         $this->startSection("Constructor");
-        $registro = new RegistroDePassagem('ABC123');
+        $registro = new RegistroDePassagem(1);
         $aeroportoSaida = new SiglaAeroporto('GRU');
         $aeroportoChegada = new SiglaAeroporto('CDG');
-        $companhiaAerea = new SiglaCompanhiaAerea('GOL');
-        $passaporte = new Passaporte('123456789');
+        $companhiaAerea = new SiglaCompanhiaAerea('GL');
+        $passaporte = new Passaporte('A12345678');
         $documentoCliente = new DocumentoPassageiro($passaporte);
         $data = new Data(2023, 9, 23);
         $valor = 100.0;
         $valorPago = 50.0;
-        $assentos = ['A1', 'A2'];
+        $assentos = new HashMap();
         $data_compra = new Data(2023, 07, 21);
         $tempo_compra = new Tempo(10, 35, 22);
         $dataTempoCompra = new DataTempo($data_compra, $tempo_compra);
@@ -89,32 +89,26 @@ class PassagemTestCase extends TestCase
         # acionarEvento
         $this->startSection("acionarEvento");
 
-        $this->checkEq(true, $passagem->acionarEvento(Evento::CANCELAR));
-
-        $this->checkEq(true, $passagem->acionarEvento(Evento::ABRIR_CHECK_IN));
-
-        $this->checkEq(true, $passagem->acionarEvento(Evento::FAZER_CHECK_IN));
-
-        $this->checkEq(true, $passagem->acionarEvento(Evento::EMBARCAR));
-
-        $this->checkEq(true, $passagem->acionarEvento(Evento::CONCLUIR));
+        $this->checkEq(Tipo::CHECK_IN_NAO_ABERTO, $passagem->tipoDeStatus());
+        $this->checkTrue($passagem->acionarEvento(Evento::ABRIR_CHECK_IN));
+        $this->checkEq(Tipo::AGUARDANDO_CHECK_IN, $passagem->tipoDeStatus());
+        $this->checkTrue($passagem->acionarEvento(Evento::FAZER_CHECK_IN));
+        $this->checkEq(Tipo::CHECKED_IN, $passagem->tipoDeStatus());
+        $this->checkTrue($passagem->acionarEvento(Evento::EMBARCAR));
+        $this->checkEq(Tipo::EMBARCADO, $passagem->tipoDeStatus());
+        $this->checkTrue($passagem->acionarEvento(Evento::CONCLUIR));
+        $this->checkEq(Tipo::CONCLUIDA_COM_SUCESSO, $passagem->tipoDeStatus());
 
         # tipoDeStatus
         $this->startSection("tipoDeStatus");
-
-        $this->checkEq(Tipo::CANCELADA, $passagem->tipoDeStatus());
-
-        $this->checkEq(Tipo::CHECK_IN_NAO_ABERTO, $passagem->tipoDeStatus());
-
-        $this->checkEq(Tipo::AGUARDANDO_CHECK_IN, $passagem->tipoDeStatus());
-
-        $this->checkEq(Tipo::NAO_APARECEU, $passagem->tipoDeStatus());
-
-        $this->checkEq(Tipo::CHECKED_IN, $passagem->tipoDeStatus());
-
-        $this->checkEq(Tipo::EMBARCADO, $passagem->tipoDeStatus());
-
-        $this->checkEq(Tipo::CONCLUIDA_COM_SUCESSO, $passagem->tipoDeStatus());
-
+        # TODO
+//
+//        $this->checkEq(Tipo::CANCELADA, $passagem->tipoDeStatus());
+//        $this->checkEq(Tipo::CHECK_IN_NAO_ABERTO, $passagem->tipoDeStatus());
+//        $this->checkEq(Tipo::AGUARDANDO_CHECK_IN, $passagem->tipoDeStatus());
+//        $this->checkEq(Tipo::NAO_APARECEU, $passagem->tipoDeStatus());
+//        $this->checkEq(Tipo::CHECKED_IN, $passagem->tipoDeStatus());
+//        $this->checkEq(Tipo::EMBARCADO, $passagem->tipoDeStatus());
+//        $this->checkEq(Tipo::CONCLUIDA_COM_SUCESSO, $passagem->tipoDeStatus());
     }
 }

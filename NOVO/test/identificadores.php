@@ -172,7 +172,7 @@ class RegistroDeAeronaveTestCase extends TestCase {
             $this->checkReached();
         }
         try {
-            new RegistroDeAeronave($prefixo, "AAA");
+            new RegistroDeAeronave($prefixo, "aaa");
             $this->checkNotReached();
         } catch (InvalidArgumentException $e) {
             $this->checkReached();
@@ -190,7 +190,7 @@ class RegistroDeAeronaveTestCase extends TestCase {
             $this->checkReached();
         }
         try {
-            new RegistroDeAeronave($prefixo, "aaa");
+            new RegistroDeAeronave($prefixo, "AAA");
             $this->checkReached();
         } catch (InvalidArgumentException $e) {
             $this->checkNotReached();
@@ -199,8 +199,8 @@ class RegistroDeAeronaveTestCase extends TestCase {
         $registroaaa = new RegistroDeAeronave($prefixo, "AAA");
         $registrobbb = new RegistroDeAeronave($prefixo, "BBB");
         $this->startSection("Stringfication");
-        $this->checkEq("{$registroaaa}", "PP-aaa");
-        $this->checkEq("{$registrobbb}", "PP-bbb");
+        $this->checkEq("{$registroaaa}", "PP-AAA");
+        $this->checkEq("{$registrobbb}", "PP-BBB");
         # Equality
         $registroaaa_2 = new RegistroDeAeronave($prefixo, "AAA");
         $registrobbb_2 = new RegistroDeAeronave($prefixo, "BBB");

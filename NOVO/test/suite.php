@@ -191,6 +191,9 @@ abstract class TestCase
 
     private function objOrEnumToString(mixed $obj)
     {
+        if (is_bool($obj)) {
+            return $obj ? "true" : "false";
+        }
         # Enum
         if (is_object($obj) && property_exists($obj, "value")) {
             return $obj->value;

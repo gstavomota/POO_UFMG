@@ -17,22 +17,22 @@ class Tripulante
     private SiglaCompanhiaAerea $companhia;
     private SiglaAeroporto $aeroporto_base;
     private Cargo $cargo;
-    private string $registro;
+    private RegistroDeTripulante $registro;
 
 
     public function __construct(
-        string              $nome,
-        string              $sobrenome,
-        CPF                 $cpf,
-        Nacionalidade       $nacionalidade,
-        DataTempo           $data_de_nascimento,
-        Email               $email,
-        string              $cht,
-        Endereco            $endereco,
-        SiglaCompanhiaAerea $companhia,
-        SiglaAeroporto      $aeroporto_base,
-        Cargo               $cargo,
-        string              $registro)
+        string               $nome,
+        string               $sobrenome,
+        CPF                  $cpf,
+        Nacionalidade        $nacionalidade,
+        DataTempo            $data_de_nascimento,
+        Email                $email,
+        string               $cht,
+        Endereco             $endereco,
+        SiglaCompanhiaAerea  $companhia,
+        SiglaAeroporto       $aeroporto_base,
+        Cargo                $cargo,
+        RegistroDeTripulante $registro)
     {
         $this->nome = $nome;
         $this->sobrenome = $sobrenome;

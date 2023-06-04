@@ -46,19 +46,19 @@ class HashMapTestCase extends TestCase
         $key1 = new IntegerKey(1);
         $key10 = new IntegerKey(10);
         # Put and get without collisions
-        $map->put($key0, 0);
-        $map->put($key1, 1);
+        $this->checkEq($map->put($key0, 0), 0);
+        $this->checkEq($map->put($key1, 1), 1);
         $this->checkEq($map->size(), 2);
         $this->checkEq($map->get($key0), 0);
         $this->checkEq($map->get($key1), 1);
         # Updating without collisions
-        $map->put($key0, 2);
-        $map->put($key1, 3);
+        $this->checkEq($map->put($key0, 2), 2);
+        $this->checkEq($map->put($key1, 3), 3);
         $this->checkEq($map->size(), 2);
         $this->checkEq($map->get($key0), 2);
         $this->checkEq($map->get($key1), 3);
         # Putting with collision
-        $map->put($key10, 4);
+        $this->checkEq($map->put($key10, 4), 4);
         $this->checkEq($map->size(), 3);
         $this->checkEq($map->get($key0), 2);
         $this->checkEq($map->get($key1), 3);
@@ -82,8 +82,8 @@ class HashMapTestCase extends TestCase
         $this->checkEq($map->get($key1), null);
         $this->checkEq($map->get($key10), null);
         # Keys
-        $map->put($key0, 0);
-        $map->put($key1, 1);
+        $this->checkEq($map->put($key0, 0), 0);
+        $this->checkEq($map->put($key1, 1), 1);
         $this->checkEq($map->keys(), [$key0, $key1]);
         # Values
         $this->checkEq($map->values(), [0, 1]);

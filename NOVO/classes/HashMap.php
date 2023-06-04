@@ -1,8 +1,8 @@
 <?php
-include_once "HashableAndEquatable.php";
+include_once "HashableAndEquatable|HashableAndComparable.php";
 
 /**
- * @template K of HashableAndEquatable
+ * @template K of HashableAndEquatable|HashableAndComparable
  * @template V
  */
 class HashMapEntry
@@ -10,13 +10,13 @@ class HashMapEntry
     /**
      * @var K
      */
-    public readonly HashableAndEquatable $key;
+    public readonly HashableAndEquatable|HashableAndComparable $key;
     /**
      * @var V
      */
     public mixed $value;
 
-    public function __construct(HashableAndEquatable $key, mixed $value)
+    public function __construct(HashableAndEquatable|HashableAndComparable $key, mixed $value)
     {
         $this->key = $key;
         $this->value = $value;
@@ -24,7 +24,7 @@ class HashMapEntry
 }
 
 /**
- * @template K of HashableAndEquatable
+ * @template K of HashableAndEquatable|HashableAndComparable
  * @template V
  */
 class HashMap
@@ -44,11 +44,11 @@ class HashMap
     /**
      * Adds a key-value pair to the map.
      *
-     * @param HashableAndEquatable $key The key.
-     * @param mixed $value The value.
-     * @return void
+     * @param K $key The key.
+     * @param V $value The value.
+     * @return V
      */
-    public function put(HashableAndEquatable $key, mixed $value): void
+    public function put(HashableAndEquatable|HashableAndComparable $key, mixed $value): mixed
     {
         $bucketIndex = $this->getBucketIndex($key);
         if (!isset($this->buckets[$bucketIndex])) {
@@ -58,12 +58,13 @@ class HashMap
         foreach ($this->buckets[$bucketIndex] as $entry) {
             if ($key->eq($entry->key)) {
                 $entry->value = $value;
-                return;
+                return $value;
             }
         }
 
         $this->buckets[$bucketIndex][] = new HashMapEntry($key, $value);
         $this->size++;
+        return $value;
     }
 
     /**
@@ -72,7 +73,7 @@ class HashMap
      * @param K $key The key.
      * @return V|null The value associated with the key, or null if the key is not found.
      */
-    public function get(HashableAndEquatable $key): mixed
+    public function get(HashableAndEquatable|HashableAndComparable $key): mixed
     {
         $bucketIndex = $this->getBucketIndex($key);
         if (isset($this->buckets[$bucketIndex])) {
@@ -92,7 +93,7 @@ class HashMap
      * @param K $key The key.
      * @return void
      */
-    public function remove(HashableAndEquatable $key): void
+    public function remove(HashableAndEquatable|HashableAndComparable $key): void
     {
         $bucketIndex = $this->getBucketIndex($key);
         if (isset($this->buckets[$bucketIndex])) {
@@ -112,7 +113,7 @@ class HashMap
      * @param K $key The key.
      * @return bool True if the key is found, false otherwise.
      */
-    public function containsKey(HashableAndEquatable $key): bool
+    public function containsKey(HashableAndEquatable|HashableAndComparable $key): bool
     {
         $bucketIndex = $this->getBucketIndex($key);
         if (isset($this->buckets[$bucketIndex])) {
@@ -150,7 +151,7 @@ class HashMap
     /**
      * Returns an array of all the entries in the map.
      *
-     * @return HashMapEntry[] An array of HashMapEntry objects.
+     * @return HashMapEntry<K, V>[] An array of HashMapEntry objects.
      */
     public function entries(): array
     {
@@ -167,7 +168,7 @@ class HashMap
     /**
      * Returns an array of all the keys in the map.
      *
-     * @return HashableAndEquatable[] An array of HashableAndEquatable objects representing the keys.
+     * @return K[] An array of HashableAndEquatable|HashableAndComparable objects representing the keys.
      */
     public function keys(): array
     {
@@ -184,7 +185,7 @@ class HashMap
     /**
      * Returns an array of all the values in the map.
      *
-     * @return mixed[] An array of values.
+     * @return V[] An array of values.
      */
     public function values(): array
     {
@@ -199,7 +200,7 @@ class HashMap
     }
 
 
-    private function getBucketIndex(HashableAndEquatable $key): int
+    private function getBucketIndex(HashableAndEquatable|HashableAndComparable $key): int
     {
         $hashCode = $key->hashCode();
         return crc32($hashCode) % PHP_INT_MAX;

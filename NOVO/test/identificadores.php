@@ -196,14 +196,14 @@ class RegistroDeAeronaveTestCase extends TestCase {
             $this->checkNotReached();
         }
         # Stringfication
-        $registroaaa = new RegistroDeAeronave($prefixo, "aaa");
-        $registrobbb = new RegistroDeAeronave($prefixo, "bbb");
+        $registroaaa = new RegistroDeAeronave($prefixo, "AAA");
+        $registrobbb = new RegistroDeAeronave($prefixo, "BBB");
         $this->startSection("Stringfication");
         $this->checkEq("{$registroaaa}", "PP-aaa");
         $this->checkEq("{$registrobbb}", "PP-bbb");
         # Equality
-        $registroaaa_2 = new RegistroDeAeronave($prefixo, "aaa");
-        $registrobbb_2 = new RegistroDeAeronave($prefixo, "bbb");
+        $registroaaa_2 = new RegistroDeAeronave($prefixo, "AAA");
+        $registrobbb_2 = new RegistroDeAeronave($prefixo, "BBB");
         $this->startSection("Equality");
         $this->checkEq($registroaaa, $registroaaa_2);
         $this->checkEq($registrobbb, $registrobbb_2);

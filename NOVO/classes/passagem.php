@@ -1,6 +1,7 @@
 <?php
 
-require_once('identificadores.php');
+require_once 'identificadores.php';
+require_once "HashMap.php";
 
 enum Tipo: string
 {
@@ -187,17 +188,20 @@ class PassagemConcluidaComSucesso extends StatusDaPassagem
 
 class Passagem
 {
-    public RegistroDePassagem $registro;
-    public SiglaAeroporto $aeroporto_de_saida;
-    public SiglaAeroporto $aeroporto_de_chegada;
-    public SiglaCompanhiaAerea $companhia_aerea;
-    public DocumentoPassageiro $documento_cliente;
-    public Data $data;
-    public float $valor;
-    public float $valor_pago;
-    public array $assentos;
-    public DataTempo $data_tempo_de_compra;
-    public StatusDaPassagem $status;
+    private RegistroDePassagem $registro;
+    private SiglaAeroporto $aeroporto_de_saida;
+    private SiglaAeroporto $aeroporto_de_chegada;
+    private SiglaCompanhiaAerea $companhia_aerea;
+    private DocumentoPassageiro $documento_cliente;
+    private Data $data;
+    private float $valor;
+    private float $valor_pago;
+    /**
+     * @var HashMap<RegistroDeViagem, CodigoDoAssento>
+     */
+    private HashMap $assentos;
+    private DataTempo $data_tempo_de_compra;
+    private StatusDaPassagem $status;
 
     public function __construct(
         RegistroDePassagem  $registro,
@@ -208,7 +212,7 @@ class Passagem
         Data                $data,
         float               $valor,
         float               $valor_pago,
-        array               $assentos,
+        HashMap             $assentos,
         DataTempo           $data_tempo_de_compra,
         StatusDaPassagem    $status
     )
@@ -291,9 +295,9 @@ class Passagem
     }
 
     /**
-     * @return array
+     * @return HashMap<RegistroDeViagem, CodigoDoAssento>
      */
-    public function getAssentos(): array
+    public function getAssentos(): HashMap
     {
         return $this->assentos;
     }

@@ -153,4 +153,12 @@ class Passageiro
         return $this->passagens;
     }
 
+    /** Adiciona uma passagem
+     * @param RegistroDePassagem $registroDePassagem
+     * @return void
+     */
+    public function addPassagem(RegistroDePassagem $registroDePassagem) {
+        $this->passagens[] = $registroDePassagem;
+    }
+
 }

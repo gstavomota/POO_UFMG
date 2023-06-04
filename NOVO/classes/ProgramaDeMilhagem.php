@@ -6,6 +6,9 @@ require_once("categoria.php");
 
 class ProgramaDeMilhagem
 {
+    /**
+     * @var Categoria[]
+     */
     private array $categorias;
     private string $nome_do_programa;
 

@@ -17,33 +17,54 @@ class CompanhiaAerea extends Persist
     private string $nome;
     private string $codigo;
     private string $razao_social;
-    private string $sigla;
-    private array $aeronaves;
-    private array $voos_planejados;
-    private array $voos_em_venda;
-    private array $voos_executados;
+    private SiglaCompanhiaAerea $sigla;
+    /**
+     * @var HashMap<RegistroDeAeronave, Aeronave>
+     */
+    private HashMap $aeronaves;
+    /**
+     * @var HashMap<CodigoVoo, Voo>
+     */
+    private HashMap $voos_planejados;
+    /**
+     * @var HashMap<Data, HashMap<RegistroDeViagem, ViagemBuilder>>
+     */
+    private HashMap $voos_em_venda;
+    /**
+     * @var HashMap<RegistroDeViagem, Viagem>
+     */
+    private HashMap $voos_executados;
     private GeradorDeRegistroDeViagem $gerador_de_registro_de_viagem;
     private GeradorDeRegistroDePassagem $gerador_de_registro_de_passagem;
     private float $tarifa_franquia;
-    private array $passagens;
-    private array $passageiros;
-    private array $tripulantes;
+    /**
+     * @var HashMap<RegistroDePassagem, Passagem>
+     */
+    private HashMap $passagens;
+    /**
+     * @var HashMap<DocumentoPassageiro, Passageiro>
+     */
+    private HashMap $passageiros;
+    /**
+     * @var HashMap<RegistroDeTripulante, Tripulante>
+     */
+    private HashMap $tripulantes;
     private static $local_filename = "companhia_aerea.txt";
 
     public function __construct(string                      $nome,
                                 string                      $codigo,
                                 string                      $razao_social,
-                                string                      $sigla,
-                                array                       $aeronaves,
-                                array                       $voos_planejados,
-                                array                       $voos_em_venda,
-                                array                       $voos_executados,
+                                SiglaCompanhiaAerea         $sigla,
+                                HashMap                     $aeronaves,
+                                HashMap                     $voos_planejados,
+                                HashMap                     $voos_em_venda,
+                                HashMap                     $voos_executados,
                                 GeradorDeRegistroDeViagem   $gerador_de_registro_de_viagem,
                                 GeradorDeRegistroDePassagem $gerador_de_registro_de_passagem,
                                 float                       $tarifa_franquia,
-                                array                       $passagens,
-                                array                       $passageiros,
-                                array                       $tripulantes,
+                                HashMap                     $passagens,
+                                HashMap                     $passageiros,
+                                HashMap                     $tripulantes,
                                                             ...$args)
     {
 
@@ -84,22 +105,22 @@ class CompanhiaAerea extends Persist
         return $this->sigla;
     }
 
-    public function getAeronaves(): array
+    public function getAeronaves(): HashMap
     {
         return $this->aeronaves;
     }
 
-    public function getVoosPlanejados(): array
+    public function getVoosPlanejados(): HashMap
     {
         return $this->voos_planejados;
     }
 
-    public function getVoosEmVenda(): array
+    public function getVoosEmVenda(): HashMap
     {
         return $this->voos_em_venda;
     }
 
-    public function getVoosExecutados(): array
+    public function getVoosExecutados(): HashMap
     {
         return $this->voos_executados;
     }
@@ -119,17 +140,17 @@ class CompanhiaAerea extends Persist
         return $this->tarifa_franquia;
     }
 
-    public function getPassagens(): array
+    public function getPassagens(): HashMap
     {
         return $this->passagens;
     }
 
-    public function getPassageiros(): array
+    public function getPassageiros(): HashMap
     {
         return $this->passageiros;
     }
 
-    public function getTripulantes(): array
+    public function getTripulantes(): HashMap
     {
         return $this->tripulantes;
     }
@@ -139,104 +160,163 @@ class CompanhiaAerea extends Persist
         return self::$local_filename;
     }
 
-    public function registrar_que_viagem_aconteceu($hora_de_partida, $hora_de_chegada, $registro_de_viagem)
+    public function registrar_que_viagem_aconteceu(DataTempo $hora_de_partida, DataTempo $hora_de_chegada, RegistroDeViagem $registro_de_viagem)
     {
+        /**
+         * @var null|ViagemBuilder $fabrica
+         */
         $fabrica = null;
-        foreach ($this->voos_em_venda as $registro_fabrica) {
-            if (array_key_exists($registro_de_viagem, $registro_fabrica)) {
-                $fabrica = $registro_fabrica[$registro_de_viagem];
-                unset($registro_fabrica[$registro_de_viagem]);
+        /**
+         * @var HashMap<Data, ViagemBuilder> $registro_fabrica
+         */
+        foreach ($this->voos_em_venda->values() as $registro_fabrica) {
+            if ($registro_fabrica->containsKey($registro_de_viagem)) {
+                $fabrica = $registro_fabrica->get($registro_de_viagem);
+                $registro_fabrica->remove($registro_de_viagem);
                 break;
             }
         }
-        if ($fabrica === null)
+        if (is_null($fabrica)) {
             throw new Exception("Fabrica não encontrada");
+        }
 
-        $fabrica->add_hora_de_partida_e_hora_de_chegada($hora_de_partida, $hora_de_chegada);
+        $fabrica->addHoraDePartidaEHoraDeChegada($hora_de_partida, $hora_de_chegada);
         $viagem = $fabrica->build();
-        $this->voos_executados[$viagem->registro] = $viagem;
-        foreach ($viagem->assentos as $assento) {
+        $this->voos_executados->put($viagem->getRegistro(), $viagem);
+        /**
+         * @var Assento $assento
+         */
+        foreach ($viagem->getAssentos()->values() as $assento) {
             if ($assento->vazio())
                 continue;
 
-            $registro_passagem = $assento->passagem;
-            $passagem = $this->passagens[$registro_passagem];
+            $registro_passagem = $assento->getPassagem();
+            $passagem = $this->passagens->get($registro_passagem);
             $passagem->acionar_evento(Evento::CONCLUIR);
         }
     }
 
-    private function _encontrar_voos_sem_conexao($data, $aeroporto_de_saida, $aeroporto_de_chegada)
+    /**
+     * @param Data $data
+     * @param SiglaAeroporto $aeroporto_de_saida
+     * @param SiglaAeroporto $aeroporto_de_chegada
+     * @return CodigoVoo[]
+     * @throws EquatableTypeException
+     */
+    private function _encontrar_voos_sem_conexao(Data $data, SiglaAeroporto $aeroporto_de_saida, SiglaAeroporto $aeroporto_de_chegada): array
     {
+        /**
+         * @var CodigoVoo[] $voos
+         */
         $voos = [];
 
-        $voo_desejado = function ($voo) use ($data, $aeroporto_de_saida, $aeroporto_de_chegada) {
-            if (!in_array($data->dia_da_semana, $voo->dias_da_semana))
+        $voo_desejado = function (Voo $voo) use ($data, $aeroporto_de_saida, $aeroporto_de_chegada) {
+            if (!in_array($data->getDiaDaSemana(), $voo->getDiasDaSemana()))
                 return false;
-            if ($aeroporto_de_saida != $voo->aeroporto_de_saida)
+            if (!$aeroporto_de_saida->eq($voo->getAeroportoSaida()))
                 return false;
-            if ($aeroporto_de_chegada != $voo->aeroporto_de_chegada)
+            if (!$aeroporto_de_chegada->eq($voo->getAeroportoChegada()))
                 return false;
             return true;
         };
 
-        foreach (array_filter($this->voos_planejados, $voo_desejado) as $voo) {
-            $voos[] = $voo->codigo;
+        /**
+         * @var Voo $voo
+         */
+        foreach (array_filter($this->voos_planejados->values(), $voo_desejado) as $voo) {
+            $voos[] = $voo->getCodigo();
         }
 
         return $voos;
     }
 
-    private function _encontrar_voos_com_conexao($data, $aeroporto_de_saida, $aeroporto_de_chegada)
+    /**
+     * @param Data $data
+     * @param SiglaAeroporto $aeroporto_de_saida
+     * @param SiglaAeroporto $aeroporto_de_chegada
+     * @return CodigoVoo[][]
+     * @throws ComparableTypeException
+     * @throws EquatableTypeException
+     */
+    private function _encontrar_voos_com_conexao(Data $data, SiglaAeroporto $aeroporto_de_saida, SiglaAeroporto $aeroporto_de_chegada): array
     {
+        /**
+         * @var CodigoVoo[][] $voos
+         */
         $voos = [];
 
-        $voo_intermediario_desejado = function ($voo) use ($data, $aeroporto_de_saida) {
-            if (!in_array($data->dia_da_semana, $voo->dias_da_semana)) {
+        $voo_intermediario_desejado = function (Voo $voo) use ($data, $aeroporto_de_saida) {
+            if (!in_array($data->getDiaDaSemana(), $voo->getDiasDaSemana())) {
                 return false;
             }
-            if ($aeroporto_de_saida != $voo->aeroporto_de_saida) {
-                return false;
-            }
-            return true;
-        };
-
-        $voo_final_desejado = function ($voo, $hora_de_chegada) use ($data, $aeroporto_de_chegada) {
-            if (!in_array($data->dia_da_semana, $voo->dias_da_semana)) {
-                return false;
-            }
-            if ($voo->aeroporto_de_chegada != $aeroporto_de_chegada) {
-                return false;
-            }
-            $tempo_da_conexao = $hora_de_chegada + Duracao::meia_hora();
-            if ($voo->hora_de_partida > $tempo_da_conexao) {
+            if (!$aeroporto_de_saida->eq($voo->getAeroportoSaida())) {
                 return false;
             }
             return true;
         };
 
-        foreach (array_filter($this->voos_planejados, $voo_intermediario_desejado) as $voo_intermediario) {
-            foreach (array_filter($this->voos_planejados, function ($voo_final) use ($voo_intermediario) {
-                $voo_final_desejado = [$voo_final, $voo_intermediario->hora_de_partida + $voo_intermediario->duracao_estimada];
-                return $voo_final_desejado;
-            }) as $voo_final) {
-                $voos[] = [$voo_intermediario->codigo, $voo_final->codigo];
+        $voo_final_desejado = function (Voo $voo, Tempo $hora_de_chegada) use ($data, $aeroporto_de_chegada) {
+            if (!in_array($data->getDiaDaSemana(), $voo->getDiasDaSemana())) {
+                return false;
+            }
+            if (!$voo->getAeroportoChegada()->eq($aeroporto_de_chegada)) {
+                return false;
+            }
+            $tempo_da_conexao = $hora_de_chegada->add(Duracao::meiaHora());
+            if ($voo->getHoraDePartida()->gt($tempo_da_conexao)) {
+                return false;
+            }
+            return true;
+        };
+
+        /**
+         * @var Voo $voo_intermediario
+         */
+        foreach (array_filter($this->voos_planejados->values(), $voo_intermediario_desejado) as $voo_intermediario) {
+            /**
+             * @var Voo $voo_final
+             */
+            foreach (array_filter($this->voos_planejados->values(), $voo_final_desejado) as $voo_final) {
+                $voos[] = [$voo_intermediario->getCodigo(), $voo_final->getCodigo()];
             }
         }
 
         return $voos;
     }
 
-    function _encontrar_melhor_voo($cliente_vip, $data, $aeroporto_de_saida, $aeroporto_de_chegada, $franquias)
+    /**
+     * @param bool $cliente_vip
+     * @param Data $data
+     * @param SiglaAeroporto $aeroporto_de_saida
+     * @param SiglaAeroporto $aeroporto_de_chegada
+     * @param FranquiasDeBagagem $franquias
+     * @return CodigoVoo[]
+     * @throws ComparableTypeException
+     * @throws EquatableTypeException
+     */
+    function _encontrar_melhor_voo(bool $cliente_vip, Data $data, SiglaAeroporto $aeroporto_de_saida, SiglaAeroporto $aeroporto_de_chegada, FranquiasDeBagagem $franquias)
     {
+        /**
+         * @var CodigoVoo[] $voos_sem_conexao
+         */
         $voos_sem_conexao = $this->_encontrar_voos_sem_conexao($data, $aeroporto_de_saida, $aeroporto_de_chegada);
         $melhor_tarifa = INF;
 
         if (count($voos_sem_conexao) != 0) {
+            /**
+             * @var Voo $melhor_voo
+             */
             $melhor_voo = null;
 
+            /**
+             * @var CodigoVoo $codigo_voo
+             */
             foreach ($voos_sem_conexao as $codigo_voo) {
-                $voo = $this->voos_planejados[$codigo_voo];
-                $tarifa = $voo->calcula_tarifa($cliente_vip, $franquias, $this->tarifa_franquia);
+                /**
+                 * @var Voo $voo
+                 */
+                $voo = $this->voos_planejados->get($codigo_voo);
+                $tarifa = $voo->calculaTarifa($cliente_vip, $franquias, $this->tarifa_franquia);
 
                 if ($tarifa >= $melhor_tarifa)
                     continue;
@@ -245,25 +325,40 @@ class CompanhiaAerea extends Persist
                 $melhor_tarifa = $tarifa;
             }
 
-            return [$melhor_voo->codigo];
+            return [$melhor_voo->getCodigo()];
         }
 
-        $melhor_tarifa = INF;
+        /**
+         * @var CodigoVoo[][] $pares_de_voos
+         */
         $pares_de_voos = $this->_encontrar_voos_com_conexao($data, $aeroporto_de_saida, $aeroporto_de_chegada);
 
         if (count($pares_de_voos) == 0) {
             return [];
         }
 
+        /**
+         * @var Voo $melhor_voo_intermediario
+         */
         $melhor_voo_intermediario = null;
+
+        /**
+         * @var Voo $melhor_voo_final
+         */
         $melhor_voo_final = null;
 
         foreach ($pares_de_voos as $par_de_voos) {
             [$codigo_voo_intermediario, $codigo_voo_final] = $par_de_voos;
-            $voo_intermediario = $this->voos_planejados[$codigo_voo_intermediario];
-            $voo_final = $this->voos_planejados[$codigo_voo_final];
-            $tarifa_intermediario = $voo_intermediario->calcula_tarifa($cliente_vip, $franquias, $this->tarifa_franquia);
-            $tarifa_final = $voo_final->calcula_tarifa($cliente_vip, $franquias, $this->tarifa_franquia);
+            /**
+             * @var Voo $voo_intermediario
+             */
+            $voo_intermediario = $this->voos_planejados->get($codigo_voo_intermediario);
+            /**
+             * @var Voo $voo_final
+             */
+            $voo_final = $this->voos_planejados->get($codigo_voo_final);
+            $tarifa_intermediario = $voo_intermediario->calculaTarifa($cliente_vip, $franquias, $this->tarifa_franquia);
+            $tarifa_final = $voo_final->calculaTarifa($cliente_vip, $franquias, $this->tarifa_franquia);
             $tarifa = $tarifa_intermediario + $tarifa_final;
 
             if ($tarifa >= $melhor_tarifa) {
@@ -275,47 +370,60 @@ class CompanhiaAerea extends Persist
             $melhor_tarifa = $tarifa;
         }
 
-        return [$melhor_voo_intermediario->codigo, $melhor_voo_final->codigo];
+        return [$melhor_voo_intermediario->getCodigo(), $melhor_voo_final->getCodigo()];
     }
 
     function adicionar_viagens_em_venda(): void
     {
-        $datas_atuais = array_keys($this->voos_em_venda);
+        /**
+         * @var Data[] $datas_atuais
+         */
+        $datas_atuais = $this->voos_em_venda->keys();
         $hoje = Data::hoje();
-        $datas_alvo = array_map(function ($i) use ($hoje) {
-            $data = $hoje->add(Duracao::umDia()->mul($i));
-            return "{$data}";
+        /**
+         * @var Data[] $datas_alvo
+         */
+        $datas_alvo = array_map(function (int $i) use ($hoje) {
+            return $hoje->add(Duracao::umDia()->mul($i));
         }, range(0, 30));
-        $datas_nao_preenchidas = array_diff($datas_alvo, $datas_atuais);
+        /**
+         * @var Data[] $datas_nao_preenchidas
+         */
+        $datas_nao_preenchidas = array_diff_equatable($datas_alvo, $datas_atuais);
 
-        foreach ($datas_nao_preenchidas as $dataString) {
-            $data = Data::fromString($dataString);
-            $voos_nesse_dia_da_semana = array_filter($this->voos_planejados, function ($voo) use ($data) {
-                return in_array($data->getDiaDaSemana(), $voo->dias_da_semana);
+        foreach ($datas_nao_preenchidas as $data) {
+            /**
+             * @var Voo[] $voos_nesse_dia_da_semana
+             */
+            $voos_nesse_dia_da_semana = array_filter($this->voos_planejados->values(), function (Voo $voo) use ($data) {
+                return in_array($data->getDiaDaSemana(), $voo->getDiasDaSemana());
             });
-            $viagens_nesse_dia_da_semana = $this->voos_em_venda["{$data}"] = [];
+            /**
+             * @var HashMap<RegistroDeViagem, Viagem> $viagens_nesse_dia_da_semana
+             */
+            $viagens_nesse_dia_da_semana = $this->voos_em_venda->put($data, new HashMap());
 
             foreach ($voos_nesse_dia_da_semana as $voo_que_ira_acontecer) {
-                $viagem_factory = (new ViagemBuilder())
-                    ->add_tarifa_franquia($this->tarifa_franquia)
-                    ->adicionar_gerador_de_registro($this->gerador_de_registro_de_viagem)
-                    ->gerar_registro()
-                    ->add_data($data)
-                    ->add_voo($voo_que_ira_acontecer);
+                $viagem_builder = (new ViagemBuilder())
+                    ->addTarifaFranquia($this->tarifa_franquia)
+                    ->adicionarGeradorDeRegistro($this->gerador_de_registro_de_viagem)
+                    ->gerarRegistro()
+                    ->addData($data)
+                    ->addVoo($voo_que_ira_acontecer);
 
-                $registro_da_viagem = $viagem_factory->registro;
-                $viagens_nesse_dia_da_semana["{$registro_da_viagem}"] = $viagem_factory;
+                $registro_da_viagem = $viagem_builder->getRegistro();
+                $viagens_nesse_dia_da_semana->put($registro_da_viagem, $viagem_builder);
             }
         }
     }
 
     function cancelar_passagem(RegistroDePassagem $passagem): void
     {
-        if (!isset($this->passagens["{$passagem}"])) {
+        if (!$this->passagens->containsKey($passagem)) {
             throw new Exception("Passagem não está na companhia");
         }
 
-        $passagem = $this->passagens["{$passagem}"];
+        $passagem = $this->passagens->get($passagem);
 
         if (!$passagem->acionar_evento(Evento::CANCELAR)) {
             throw new Exception("A passagem não pode ser cancelada agora");
@@ -323,70 +431,92 @@ class CompanhiaAerea extends Persist
 
         $data = $passagem->getData();
 
-        foreach ($passagem->assentos as $viagem => $assento) {
-            $voos_em_venda_na_data = $this->voos_em_venda["{$data}"];
+        foreach ($passagem->getAssentos()->entries() as $entry) {
+            /**
+             * @var RegistroDeViagem $registro_viagem
+             */
+            $registro_viagem = $entry->key;
+            /**
+             * @var CodigoDoAssento $codigo_assento
+             */
+            $codigo_assento = $entry->value;
+            /**
+             * @var HashMap<RegistroDeViagem, ViagemBuilder> $voos_em_venda_na_data
+             */
+            $voos_em_venda_na_data = $this->voos_em_venda->get($data);
 
-            if (!isset($voos_em_venda_na_data[$viagem])) {
+            if (!$voos_em_venda_na_data->containsKey($registro_viagem)) {
                 throw new Exception("Não é possível cancelar uma viagem que já ocorreu");
             }
 
-            $viagem_factory = $voos_em_venda_na_data[$viagem];
-            $viagem_factory->liberar_assento($passagem->registro, $assento);
+            $viagem_builder = $voos_em_venda_na_data->get($registro_viagem);
+            $viagem_builder->liberarAssento($passagem->getRegistro(), $codigo_assento);
         }
     }
 
-    function acessar_historico_de_viagens(DocumentoPassageiro $passageiro)
+    function acessar_historico_de_viagens(DocumentoPassageiro $documentoPassageiro)
     {
-        if (!isset($this->passageiros["{$passageiro}"])) {
+        if (!$this->passageiros->containsKey($documentoPassageiro)) {
             throw new Exception("Passageiro nao cadastrado");
         }
 
-        $passageiro = $this->passageiros["{$passageiro}"];
-        $registros_de_passagens = $passageiro->passagens;
-        $passagens = array_map(function ($passagem) {
-            return $this->passagens["{$passagem}"];
+        /**
+         * @var Passageiro $passageiro
+         */
+        $passageiro = $this->passageiros->get($documentoPassageiro);
+        $registros_de_passagens = $passageiro->getPassagens();
+        /**
+         * @var Passagem[] $passagens
+         */
+        $passagens = array_map(function (RegistroDePassagem $passagem) {
+            return $this->passagens->get($passagem);
         }, $registros_de_passagens);
 
+        /**
+         * @var Viagem[] $viagens
+         */
         $viagens = [];
 
         foreach ($passagens as $passagem) {
-            $registros_de_viagens = array_keys($passagem->assentos);
-            $viagens_na_passagem = array_map(function ($registro_de_viagem) {
-                return $this->voos_executados[$registro_de_viagem];
+            /**
+             * @var RegistroDeViagem[] $registros_de_viagens
+             */
+            $registros_de_viagens = $passagem->getAssentos()->keys();
+            /**
+             * @var Viagem[] $viagens_na_passagem
+             */
+            $viagens_na_passagem = array_map(function (RegistroDeViagem $registro_de_viagem) {
+                return $this->voos_executados->get($registro_de_viagem);
             }, $registros_de_viagens);
 
             foreach ($viagens_na_passagem as $viagem) {
                 $viagens[] = $viagem;
             }
         }
-        function viagem_cmp(Viagem $a, Viagem $b): int
-        {
-            if ($a->eq($b)) {
-                return 0;
-            }
-            return $a->st($b) ? -1 : 1;
-        }
 
-        usort($viagens, function (Viagem $a, Viagem $b): int
-        {
-            if ($a->eq($b)) {
+        usort($viagens, function (Viagem $a, Viagem $b): int {
+            if ($a->getHoraDePartida()->eq($b->getHoraDePartida())) {
                 return 0;
             }
-            return $a->st($b) ? -1 : 1;
+            return $a->getHoraDePartida()->st($b->getHoraDePartida()) ? -1 : 1;
         });
         return $viagens;
     }
 
-    function abrir_check_in_para_passagens(...$args)
+    function abrir_check_in_para_passagens(RegistroDePassagem ...$args)
     {
         $twoDays = new Duracao(2, 0);
         $hoje = Data::hoje();
         if (!empty($args)) {
             foreach ($args as $registro_passagem) {
-                if (!isset($this->passagens["{$registro_passagem}"]))
+                if (!$this->passagens->containsKey($registro_passagem)) {
                     throw new Exception("Passagem não está na companhia");
+                }
 
-                $passagem = $this->passagens["{$registro_passagem}"];
+                /**
+                 * @var Passagem $passagem
+                 */
+                $passagem = $this->passagens->get($registro_passagem);
 
                 $delta = $passagem->getData()->dt($hoje);
                 if ($delta->st($twoDays)) {
@@ -397,93 +527,116 @@ class CompanhiaAerea extends Persist
             }
 
             foreach ($args as $registro_passagem) {
-                $passagem = $this->passagens["{$registro_passagem}"];
-                $passagem->acionar_evento(Evento::ABRIR_CHECK_IN);
+                /**
+                 * @var Passagem $passagem
+                 */
+                $passagem = $this->passagens->get($registro_passagem);
+                $passagem->acionarEvento(Evento::ABRIR_CHECK_IN);
             }
 
             return;
         }
 
-        foreach ($this->passagens as $passagem) {
+        /**
+         * @var Passagem $passagem
+         */
+        foreach ($this->passagens->values() as $passagem) {
             $delta = $passagem->getData()->dt($hoje);
             if ($delta->st($twoDays)) {
-                $passagem->acionar_evento(Evento::ABRIR_CHECK_IN);
+                $passagem->acionarEvento(Evento::ABRIR_CHECK_IN);
             }
         }
     }
 
     function fazer_check_in(RegistroDePassagem $passagem)
     {
-        if (!isset($this->passagens["{$passagem}"]))
+        if (!$this->passagens->containsKey($passagem)) {
             throw new Exception("Passagem não está na companhia");
+        }
 
-        $passagem = $this->passagens["{$passagem}"];
+        /**
+         * @var Passagem $passagem
+         */
+        $passagem = $this->passagens->get($passagem);
 
         $twoDays = new Duracao(2, 0);
         $hoje = Data::hoje();
         $delta = $passagem->getData()->dt($hoje);
         if ($delta->st($twoDays)) {
-            $passagem->acionar_evento(Evento::ABRIR_CHECK_IN);
+            $passagem->acionarEvento(Evento::ABRIR_CHECK_IN);
         }
 
-        if (!$passagem->acionar_evento(Evento::FAZER_CHECK_IN))
+        if (!$passagem->acionarEvento(Evento::FAZER_CHECK_IN)) {
             throw new Exception("Não é possível fazer check-in agora");
+        }
     }
 
-    function comprar_passagem(DocumentoPassageiro $id_cliente, Data $data, SiglaAeroporto $aeroporto_de_saida, SiglaAeroporto $aeroporto_de_chegada, FranquiasDeBagagem $franquias, ?CodigoDoAssento $assento = null)
+    private function findViagemBuilderByCodigoVoo(CodigoVoo $codigo_voo, Data $data)
     {
-        if (!isset($this->passageiros["{$id_cliente}"])) {
+        /** @var HashMap<RegistroDeViagem, ViagemBuilder> $viagem_builders */
+        $viagem_builders = $this->voos_em_venda->get($data);
+
+        /**
+         * @var ViagemBuilder $viagem_builder
+         */
+        foreach ($viagem_builders->values() as $viagem_builder) {
+            if ($viagem_builder->getCodigoDoVoo()->eq($codigo_voo)) {
+                return $viagem_builder;
+            }
+        }
+
+        throw new Exception("Didnt find the viagem builder");
+    }
+
+    function comprar_passagem(DocumentoPassageiro $documentoPassageiro, Data $data, SiglaAeroporto $aeroporto_de_saida, SiglaAeroporto $aeroporto_de_chegada, FranquiasDeBagagem $franquias, ?CodigoDoAssento $assento = null)
+    {
+        if (!$this->passageiros->containsKey($documentoPassageiro)) {
             throw new Exception("Cliente nao cadastrado");
         }
 
-        $cliente = $this->passageiros["{$id_cliente}"];
-        $voos = $this->_encontrar_melhor_voo($cliente->vip, $data, $aeroporto_de_saida, $aeroporto_de_chegada, $franquias);
+        /**
+         * @var Passageiro $passageiro
+         */
+        $passageiro = $this->passageiros->get($documentoPassageiro);
+        $voos = $this->_encontrar_melhor_voo($passageiro instanceof PassageiroVip, $data, $aeroporto_de_saida, $aeroporto_de_chegada, $franquias);
 
         if (count($voos) == 0) {
             return null;
         }
 
-        $viagem_factories = array_map(function ($codigo_voo) use ($data) {
-            $viagem_factories = $this->voos_em_venda["{$data}"];
-
-            foreach ($viagem_factories as $viagem_factory) {
-                if ($viagem_factory->codigo_do_voo == $codigo_voo) {
-                    return $viagem_factory;
-                }
-            }
-
-            return null;
+        /**
+         * @var ViagemBuilder[] $viagem_builders
+         */
+        $viagem_builders = array_map(function (CodigoVoo $codigoVoo) use ($data) {
+                return $this->findViagemBuilderByCodigoVoo($codigoVoo, $data);
         }, $voos);
 
-        if (count(array_filter($viagem_factories, function ($viagem_factory) {
-                return $viagem_factory == null;
-            })) != 0) {
-            return null;
-        }
-
-        foreach ($viagem_factories as $viagem_factory) {
+        foreach ($viagem_builders as $viagem_builder) {
             if ($assento === null) {
-                if (!$viagem_factory->tem_assentos_liberados()) {
+                if (!$viagem_builder->temAssentosLiberados()) {
                     return null;
                 }
-            } elseif (!$viagem_factory->assento_esta_liberado($assento)) {
+            } else if (!$viagem_builder->assentoEstaLiberado($assento)) {
                 return null;
             }
 
-            if (!$viagem_factory->tem_carga_disponivel_para_franquias($franquias)) {
+            if (!$viagem_builder->temCargaDisponivelParaFranquias($franquias)) {
                 return null;
             }
         }
 
         $registro_passagem = $this->gerador_de_registro_de_passagem->gerar();
-        $viagens_assentos = [];
-        $valor_total = 0;
+        /**
+         * @var HashMap<RegistroDeViagem, CodigoDoAssento> $viagens_assentos
+         */
+        $viagens_assentos = new HashMap();
+        $valor_total = 0.0;
 
-        foreach ($viagem_factories as $viagem_factory) {
-            $assento_desejado = $assento ?? $viagem_factory->codigo_assento_liberado();
-            $valor = $viagem_factory->reservar_assento($cliente->vip, $registro_passagem, $franquias, $assento_desejado);
+        foreach ($viagem_builders as $viagem_builder) {
+            $assento_desejado = $assento ?? $viagem_builder->codigoAssentoLiberado();
+            $valor = $viagem_builder->reservarAssento($passageiro instanceof PassageiroVip, $registro_passagem, $franquias, $assento_desejado);
             $valor_total += $valor;
-            $viagens_assentos["{$viagem_factory->registro}"] = $assento_desejado;
+            $viagens_assentos->put($viagem_builder->getRegistro(), $assento_desejado);
         }
 
         $status = new PassagemCheckInNaoAberto();
@@ -498,10 +651,10 @@ class CompanhiaAerea extends Persist
         $ultimo_voo = end($voos);
         $passagem = new Passagem(
             $registro_passagem,
-            $this->voos_planejados["{$primeiro_voo}"]->aeroporto_de_saida,
-            $this->voos_planejados["{$ultimo_voo}"]->aeroporto_de_chegada,
+            $this->voos_planejados->get($primeiro_voo)->getAeroportoSaida(),
+            $this->voos_planejados->get($ultimo_voo)->getAeroportoChegada(),
             $this->sigla,
-            $id_cliente,
+            $documentoPassageiro,
             $data,
             $valor_total,
             0,
@@ -510,9 +663,9 @@ class CompanhiaAerea extends Persist
             $status
         );
 
-        $cliente->passagens[] = $passagem->registro;
-        $this->passagens[$registro_passagem] = $passagem;
-        return $passagem->registro;
+        $passageiro->addPassagem($registro_passagem);
+        $this->passagens->put($registro_passagem, $passagem);
+        return $registro_passagem;
     }
 }
 

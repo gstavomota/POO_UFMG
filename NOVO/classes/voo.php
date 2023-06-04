@@ -171,17 +171,17 @@ class Voo
     }
 
     /** Constroi os assentos para a capacidade de passageiros desse Voo
-     * @return Assento[]
+     * @return HashMap<CodigoDoAssento, Assento>
      */
-    public function construirAssentos(): array
+    public function construirAssentos(): HashMap
     {
         $gerador = new GeradorDeCodigoDoAssento($this->capacidade_passageiros, 0.0);
         $assentos = $gerador->gerar_todos();
-        $dict_assentos = array();
+        $hashmap_assentos = new HashMap();
         foreach ($assentos as $codigo_assento) {
-            $dict_assentos["{$codigo_assento}"] = new Assento($codigo_assento);
+            $hashmap_assentos->put($codigo_assento, new Assento($codigo_assento));
         }
-        return $dict_assentos;
+        return $hashmap_assentos;
     }
 }
 

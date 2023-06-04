@@ -7,15 +7,16 @@ require_once('temporal.php');
 require_once('viagem.php');
 require_once('tripulacao.php');
 require_once('voo.php');
+require_once "HashMap.php";
 
 class ViagemBuilder
 {
     private float $carga, $tarifa, $tarifa_franquia;
     private int $passageiros, $pontuacaoMilhagem;
     /**
-     * @var array<string, Assento>
+     * @var HashMap<CodigoDoAssento, Assento>
      */
-    private array $assentos;
+    private HashMap $assentos;
     private GeradorDeRegistroDeViagem $gerador_de_registro;
     private RegistroDeViagem $registro;
     private RegistroDeAeronave $aeronave;
@@ -145,6 +146,22 @@ class ViagemBuilder
         $this->hora_de_partida = $hora_de_partida;
         $this->hora_de_chegada = $hora_de_chegada;
         return $this;
+    }
+
+    /**
+     * @return RegistroDeViagem
+     */
+    public function getRegistro(): RegistroDeViagem
+    {
+        return $this->registro;
+    }
+
+    /**
+     * @return CodigoVoo
+     */
+    public function getCodigoDoVoo(): CodigoVoo
+    {
+        return $this->codigo_do_voo;
     }
 
     public function build(): Viagem

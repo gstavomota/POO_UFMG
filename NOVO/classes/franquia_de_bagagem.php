@@ -28,6 +28,9 @@ class FranquiaDeBagagem
 
 class FranquiasDeBagagem
 {
+    /**
+     * @var FranquiaDeBagagem[]
+     */
     private array $franquias;
 
     public function __construct(array $franquias)

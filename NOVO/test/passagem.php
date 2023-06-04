@@ -66,7 +66,7 @@ class PassagemTestCase extends TestCase
 
         $this->checkEq($dataTempoCompra, $passagem->getDataTempoDeCompra());
 
-        $this->checkEq($status, $passagem->status);
+        $this->checkEq($status, $this->getNonPublicProperty($passagem, "status"));
 
         # valorDevendo
         $this->startSection("valorDevendo");

@@ -14,7 +14,10 @@ class Viagem
     private Tripulacao $tripulacao;
     private float $tarifa;
     private float $tarifa_franquia;
-    private array $assentos;
+    /**
+     * @var HashMap<CodigoDoAssento, Assento>
+     */
+    private HashMap $assentos;
 
     public function __construct(
         RegistroDeViagem   $registro,
@@ -27,7 +30,7 @@ class Viagem
         Tripulacao         $tripulacao,
         float              $tarifa,
         float              $tarifa_franquia,
-        array              $assentos
+        HashMap            $assentos
     )
     {
         $this->registro = $registro;
@@ -93,7 +96,10 @@ class Viagem
         return $this->tarifa_franquia;
     }
 
-    public function getAssentos(): array
+    /**
+     * @return HashMap<CodigoDoAssento, Assento>
+     */
+    public function getAssentos(): HashMap
     {
         return $this->assentos;
     }

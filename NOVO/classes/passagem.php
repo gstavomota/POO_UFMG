@@ -334,6 +334,6 @@ class Passagem
         $old_status = $this->status;
         $new_status = $this->status->dispatch_event($evento);
         $this->status = $new_status;
-        return $old_status === $new_status;
+        return $old_status !== $new_status;
     }
 }

@@ -9,8 +9,14 @@ require_once 'categoria_com_data.php';
 
 class PassageiroVip extends Passageiro
 {
+    /**
+     * @var Pontos[]
+     */
     private array $pontuacao;
     private string $numero_de_registro;
+    /**
+     * @var CategoriaComData[]
+     */
     private array $categoria_do_programa;
     private ProgramaDeMilhagem $programa_de_milhagem;
 
@@ -39,16 +45,14 @@ class PassageiroVip extends Passageiro
         $this->programa_de_milhagem = $programa_de_milhagem;
     }
 
-    public function getPontuacao(): array
-    {
-        return $this->pontuacao;
-    }
-
     public function getNumeroDeRegistro(): string
     {
         return $this->numero_de_registro;
     }
 
+    /**
+     * @return CategoriaComData[]
+     */
     public function getCategoriaDoPrograma(): array
     {
         return $this->categoria_do_programa;
@@ -59,15 +63,22 @@ class PassageiroVip extends Passageiro
         return $this->programa_de_milhagem;
     }
 
-    public function addPontos(int $pontos): void
+    public function addPontos(int $pontos, DataTempo $dataTempoParaTeste = null): void
     {
-        $this->pontuacao[] = new Pontos($pontos, DataTempo::agora());
+        $this->pontuacao[] = new Pontos($pontos, $dataTempoParaTeste ?? DataTempo::agora());
     }
 
 
     public function alterarCategoria(Categoria $categoria, DataTempo $dataTempoParaTeste = null)
     {
-        $this->categoria_do_programa[] = new CategoriaComData($categoria, $dataTempoParaTeste??DataTempo::agora());
+        if (!in_array($categoria, $this->programa_de_milhagem->getCategorias())) {
+            throw new InvalidArgumentException("A categoria deve estar no programa de milhagem");
+        }
+        $pontuacao = $this->getPontosValidos();
+        if ($pontuacao < $categoria->getPontuacao()) {
+            throw new InvalidArgumentException("A categoria precisa de mais pontos que o passageiro tem");
+        }
+        $this->categoria_do_programa[] = new CategoriaComData($categoria, $dataTempoParaTeste ?? DataTempo::agora());
     }
 
     public function getPontosValidos(): int

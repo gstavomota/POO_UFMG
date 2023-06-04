@@ -38,8 +38,8 @@ class ProgramaDeMilhagem
                 $categoria = $categoriaAlvo;
             }
         }
-        if (count($categoriaDoPassageiro) > 1 and $categoriaDoPassageiro[count($categoriaDoPassageiro) - 1] == $categoria) {
-            return null;
+        if (count($categoriaDoPassageiro) > 1 and $categoriaDoPassageiro[count($categoriaDoPassageiro) - 1] === $categoria) {
+            return $categoria;
         }
         $passageiro->alterarCategoria($categoria);
         return $categoria;

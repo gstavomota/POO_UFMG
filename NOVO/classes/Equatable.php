@@ -21,3 +21,26 @@ interface Equatable
      */
     public function eq(self $other): bool;
 }
+
+/**
+ * @param Equatable[] $array1
+ * @param Equatable[] $array2
+ * @return Equatable[]
+ */
+function array_diff_equatable(array $array1, array $array2): array {
+    /** @var Equatable[] $diff */
+    $diff = [];
+    foreach ($array1 as $item1) {
+        $found = false;
+        foreach ($array2 as $item2) {
+            if ($item1->eq($item2)) {
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
+            $diff[] = $item1;
+        }
+    }
+    return $diff;
+}

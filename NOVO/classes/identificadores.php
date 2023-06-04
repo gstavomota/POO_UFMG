@@ -149,7 +149,7 @@ class RegistroDeAeronave implements HashableAndEquatable
         if (strlen($v) !== 3) {
             throw new InvalidArgumentException("O sufixo deve ter 3 letras");
         }
-        if (strtolower($v) !== $v) {
+        if (!ctype_upper($v)) {
             throw new InvalidArgumentException("O sufixo deve ser uppercase");
         }
         if (!ctype_alpha($v)) {

@@ -1,5 +1,6 @@
 <?php
-include_once "HashableAndEquatable|HashableAndComparable.php";
+include_once "HashableAndEquatable.php";
+include_once "HashableAndComparable.php";
 
 /**
  * @template K of HashableAndEquatable|HashableAndComparable

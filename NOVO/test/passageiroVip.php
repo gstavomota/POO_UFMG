@@ -22,6 +22,7 @@ class PassageiroVipTestCase extends TestCase{
         $pontuacaoVazia = [];
         $numero_de_registro = '12345';
         $categorias = [
+            new Categoria('branca', 0),
             new Categoria('prata', 50),
             new Categoria('ouro', 100)
         ];
@@ -53,8 +54,8 @@ class PassageiroVipTestCase extends TestCase{
         $this->checkEq($passageiroTeste->getPontosValidos(), 20);
 
         # alterarCategoria
-        $categoria = $categorias[0];
-        $categoria1 = $categorias[1];
+        $categoria = $categorias[1];
+        $categoria1 = $categorias[2];
         $categoriaInvalida = new Categoria("invalida", 10);
         $this->startSection("alterarCategoria");
         try {

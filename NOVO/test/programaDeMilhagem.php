@@ -29,32 +29,67 @@
                 new Pontos(750, DataTempo::fromDateTime(DateTime::createFromFormat("d/m/Y", "06/01/2022")))
             ];
             $categorias = [
+                new Categoria('branco', 0),
                 new Categoria('bronze', 1000),
                 new Categoria('prata', 2000),
                 new Categoria('ouro', 3000),
                 new Categoria('diamante', 5000)
             ];
+            $categoriaBase = $categorias[0];
             $numeroDeRegistro = '12345';
-            
+            # Construtor
+            $this->startSection("Construtor");
+            try {
+                $categoriasSemBase = [$categorias[1], $categorias[2]];
+                new ProgramaDeMilhagem($categoriasSemBase, "Programa Teste");
+                $this->checkNotReached();
+            } catch (InvalidArgumentException $e) {
+                $this->checkReached();
+            }
+            try {
+                new ProgramaDeMilhagem([], "Programa Teste");
+                $this->checkNotReached();
+            } catch (InvalidArgumentException $e) {
+                $this->checkReached();
+            }
+            try {
+                $categoriasForaDeOrdem = [$categorias[0], $categorias[2], $categorias[1]];
+                new ProgramaDeMilhagem($categoriasForaDeOrdem, "Programa Teste");
+                $this->checkNotReached();
+            } catch (InvalidArgumentException $e) {
+                $this->checkReached();
+            }
+            try {
+                new ProgramaDeMilhagem($categorias, "");
+                $this->checkNotReached();
+            } catch (InvalidArgumentException $e) {
+                $this->checkReached();
+            }
+            try {
+                new ProgramaDeMilhagem($categorias, "Programa Teste");
+                $this->checkReached();
+            } catch (InvalidArgumentException $e) {
+                $this->checkNotReached();
+            }
+
+            # Update
             $programaDeMilhagem = new ProgramaDeMilhagem($categorias, "Programa Teste");
-            
-            #Método update
-            $this->startSection("Método update");
+            $this->startSection("update");
             
             $passageiroSemPontos = new PassageiroVip('Maria', 'Sampaio', $documentoPassageiro, $nacionalidade, $cpf, $data , $email,  $passagens, 
             $pontuacaoVazia, $numeroDeRegistro, $categorias, $programaDeMilhagem);
-            $this->checkEq($programaDeMilhagem->update($passageiroSemPontos), null);
+            $this->checkEq($programaDeMilhagem->update($passageiroSemPontos), $categoriaBase);
 
             $passageiroComPontosVencidos = new PassageiroVip('Maria', 'Sampaio', $documentoPassageiro, $nacionalidade, $cpf, $data , $email,  $passagens, 
             $pontuacaoVencida, $numeroDeRegistro, $categorias, $programaDeMilhagem);
-            $this->checkEq($programaDeMilhagem->update($passageiroComPontosVencidos), null);
+            $this->checkEq($programaDeMilhagem->update($passageiroComPontosVencidos), $categoriaBase);
 
             $passageiroComPontos = new PassageiroVip('Maria', 'Sampaio', $documentoPassageiro, $nacionalidade, $cpf, $data , $email,  $passagens, 
             $pontuacaoPreenchida, $numeroDeRegistro, $categorias, $programaDeMilhagem);
-            $this->checkEq($programaDeMilhagem->update($passageiroComPontos), $categorias[2]);
+            $this->checkEq($programaDeMilhagem->update($passageiroComPontos), $categorias[3]);
 
             $passageiroComPontos->addPontos(4000);
-            $this->checkEq($programaDeMilhagem->update($passageiroComPontos), $categorias[3]);
+            $this->checkEq($programaDeMilhagem->update($passageiroComPontos), $categorias[4]);
 
         }
     }

@@ -10,7 +10,7 @@ class Tripulante
     private string $sobrenome;
     private CPF $cpf;
     private Nacionalidade $nacionalidade;
-    private DataTempo $data_de_nascimento;
+    private Data $data_de_nascimento;
     private Email $email;
     private string $cht; // esse documento ainda não possui um identificador
     private Endereco $endereco;
@@ -25,7 +25,7 @@ class Tripulante
         string               $sobrenome,
         CPF                  $cpf,
         Nacionalidade        $nacionalidade,
-        DataTempo            $data_de_nascimento,
+        Data                 $data_de_nascimento,
         Email                $email,
         string               $cht,
         Endereco             $endereco,
@@ -68,7 +68,7 @@ class Tripulante
         return $this->nacionalidade;
     }
 
-    public function getDataDeNascimento(): DataTempo
+    public function getDataDeNascimento(): Data
     {
         return $this->data_de_nascimento;
     }
@@ -105,7 +105,7 @@ class Tripulante
     }
 
 
-    public function getRegistro(): string
+    public function getRegistro(): RegistroDeTripulante
     {
         return $this->registro;
     }

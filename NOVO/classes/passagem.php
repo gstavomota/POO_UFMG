@@ -2,6 +2,7 @@
 
 require_once 'identificadores.php';
 require_once "HashMap.php";
+require_once "Equatable.php";
 
 enum Tipo: string
 {
@@ -27,7 +28,7 @@ enum Evento: string
     case CONCLUIR = "concluir";
 }
 
-class StatusDaPassagem
+class StatusDaPassagem implements Equatable
 {
 
     public Tipo $tipo;
@@ -76,6 +77,14 @@ class StatusDaPassagem
             case Evento::CONCLUIR:
                 return $this->concluir();
         }
+    }
+
+    public function eq(Equatable $other): bool
+    {
+        if (!$other instanceof self) {
+            throw new EquatableTypeException();
+        }
+        return $this->tipo == $other->tipo;
     }
 }
 

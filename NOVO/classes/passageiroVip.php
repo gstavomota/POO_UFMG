@@ -29,19 +29,16 @@ class PassageiroVip extends Passageiro
         ?CPF                $cpf,
         Data                $data_de_nascimento,
         Email               $email,
-        array               $passagens,
 
         //passageiro VIP
-        array               $pontuacao,
         string              $numero_de_registro,
-        array               $categoria_do_programa,
         ProgramaDeMilhagem  $programa_de_milhagem,
     )
     {
-        parent::__construct($nome, $sobrenome, $documento, $nacionalidade, $cpf, $data_de_nascimento, $email, $passagens);
-        $this->pontuacao = $pontuacao;
+        parent::__construct($nome, $sobrenome, $documento, $nacionalidade, $cpf, $data_de_nascimento, $email);
+        $this->pontuacao = [];
         $this->numero_de_registro = $numero_de_registro;
-        $this->categoria_do_programa = $categoria_do_programa;
+        $this->categoria_do_programa = [];
         $this->programa_de_milhagem = $programa_de_milhagem;
     }
 

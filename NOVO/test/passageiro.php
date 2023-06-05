@@ -20,32 +20,31 @@
             $validData = new Data(2023, 05, 01);
             $passaporte = new Passaporte('A00000000');
             $documentoCliente = new DocumentoPassageiro($passaporte);
-            $validPassagens = [new RegistroDePassagem(0)];
 
             try {
                 // nome vazio
-                new Passageiro('', $validSobrenome, $documentoCliente, $validNacionalidade, $validCPF, $validData, $validEmail, $validPassagens);
+                new Passageiro('', $validSobrenome, $documentoCliente, $validNacionalidade, $validCPF, $validData, $validEmail);
                 $this->checkNotReached();
             } catch (InvalidArgumentException $e) {
                 $this->checkReached();
             }
             try {
                 // sobrenome vazio
-                new Passageiro($validNome, '', $documentoCliente, $validNacionalidade, $validCPF, $validData, $validEmail, $validPassagens);
+                new Passageiro($validNome, '', $documentoCliente, $validNacionalidade, $validCPF, $validData, $validEmail);
                 $this->checkNotReached();
             } catch (InvalidArgumentException $e) {
                 $this->checkReached();
             }
             try {
                 // há um cpf, mas a pessoa não é brasileira
-                new Passageiro($validNome, $validSobrenome, $documentoCliente, $invalidNacionalidade, $validCPF, $validData, $validEmail, $validPassagens);
+                new Passageiro($validNome, $validSobrenome, $documentoCliente, $invalidNacionalidade, $validCPF, $validData, $validEmail);
                 $this->checkNotReached();
             } catch (InvalidArgumentException $e) {
                 $this->checkReached();
             }
             try {
                 // a pessoa é brasileira, e há um cpf
-                new Passageiro($validNome, $validSobrenome, $documentoCliente, $validNacionalidade, $validCPF, $validData, $validEmail, $validPassagens);
+                new Passageiro($validNome, $validSobrenome, $documentoCliente, $validNacionalidade, $validCPF, $validData, $validEmail);
                 $this->checkReached();
             } catch (InvalidArgumentException $e) {
                 $this->checkNotReached();

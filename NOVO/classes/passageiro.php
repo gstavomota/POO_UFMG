@@ -26,7 +26,6 @@ class Passageiro
      * @param CPF|null $cpf
      * @param Data $data_de_nascimento
      * @param Email $email
-     * @param array $passagens
      * @throws InvalidArgumentException se o passageiro for invalido
      */
     public function __construct(
@@ -37,7 +36,6 @@ class Passageiro
         ?CPF                $cpf,
         Data                $data_de_nascimento,
         Email               $email,
-        array               $passagens,
     )
     {
         $this->nome = Passageiro::valida_nome($nome);
@@ -47,7 +45,7 @@ class Passageiro
         $this->cpf = Passageiro::valida_cpf_se_brasileiro($cpf, $nacionalidade);
         $this->data_de_nascimento = $data_de_nascimento;
         $this->email = $email;
-        $this->passagens = $passagens;
+        $this->passagens = [];
     }
 
     /** Valida um nome

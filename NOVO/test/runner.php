@@ -2,6 +2,7 @@
 require_once "assento.php";
 require_once "calculo_tarifa_strategy.php";
 require_once "endereco.php";
+require_once "enum_to_array.php";
 require_once "franquia_de_bagagem.php";
 require_once "HashMap.php";
 require_once "identificadores.php";
@@ -25,7 +26,10 @@ require_once "voo.php";
     // Fim calculo_tarifa_strategy.php
     // Inicio endereco.php
     ->addCase(new EnderecoTestCase())
-    // Fim identificadores.php
+    // Fim endereco.php
+    // Inicio enum_to_array.php
+    ->addCase(new EnumToArrayTestCase())
+    // Fim enum_to_array.php
     // Inicio franquia_de_bagagem.php
     ->addCase(new FranquiaDeBagagemTestCase())
     ->addCase(new FranquiasDeBagagemTestCase())

@@ -13,7 +13,7 @@ trait EnumToArray {
 
         public static function array(): array
         {
-            return array_combine(self::values(), self::names());
+            return array_combine(self::names(), self::values());
         }
     }
 

@@ -62,11 +62,18 @@ require_once "voo.php";
     ->addCase(new PassageiroVipTestCase())
     // Fim passageiroVip.php
     // Inicio passagem.php
+    ->addCase(new PassagemCanceladaTestCase())
+    ->addCase(new PassagemCheckInNaoAbertoTestCase())
+    ->addCase(new PassagemAguardandoCheckInTestCase())
+    ->addCase(new PassagemNaoApareceuTestCase())
+    ->addCase(new PassagemCheckedInTestCase())
+    ->addCase(new PassagemEmbarcadoTestCase())
+    ->addCase(new PassagemConcluidaComSucessoTestCase())
     ->addCase(new PassagemTestCase())
+    // Fim passagem.php
     // Inicio HashMap.php
     ->addCase(new HashMapTestCase())
     // Fim HashMap.php
-    // Fim passagem.php
     // Inicio programaDeMilhagem.php
     ->addCase(new ProgramaDeMilhagemTestCase())
     // Fim programaDeMilhagem.php

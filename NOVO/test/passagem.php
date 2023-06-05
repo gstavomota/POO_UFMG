@@ -3,6 +3,120 @@
 require_once 'suite.php';
 require_once '../classes/passagem.php';
 
+class PassagemCanceladaTestCase extends TestCase {
+    public function getName(): string {
+        return "PassagemCancelada";
+    }
+    
+    public function run() {
+        # Transitions
+        $status = new PassagemCancelada();
+        $this->checkEq($status->abrir_check_in(), $status);
+        $this->checkEq($status->fazer_check_in(), $status);
+        $this->checkEq($status->embarcar(), $status);
+        $this->checkEq($status->concluir(), $status);
+        $this->checkEq($status->cancelar(), $status);
+        
+    }
+}
+class PassagemCheckInNaoAbertoTestCase extends TestCase {
+    public function getName(): string {
+        return "PassagemCheckInNaoAberto";
+    }
+    
+    public function run() {
+        # Transitions
+        $status = new PassagemCheckInNaoAberto();
+        $this->checkEq($status->abrir_check_in(), new PassagemAguardandoCheckIn());
+        $this->checkEq($status->fazer_check_in(), $status);
+        $this->checkEq($status->embarcar(), $status);
+        $this->checkEq($status->concluir(), $status);
+        $this->checkEq($status->cancelar(), new PassagemCancelada());
+        
+    }
+}
+class PassagemAguardandoCheckInTestCase extends TestCase {
+    public function getName(): string {
+        return "PassagemAguardandoCheckIn";
+    }
+    
+    public function run() {
+        # Transitions
+        $status = new PassagemAguardandoCheckIn();
+        $this->checkEq($status->abrir_check_in(), $status);
+        $this->checkEq($status->fazer_check_in(), new PassagemCheckedIn());
+        $this->checkEq($status->embarcar(), $status);
+        $this->checkEq($status->concluir(), new PassagemNaoApareceu());
+        $this->checkEq($status->cancelar(), new PassagemCancelada());
+        
+    }
+}
+class PassagemNaoApareceuTestCase extends TestCase {
+    public function getName(): string {
+        return "PassagemNaoApareceu";
+    }
+    
+    public function run() {
+        # Transitions
+        $status = new PassagemNaoApareceu();
+        $this->checkEq($status->abrir_check_in(), $status);
+        $this->checkEq($status->fazer_check_in(), $status);
+        $this->checkEq($status->embarcar(), $status);
+        $this->checkEq($status->concluir(), $status);
+        $this->checkEq($status->cancelar(), $status);
+        
+    }
+}
+class PassagemCheckedInTestCase extends TestCase {
+    public function getName(): string {
+        return "PassagemCheckedIn";
+    }
+    
+    public function run() {
+        # Transitions
+        $status = new PassagemCheckedIn();
+        $this->checkEq($status->abrir_check_in(), $status);
+        $this->checkEq($status->fazer_check_in(), $status);
+        $this->checkEq($status->embarcar(), new PassagemEmbarcado());
+        $this->checkEq($status->concluir(), new PassagemNaoApareceu());
+        $this->checkEq($status->cancelar(), new PassagemCancelada());
+        
+    }
+}
+class PassagemEmbarcadoTestCase extends TestCase {
+    public function getName(): string {
+        return "PassagemEmbarcado";
+    }
+    
+    public function run() {
+        # Transitions
+        $status = new PassagemEmbarcado();
+        $this->checkEq($status->abrir_check_in(), $status);
+        $this->checkEq($status->fazer_check_in(), $status);
+        $this->checkEq($status->embarcar(), $status);
+        $this->checkEq($status->concluir(), new PassagemConcluidaComSucesso());
+        $this->checkEq($status->cancelar(), $status);
+        
+    }
+}
+class PassagemConcluidaComSucessoTestCase extends TestCase {
+    public function getName(): string {
+        return "PassagemConcluidaComSucesso";
+    }
+    
+    public function run() {
+        # Transitions
+        $status = new PassagemConcluidaComSucesso();
+        $this->checkEq($status->abrir_check_in(), $status);
+        $this->checkEq($status->fazer_check_in(), $status);
+        $this->checkEq($status->embarcar(), $status);
+        $this->checkEq($status->concluir(), $status);
+        $this->checkEq($status->cancelar(), $status);
+        
+    }
+}
+
+
 class PassagemTestCase extends TestCase
 {
     protected function getName(): string
@@ -98,17 +212,5 @@ class PassagemTestCase extends TestCase
         $this->checkEq(Tipo::EMBARCADO, $passagem->tipoDeStatus());
         $this->checkTrue($passagem->acionarEvento(Evento::CONCLUIR));
         $this->checkEq(Tipo::CONCLUIDA_COM_SUCESSO, $passagem->tipoDeStatus());
-
-        # tipoDeStatus
-        $this->startSection("tipoDeStatus");
-        # TODO
-//
-//        $this->checkEq(Tipo::CANCELADA, $passagem->tipoDeStatus());
-//        $this->checkEq(Tipo::CHECK_IN_NAO_ABERTO, $passagem->tipoDeStatus());
-//        $this->checkEq(Tipo::AGUARDANDO_CHECK_IN, $passagem->tipoDeStatus());
-//        $this->checkEq(Tipo::NAO_APARECEU, $passagem->tipoDeStatus());
-//        $this->checkEq(Tipo::CHECKED_IN, $passagem->tipoDeStatus());
-//        $this->checkEq(Tipo::EMBARCADO, $passagem->tipoDeStatus());
-//        $this->checkEq(Tipo::CONCLUIDA_COM_SUCESSO, $passagem->tipoDeStatus());
     }
 }

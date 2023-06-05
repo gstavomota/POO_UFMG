@@ -70,8 +70,8 @@ class SiglaCompanhiaAerea implements HashableAndEquatable
 
 class CodigoVoo implements HashableAndEquatable
 {
-    public SiglaCompanhiaAerea $sigla_da_companhia;
-    public int $numero;
+    private SiglaCompanhiaAerea $sigla_da_companhia;
+    private int $numero;
 
     public function __construct(
         SiglaCompanhiaAerea $sigla_da_companhia,
@@ -111,6 +111,22 @@ class CodigoVoo implements HashableAndEquatable
     public function hashCode(): int
     {
         return combineHash([$this->sigla_da_companhia, $this->numero]);
+    }
+
+    /**
+     * @return SiglaCompanhiaAerea
+     */
+    public function getSiglaDaCompanhia(): SiglaCompanhiaAerea
+    {
+        return $this->sigla_da_companhia;
+    }
+
+    /**
+     * @return int
+     */
+    public function getNumero(): int
+    {
+        return $this->numero;
     }
 }
 

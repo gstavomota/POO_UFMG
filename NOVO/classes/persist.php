@@ -3,15 +3,13 @@ include_once('container.php');
 
 abstract class persist
 {
-    private ?string $filename;
     private ?int $index = null;
 
     public function __construct()
     {
-        if (func_num_args() == 1) {
-            $this->filename = func_get_arg(0);
-        } else if (func_num_args() == 2) {
-            $this->filename = func_get_arg(0);
+        if (func_num_args() == 0) {
+
+        } else if (func_num_args() == 1) {
             $this->index = func_get_arg(1);
         } else {
             throw(new Exception('Eror ao instanciar objeto da classe Persist - Número de parâmetros incorreto.'));
@@ -62,7 +60,7 @@ abstract class persist
         $objs = $container->getObjects();
         $matchObjects = array();
         for ($i = 0; $i < count($objs); $i++) {
-            if ($objs[$i]->$p_field == $p_value) {
+            if (equals($objs[$i]->$p_field, $p_value)) {
                 array_push($matchObjects, $objs[$i]);
             }
         }
@@ -87,7 +85,7 @@ abstract class persist
 
     public function __toString()
     {
-        return print_r($this);
+        return print_r($this, true);
     }
 
     abstract static public function getFilename();

@@ -14,8 +14,6 @@
             $documentoPassageiro = new DocumentoPassageiro(null, $rg);
             $data = Data::fromString("11/03/2003");
             $email = new Email("mariaeduardamrs0@gmail.com");
-            $passagens = [];
-            $pontuacaoVazia = [];
             $pontuacaoPreenchida = [
                 new Pontos(2000, DataTempo::fromDateTime(DateTime::createFromFormat("d/m/Y", "01/01/2020"))),
                 new Pontos(2000, DataTempo::agora()),
@@ -76,16 +74,22 @@
             $programaDeMilhagem = new ProgramaDeMilhagem($categorias, "Programa Teste");
             $this->startSection("update");
             
-            $passageiroSemPontos = new PassageiroVip('Maria', 'Sampaio', $documentoPassageiro, $nacionalidade, $cpf, $data , $email,  $passagens, 
-            $pontuacaoVazia, $numeroDeRegistro, $categorias, $programaDeMilhagem);
+            $passageiroSemPontos = new PassageiroVip('Maria', 'Sampaio', $documentoPassageiro, $nacionalidade, $cpf, $data , $email,
+            $numeroDeRegistro, $programaDeMilhagem);
             $this->checkEq($programaDeMilhagem->update($passageiroSemPontos), $categoriaBase);
 
-            $passageiroComPontosVencidos = new PassageiroVip('Maria', 'Sampaio', $documentoPassageiro, $nacionalidade, $cpf, $data , $email,  $passagens, 
-            $pontuacaoVencida, $numeroDeRegistro, $categorias, $programaDeMilhagem);
+            $passageiroComPontosVencidos = new PassageiroVip('Maria', 'Sampaio', $documentoPassageiro, $nacionalidade, $cpf, $data , $email,
+            $numeroDeRegistro, $programaDeMilhagem);
+            foreach ($pontuacaoVencida as $pontos) {
+                $passageiroComPontosVencidos->addPontos($pontos->getPontosGanhos(), $pontos->getDataDeObtencao());
+            }
             $this->checkEq($programaDeMilhagem->update($passageiroComPontosVencidos), $categoriaBase);
 
-            $passageiroComPontos = new PassageiroVip('Maria', 'Sampaio', $documentoPassageiro, $nacionalidade, $cpf, $data , $email,  $passagens, 
-            $pontuacaoPreenchida, $numeroDeRegistro, $categorias, $programaDeMilhagem);
+            $passageiroComPontos = new PassageiroVip('Maria', 'Sampaio', $documentoPassageiro, $nacionalidade, $cpf, $data , $email, $numeroDeRegistro, $programaDeMilhagem);
+
+            foreach ($pontuacaoPreenchida as $pontos) {
+                $passageiroComPontos->addPontos($pontos->getPontosGanhos(), $pontos->getDataDeObtencao());
+            }
             $this->checkEq($programaDeMilhagem->update($passageiroComPontos), $categorias[3]);
 
             $passageiroComPontos->addPontos(4000);

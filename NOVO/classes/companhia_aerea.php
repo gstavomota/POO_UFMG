@@ -616,8 +616,31 @@ class CompanhiaAerea extends Persist
         return $registro_passagem;
     }
 
-    public function adicionarVoo(Voo $voo): void
+    public function registrarVoo(
+        int                $numero,
+        SiglaAeroporto     $aeroporto_de_saida,
+        SiglaAeroporto     $aeroporto_de_chegada,
+        Tempo              $hora_de_partida,
+        Duracao            $duracao_estimada,
+        array              $dias_da_semana,
+        RegistroDeAeronave $aeronave_padrao,
+        int                $capacidade_passageiros,
+        float              $capacidade_carga,
+        float              $tarifa,
+        int                $pontuacaoMilhagem): Voo
     {
+        $voo = new Voo(new CodigoVoo($this->sigla, $numero),
+            $aeroporto_de_saida,
+            $aeroporto_de_chegada,
+            $hora_de_partida,
+            $duracao_estimada,
+            $dias_da_semana,
+            $aeronave_padrao,
+            $capacidade_passageiros,
+            $capacidade_carga,
+            $tarifa,
+            $pontuacaoMilhagem
+        );
         if ($this->voos_planejados->containsKey($voo->getCodigo())) {
             throw new Exception("Voo já presente");
         }
@@ -640,6 +663,7 @@ class CompanhiaAerea extends Persist
             $registro_da_viagem = $viagem_builder->getRegistro();
             $viagem_builders->put($registro_da_viagem, $viagem_builder);
         }
+        return $voo;
     }
 
     public function encontrarVoo(CodigoVoo $voo): ?Voo
@@ -717,7 +741,9 @@ class CompanhiaAerea extends Persist
         $this->aeronaves->put($registro, $aeronave);
         return $aeronave;
     }
-    public function encontrarAeronave(RegistroDeAeronave $registro): ?Aeronave {
+
+    public function encontrarAeronave(RegistroDeAeronave $registro): ?Aeronave
+    {
         return $this->aeronaves->get($registro);
     }
 }

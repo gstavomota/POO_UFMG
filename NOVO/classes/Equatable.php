@@ -44,3 +44,38 @@ function array_diff_equatable(array $array1, array $array2): array {
     }
     return $diff;
 }
+function equals(mixed $a, mixed $b, bool $strict): bool
+{
+    if ($a instanceof Equatable && $b instanceof Equatable) {
+        return $a->eq($b);
+    }
+    if (is_string($a) && is_string($b)) {
+        return strcmp($a, $b) === 0;
+    }
+    if (is_array($a) && is_array($b)) {
+        $a_keys = array_keys($a);
+        $b_keys = array_keys($b);
+
+        if (count($a_keys) !== count($b_keys)) {
+            return false;
+        }
+
+        sort($a_keys);
+        sort($b_keys);
+
+        for ($i = 0; $i < count($a_keys); $i++) {
+            if (!equals($a_keys[$i], $b_keys[$i], $strict)) {
+                return false;
+            }
+        }
+
+        foreach ($a_keys as $key) {
+            if (!equals($a[$key], $b[$key], $strict)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    return $strict ? $a === $b : $a == $b;
+}

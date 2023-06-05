@@ -268,46 +268,10 @@ abstract class TestCase
         $this->checkResultsOrSections[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
     }
 
-    private function equals(mixed $a, mixed $b, bool $strict): bool
-    {
-        if ($a instanceof Equatable && $b instanceof Equatable) {
-            return $a->eq($b);
-        }
-        if (is_string($a) && is_string($b)) {
-            return strcmp($a, $b) === 0;
-        }
-        if (is_array($a) && is_array($b)) {
-            $a_keys = array_keys($a);
-            $b_keys = array_keys($b);
-
-            if (count($a_keys) !== count($b_keys)) {
-                return false;
-            }
-
-            sort($a_keys);
-            sort($b_keys);
-
-            for ($i = 0; $i < count($a_keys); $i++) {
-                if (!$this->equals($a_keys[$i], $b_keys[$i], $strict)) {
-                    return false;
-                }
-            }
-
-            foreach ($a_keys as $key) {
-                if (!$this->equals($a[$key], $b[$key], $strict)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-        return $strict ? $a === $b : $a == $b;
-    }
-
     protected function checkEq(mixed $a, mixed $b, bool $strict = true): void
     {
         $symbol = $strict ? "===" : "==";
-        $success = $this->equals($a, $b, $strict);
+        $success = equals($a, $b, $strict);
         [$line, $file] = $this->getLineAndFileForPreviousFunction();
         $this->checkResultsOrSections[] = new CheckResult($success, "{$this->objOrEnumToString($a)} {$symbol} {$this->objOrEnumToString($b)}", $line, $file);
     }

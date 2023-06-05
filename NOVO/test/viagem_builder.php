@@ -94,7 +94,7 @@ class ViagemBuilderTestCase extends TestCase
         $data = Data::hoje()->add(Duracao::umDia());
         $this->startSection("addData");
         $this->checkEq($vb, $vb->addData($data));
-        $this->checkEq($this->getNonPublicProperty($vb, "data"), $data);
+        $this->checkEq($vb->getData(), $data);
         # addVoo
         $codigoVoo = new CodigoVoo(new SiglaCompanhiaAerea("LT"), 1);
         $aeroportoSaida = new SiglaAeroporto("AAA");

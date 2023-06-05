@@ -190,6 +190,14 @@ class ViagemBuilder
         return $this->codigo_do_voo;
     }
 
+    /**
+     * @return Data
+     */
+    public function getData(): Data
+    {
+        return $this->data;
+    }
+
     public function build(): Viagem
     {
         $this->tripulacao->trancar();

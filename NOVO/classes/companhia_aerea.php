@@ -52,39 +52,29 @@ class CompanhiaAerea extends Persist
     private GeradorDeRegistroDeTripulante $gerador_de_registro_de_tripulante;
     private static $local_filename = "companhia_aerea.txt";
 
-    public function __construct(string                        $nome,
-                                string                        $codigo,
-                                string                        $razao_social,
-                                SiglaCompanhiaAerea           $sigla,
-                                HashMap                       $aeronaves,
-                                HashMap                       $voos_planejados,
-                                HashMap                       $voos_em_venda,
-                                HashMap                       $voos_executados,
-                                GeradorDeRegistroDeViagem     $gerador_de_registro_de_viagem,
-                                GeradorDeRegistroDePassagem   $gerador_de_registro_de_passagem,
-                                float                         $tarifa_franquia,
-                                HashMap                       $passagens,
-                                HashMap                       $passageiros,
-                                HashMap                       $tripulantes,
-                                GeradorDeRegistroDeTripulante $gerador_de_registro_de_tripulante,
-                                                              ...$args)
+    public function __construct(string              $nome,
+                                string              $codigo,
+                                string              $razao_social,
+                                SiglaCompanhiaAerea $sigla,
+                                float               $tarifa_franquia,
+                                                    ...$args)
     {
 
         $this->nome = $nome;
         $this->codigo = $codigo;
         $this->razao_social = $razao_social;
         $this->sigla = $sigla;
-        $this->aeronaves = $aeronaves;
-        $this->voos_planejados = $voos_planejados;
-        $this->voos_em_venda = $voos_em_venda;
-        $this->voos_executados = $voos_executados;
-        $this->gerador_de_registro_de_viagem = $gerador_de_registro_de_viagem;
-        $this->gerador_de_registro_de_passagem = $gerador_de_registro_de_passagem;
+        $this->aeronaves = new HashMap();
+        $this->voos_planejados = new HashMap();
+        $this->voos_em_venda = new HashMap();
+        $this->voos_executados = new HashMap();
+        $this->gerador_de_registro_de_viagem = new GeradorDeRegistroDeViagem();
+        $this->gerador_de_registro_de_passagem = new GeradorDeRegistroDePassagem();
         $this->tarifa_franquia = $tarifa_franquia;
-        $this->passagens = $passagens;
-        $this->passageiros = $passageiros;
-        $this->tripulantes = $tripulantes;
-        $this->gerador_de_registro_de_tripulante = $gerador_de_registro_de_tripulante;
+        $this->passagens = new HashMap();
+        $this->passageiros = new HashMap();
+        $this->tripulantes = new HashMap();
+        $this->gerador_de_registro_de_tripulante = new GeradorDeRegistroDeTripulante();
         parent::__construct(...$args);
     }
 
@@ -103,59 +93,14 @@ class CompanhiaAerea extends Persist
         return $this->razao_social;
     }
 
-    public function getSigla(): string
+    public function getSigla(): SiglaCompanhiaAerea
     {
         return $this->sigla;
-    }
-
-    public function getAeronaves(): HashMap
-    {
-        return $this->aeronaves;
-    }
-
-    public function getVoosPlanejados(): HashMap
-    {
-        return $this->voos_planejados;
-    }
-
-    public function getVoosEmVenda(): HashMap
-    {
-        return $this->voos_em_venda;
-    }
-
-    public function getVoosExecutados(): HashMap
-    {
-        return $this->voos_executados;
-    }
-
-    public function getGeradorDeRegistroDeViagem(): GeradorDeRegistroDeViagem
-    {
-        return $this->gerador_de_registro_de_viagem;
-    }
-
-    public function getGeradorDeRegistroDePassagem(): GeradorDeRegistroDePassagem
-    {
-        return $this->gerador_de_registro_de_passagem;
     }
 
     public function getTarifaFranquia(): float
     {
         return $this->tarifa_franquia;
-    }
-
-    public function getPassagens(): HashMap
-    {
-        return $this->passagens;
-    }
-
-    public function getPassageiros(): HashMap
-    {
-        return $this->passageiros;
-    }
-
-    public function getTripulantes(): HashMap
-    {
-        return $this->tripulantes;
     }
 
     public static function getFilename()

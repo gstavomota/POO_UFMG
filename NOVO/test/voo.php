@@ -22,7 +22,6 @@ class VooTestCase extends TestCase
         $aeroPadrao = new RegistroDeAeronave(PrefixoRegistroDeAeronave::PP, "AAA");
         $tarifa_voo = 300.0;
         $voo = new Voo($codigo,
-            $siglaCA,
             $siglaAeroSaida,
             $siglaAeroChegada,
             $horaPartida,

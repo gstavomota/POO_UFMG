@@ -11,7 +11,6 @@ require_once "temporal.php";
 class Voo
 {
     private CodigoVoo $codigo;
-    private SiglaCompanhiaAerea $companhia_aerea;
     private SiglaAeroporto $aeroporto_de_saida;
     private SiglaAeroporto $aeroporto_de_chegada;
     private Tempo $hora_de_partida;
@@ -28,7 +27,6 @@ class Voo
 
     public function __construct(
         CodigoVoo           $codigo,
-        SiglaCompanhiaAerea $companhia_aerea,
         SiglaAeroporto      $aeroporto_de_saida,
         SiglaAeroporto      $aeroporto_de_chegada,
         Tempo               $hora_de_partida,
@@ -42,7 +40,6 @@ class Voo
     )
     {
         $this->codigo = $codigo;
-        $this->companhia_aerea = $companhia_aerea;
         $this->aeroporto_de_saida = $aeroporto_de_saida;
         $this->aeroporto_de_chegada = $aeroporto_de_chegada;
         $this->hora_de_partida = $hora_de_partida;
@@ -70,9 +67,9 @@ class Voo
     /** Retorna a CompanhiaAerea do Voo
      * @return SiglaCompanhiaAerea
      */
-    public function getCompanhiaAerea(): SiglaCompanhiaAerea
+    public function getSiglaCompanhiaAerea(): SiglaCompanhiaAerea
     {
-        return $this->companhia_aerea;
+        return $this->codigo->getSiglaDaCompanhia();
     }
 
     /** Retorna o Aeroporto de saida do Voo

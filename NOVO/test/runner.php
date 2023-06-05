@@ -14,6 +14,7 @@ require_once "suite.php";
 require_once "suite_test.php";
 require_once "temporal.php";
 require_once "tripulacao.php";
+require_once "viagem_builder.php";
 require_once "voo.php";
 
 (new TestRunner())
@@ -94,6 +95,9 @@ require_once "voo.php";
     // Inicio tripulacao.php
     ->addCase(new TripulacaoTestCase())
     // Fim tripulacao.php
+    // Inicio viagem_builder.php
+    ->addCase(new ViagemBuilderTestCase())
+    // Fim viagem_builder.php
     // Inicio voo.php
     ->addCase(new VooTestCase())
     // Fim voo.php

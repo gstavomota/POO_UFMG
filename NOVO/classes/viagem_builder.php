@@ -28,6 +28,10 @@ class ViagemBuilder
 
     private DataTempo $hora_de_partida, $hora_de_chegada;
 
+    function __construct() {
+        $this->tripulacao = new Tripulacao();
+    }
+
     public function addTarifaFranquia(float $tarifa_franquia): self
     {
         $this->tarifa_franquia = $tarifa_franquia;
@@ -78,7 +82,7 @@ class ViagemBuilder
 
     function temAssentosLiberados(): bool
     {
-        foreach ($this->assentos as $assento) {
+        foreach ($this->assentos->values() as $assento) {
             if ($assento->vazio()) {
                 return true;
             }
@@ -88,19 +92,26 @@ class ViagemBuilder
 
     function assentoEstaLiberado(CodigoDoAssento $assento): bool
     {
-        if (!isset($this->assentos["{$assento}"])) {
+        if (!$this->assentos->containsKey($assento)) {
             throw new InvalidArgumentException('Assento não encontrado');
         }
-        return $this->assentos["{$assento}"]->vazio();
+        return $this->assentos->get($assento)->vazio();
     }
 
     function temCargaDisponivelParaFranquias(FranquiasDeBagagem $franquias): bool
     {
         $carga_usada = 0;
-        foreach ($this->assentos as $assento) {
-            $carga_usada += $assento->getFranquias()->getCarga();
+        foreach ($this->assentos->values() as $assento) {
+            /**
+             * @var ?FranquiasDeBagagem $franquiasAssento
+             */
+            $franquiasAssento = $assento->getFranquias();
+            if (is_null($franquiasAssento)) {
+                continue;
+            }
+            $carga_usada += $franquiasAssento->carga();
         }
-        if ($carga_usada + $franquias->getCarga() > $this->carga) {
+        if ($carga_usada + $franquias->carga() > $this->carga) {
             return false;
         }
         return true;
@@ -108,7 +119,7 @@ class ViagemBuilder
 
     function codigoAssentoLiberado(): CodigoDoAssento
     {
-        foreach ($this->assentos as $assento) {
+        foreach ($this->assentos->values() as $assento) {
             if ($assento->vazio()) {
                 return $assento->getCodigo();
             }
@@ -120,25 +131,40 @@ class ViagemBuilder
     function reservarAssento(bool $cliente_vip, RegistroDePassagem $registro_passagem, FranquiasDeBagagem $franquias, CodigoDoAssento $assento_desejado): float
     {
         if (!$this->temCargaDisponivelParaFranquias($franquias)) {
+            // TODO: Custom exception type
             throw new Exception('Não tem carga para franquia disponível');
         }
-        if (!isset($this->assentos["{$assento_desejado}"])) {
+        if (!$this->assentos->containsKey($assento_desejado)) {
             throw new InvalidArgumentException('Assento não encontrado');
         }
-        $assento = $this->assentos["{$assento_desejado}"];
+        $assento = $this->assentos->get($assento_desejado);
         if ($assento->preenchido()) {
-            throw new Exception('O assento está preenchido');
+            throw new PreenchimentoDeAssentoException('O assento está preenchido');
         }
         $assento->reservar($registro_passagem, $franquias);
         return calculo_tarifa_strategy_for($cliente_vip, $this->tarifa, $this->tarifa_franquia)->calcula($franquias);
     }
 
-    function liberarAssento(RegistroDePassagem $registro_passagem, CodigoDoAssento $assento): void
+    function liberarAssento(RegistroDePassagem $registro_passagem, CodigoDoAssento $codigoAssento): void
     {
-        if (!isset($this->assentos["{$assento}"])) {
+        if (!$this->assentos->containsKey($codigoAssento)) {
             throw new InvalidArgumentException('Assento não encontrado');
         }
-        $this->assentos["{$assento}"]->liberar($registro_passagem);
+        $assento = $this->assentos->get($codigoAssento);
+        if (!$assento->getPassagem()->eq($registro_passagem)) {
+            throw new Exception("Passagem errada");
+        }
+        $assento->liberar();
+    }
+
+    function addTripulante(Tripulante $tripulante): self {
+        $registro = $tripulante->getRegistro();
+        match ($tripulante->getCargo()) {
+            Cargo::COMISSARIO => $this->tripulacao->addComissario($registro),
+            Cargo::PILOTO => $this->tripulacao->setPiloto($registro),
+            Cargo::COPILOTO => $this->tripulacao->setCopiloto($registro)
+        };
+        return $this;
     }
 
     function addHoraDePartidaEHoraDeChegada(DataTempo $hora_de_partida, DataTempo $hora_de_chegada): self
@@ -166,11 +192,12 @@ class ViagemBuilder
 
     public function build(): Viagem
     {
+        $this->tripulacao->trancar();
         return new Viagem(
             $this->registro,
             $this->codigo_do_voo,
-            $this->aeroporto_de_chegada,
             $this->aeroporto_de_saida,
+            $this->aeroporto_de_chegada,
             $this->hora_de_partida,
             $this->hora_de_chegada,
             $this->aeronave,

@@ -64,13 +64,15 @@ class HashMapTestCase extends TestCase
         $this->checkEq($map->get($key1), 3);
         $this->checkEq($map->get($key10), 4);
         # Deleting with collision
-        $map->remove($key10);
+        $this->checkTrue($map->remove($key10));
+        $this->checkFalse($map->remove($key10));
         $this->checkEq($map->size(), 2);
         $this->checkEq($map->get($key0), 2);
         $this->checkEq($map->get($key1), 3);
         $this->checkEq($map->get($key10), null);
         # Deleting without collision
-        $map->remove($key0);
+        $this->checkTrue($map->remove($key0));
+        $this->checkFalse($map->remove($key0));
         $this->checkEq($map->size(), 1);
         $this->checkEq($map->get($key0), null);
         $this->checkEq($map->get($key1), 3);

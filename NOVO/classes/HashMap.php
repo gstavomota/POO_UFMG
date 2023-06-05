@@ -92,9 +92,9 @@ class HashMap
      * Removes the key-value pair associated with the specified key.
      *
      * @param K $key The key.
-     * @return void
+     * @return bool
      */
-    public function remove(HashableAndEquatable|HashableAndComparable $key): void
+    public function remove(HashableAndEquatable|HashableAndComparable $key): bool
     {
         $bucketIndex = $this->getBucketIndex($key);
         if (isset($this->buckets[$bucketIndex])) {
@@ -102,10 +102,11 @@ class HashMap
                 if ($key->eq($entry->key)) {
                     unset($this->buckets[$bucketIndex][$index]);
                     $this->size--;
-                    return;
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     /**

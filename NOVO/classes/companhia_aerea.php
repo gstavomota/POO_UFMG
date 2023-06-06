@@ -1,6 +1,7 @@
 <?php
 
 require_once 'aeronave.php';
+require_once 'cartaoDeEmbarque.php';
 require_once 'passageiro.php';
 require_once 'franquia_de_bagagem.php';
 require_once 'identificadores.php';
@@ -50,6 +51,11 @@ class CompanhiaAerea extends Persist
      */
     private HashMap $tripulantes;
     private GeradorDeRegistroDeTripulante $gerador_de_registro_de_tripulante;
+    /**
+     * @var HashMap<RegistroDeCartaoDeEmbarque, CartaoDeEmbarque>
+     */
+    private HashMap $cartoesDeEmbarque;
+    private GeradorDeRegistroDeCartaoDeEmbarque $geradorDeRegistroDeCartaoDeEmbarque;
     private static $local_filename = "companhia_aerea.txt";
 
     public function __construct(string              $nome,
@@ -75,6 +81,8 @@ class CompanhiaAerea extends Persist
         $this->passageiros = new HashMap();
         $this->tripulantes = new HashMap();
         $this->gerador_de_registro_de_tripulante = new GeradorDeRegistroDeTripulante();
+        $this->cartoesDeEmbarque = new HashMap();
+        $this->geradorDeRegistroDeCartaoDeEmbarque = new GeradorDeRegistroDeCartaoDeEmbarque($sigla);
         parent::__construct(...$args);
     }
 
@@ -171,15 +179,18 @@ class CompanhiaAerea extends Persist
             return true;
         };
 
-        $voo_final_desejado = function (Voo $voo, Tempo $hora_de_chegada) use ($data, $aeroporto_de_chegada) {
+        $voo_final_desejado = function (Voo $voo, SiglaAeroporto $aeroporto_intermediario, Tempo $hora_de_chegada) use ($data, $aeroporto_de_chegada) {
             if (!in_array($data->getDiaDaSemana(), $voo->getDiasDaSemana())) {
+                return false;
+            }
+            if (!$voo->getAeroportoSaida()->eq($aeroporto_intermediario)) {
                 return false;
             }
             if (!$voo->getAeroportoChegada()->eq($aeroporto_de_chegada)) {
                 return false;
             }
             $tempo_da_conexao = $hora_de_chegada->add(Duracao::meiaHora());
-            if ($voo->getHoraDePartida()->gt($tempo_da_conexao)) {
+            if ($voo->getHoraDePartida()->st($tempo_da_conexao)) {
                 return false;
             }
             return true;
@@ -189,10 +200,14 @@ class CompanhiaAerea extends Persist
          * @var Voo $voo_intermediario
          */
         foreach (array_filter($this->voos_planejados->values(), $voo_intermediario_desejado) as $voo_intermediario) {
+            $hora_de_chegada = $voo_intermediario->getHoraDePartida()->add($voo_intermediario->getDuracaoEstimada());
+            $voo_final_desejado_com_aeroporto_intermediario_e_hora_de_chegada = function (Voo $voo_final) use ($voo_intermediario, $voo_final_desejado, $hora_de_chegada) {
+                return $voo_final_desejado($voo_final, $voo_intermediario->getAeroportoChegada(), $hora_de_chegada);
+            };
             /**
              * @var Voo $voo_final
              */
-            foreach (array_filter($this->voos_planejados->values(), $voo_final_desejado) as $voo_final) {
+            foreach (array_filter($this->voos_planejados->values(), $voo_final_desejado_com_aeroporto_intermediario_e_hora_de_chegada) as $voo_final) {
                 $voos[] = [$voo_intermediario->getCodigo(), $voo_final->getCodigo()];
             }
         }
@@ -336,7 +351,9 @@ class CompanhiaAerea extends Persist
             }
         }
     }
-    public function registrarAeronaveNaViagem(RegistroDeViagem $registroDeViagem, RegistroDeAeronave $registroDeAeronave) {
+
+    public function registrarAeronaveNaViagem(RegistroDeViagem $registroDeViagem, RegistroDeAeronave $registroDeAeronave)
+    {
         if (!$this->aeronaves->containsKey($registroDeAeronave)) {
             throw new Exception("Aeronave não presente na companhia");
         }
@@ -348,7 +365,8 @@ class CompanhiaAerea extends Persist
         $vb->addAeronave($aeronave);
     }
 
-    public function registrarTripulanteNaViagem(RegistroDeViagem $registroDeViagem, RegistroDeTripulante $registroDeTripulante) {
+    public function registrarTripulanteNaViagem(RegistroDeViagem $registroDeViagem, RegistroDeTripulante $registroDeTripulante)
+    {
         if (!$this->tripulantes->containsKey($registroDeTripulante)) {
             throw new Exception("Tripulante não presente na companhia");
         }
@@ -379,8 +397,11 @@ class CompanhiaAerea extends Persist
                 continue;
 
             $registro_passagem = $assento->getPassagem();
+            /**
+             * @var Passagem $passagem
+             */
             $passagem = $this->passagens->get($registro_passagem);
-            $passagem->acionar_evento(Evento::CONCLUIR);
+            $passagem->acionarEvento(Evento::CONCLUIR);
         }
     }
 
@@ -525,16 +546,21 @@ class CompanhiaAerea extends Persist
         return $viagens;
     }
 
-    function fazerCheckIn(RegistroDePassagem $passagem)
+    /**
+     * @param RegistroDePassagem $registroDePassagem
+     * @return CartaoDeEmbarque[]
+     * @throws ComparableTypeException
+     */
+    function fazerCheckIn(RegistroDePassagem $registroDePassagem): array
     {
-        if (!$this->passagens->containsKey($passagem)) {
+        if (!$this->passagens->containsKey($registroDePassagem)) {
             throw new Exception("Passagem não está na companhia");
         }
 
         /**
          * @var Passagem $passagem
          */
-        $passagem = $this->passagens->get($passagem);
+        $passagem = $this->passagens->get($registroDePassagem);
 
         $twoDays = new Duracao(2, 0);
         $hoje = Data::hoje();
@@ -545,6 +571,52 @@ class CompanhiaAerea extends Persist
 
         if (!$passagem->acionarEvento(Evento::FAZER_CHECK_IN)) {
             throw new Exception("Não é possível fazer check-in agora");
+        }
+        $passageiro = $this->passageiros->get($passagem->getDocumentoCliente());
+        /**
+         * @var CartaoDeEmbarque[]
+         */
+        $cartoesDeEmbarque = [];
+        foreach ($passagem->getAssentos() as $viagem_assento) {
+            /**
+             * @var RegistroDeViagem $registroViagem
+             */
+            $registroViagem = $viagem_assento->key;
+            /**
+             * @var CodigoDoAssento $codigoAssento
+             */
+            $codigoAssento = $viagem_assento->value;
+            $registroDeCartaoDeEmbarque = $this->geradorDeRegistroDeCartaoDeEmbarque->gerar();
+            $viagemBuilder = $this->findViagemBuilder($registroViagem);
+            $horaPrimeiroVoo = $viagemBuilder->getHoraDePartidaEstimada();
+            $duracao40min = new Duracao(0, 40 * 60);
+            $horaDeEmbarque = $horaPrimeiroVoo->sub($duracao40min);
+            $cartaoDeEmbarque = new CartaoDeEmbarque(
+                $registroDeCartaoDeEmbarque,
+                $passageiro->getNome(),
+                $passageiro->getSobrenome(),
+                $viagemBuilder->getAeroportoDeSaida(),
+                $viagemBuilder->getAeroportoDeChegada(),
+                $horaDeEmbarque,
+                $codigoAssento,
+            );
+            $this->cartoesDeEmbarque->put($registroDeCartaoDeEmbarque, $cartaoDeEmbarque);
+            $cartoesDeEmbarque[] = $cartaoDeEmbarque;
+        }
+        return $cartoesDeEmbarque;
+    }
+    function embarcar(RegistroDePassagem $registroDePassagem): void
+    {
+        if (!$this->passagens->containsKey($registroDePassagem)) {
+            throw new Exception("Passagem não está na companhia");
+        }
+
+        /**
+         * @var Passagem $passagem
+         */
+        $passagem = $this->passagens->get($registroDePassagem);
+        if (!$passagem->acionarEvento(Evento::EMBARCAR)) {
+            throw new Exception("Não é possivel embarcar agora");
         }
     }
 
@@ -592,16 +664,16 @@ class CompanhiaAerea extends Persist
 
         $registro_passagem = $this->gerador_de_registro_de_passagem->gerar();
         /**
-         * @var HashMap<RegistroDeViagem, CodigoDoAssento> $viagens_assentos
+         * @var HashMapEntry<RegistroDeViagem, CodigoDoAssento>[] $viagens_assentos
          */
-        $viagens_assentos = new HashMap();
+        $viagens_assentos = [];
         $valor_total = 0.0;
 
         foreach ($viagem_builders as $viagem_builder) {
             $assento_desejado = $assento ?? $viagem_builder->codigoAssentoLiberado();
             $valor = $viagem_builder->reservarAssento($passageiro instanceof PassageiroVip, $registro_passagem, $franquias, $assento_desejado);
             $valor_total += $valor;
-            $viagens_assentos->put($viagem_builder->getRegistro(), $assento_desejado);
+            $viagens_assentos[] = new HashMapEntry($viagem_builder->getRegistro(), $assento_desejado);
         }
 
         $status = new PassagemCheckInNaoAberto();
@@ -671,7 +743,8 @@ class CompanhiaAerea extends Persist
      * @param Data|null $data
      * @return ViagemBuilder|null
      */
-    private function findViagemBuilder(RegistroDeViagem $registroDeViagem, ?Data $data = null): ?ViagemBuilder {
+    private function findViagemBuilder(RegistroDeViagem $registroDeViagem, ?Data $data = null): ?ViagemBuilder
+    {
         if (!is_null($data)) {
             if (!$this->voos_em_venda->containsKey($data)) {
                 return null;
@@ -719,7 +792,8 @@ class CompanhiaAerea extends Persist
      * @param CodigoVoo $codigoVoo
      * @return ViagemBuilder|null
      */
-    private function findViagemBuilderByDataECodigoVoo(Data $data, CodigoVoo $codigoVoo): ?ViagemBuilder {
+    private function findViagemBuilderByDataECodigoVoo(Data $data, CodigoVoo $codigoVoo): ?ViagemBuilder
+    {
         if (!$this->voos_em_venda->containsKey($data)) {
             return null;
         }
@@ -816,11 +890,10 @@ class CompanhiaAerea extends Persist
         string              $sobrenome,
         CPF                 $cpf,
         Nacionalidade       $nacionalidade,
-        DataTempo           $data_de_nascimento,
+        Data                $data_de_nascimento,
         Email               $email,
         string              $cht,
         Endereco            $endereco,
-        SiglaCompanhiaAerea $companhia,
         SiglaAeroporto      $aeroporto_base,
         Cargo               $cargo): Tripulante
     {
@@ -834,7 +907,7 @@ class CompanhiaAerea extends Persist
             $email,
             $cht,
             $endereco,
-            $companhia,
+            $this->sigla,
             $aeroporto_base,
             $cargo,
             $registro,
@@ -846,6 +919,14 @@ class CompanhiaAerea extends Persist
     public function encontrarTripulante(RegistroDeTripulante $tripulante): ?Tripulante
     {
         return $this->tripulantes->get($tripulante);
+    }
+
+    public function encontrarViagem(RegistroDeViagem $registroDeViagem): ?Viagem {
+        $vb = $this->findViagemBuilder($registroDeViagem);
+        if (!is_null($vb)) {
+            throw new Exception("A viagem ainda não foi executada");
+        }
+        return $this->voos_executados->get($registroDeViagem);
     }
 
     public function registrarAeronave(
@@ -874,7 +955,8 @@ class CompanhiaAerea extends Persist
         return $this->aeronaves->get($registro);
     }
 
-    public function encontrarPassagem(RegistroDePassagem $registro): ?Passagem {
+    public function encontrarPassagem(RegistroDePassagem $registro): ?Passagem
+    {
         return $this->passagens->get($registro);
     }
 }

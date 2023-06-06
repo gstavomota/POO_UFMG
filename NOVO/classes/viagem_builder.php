@@ -26,6 +26,8 @@ class ViagemBuilder
 
     private SiglaAeroporto $aeroporto_de_saida, $aeroporto_de_chegada;
 
+    private DataTempo $hora_de_partida_estimada;
+
     private DataTempo $hora_de_partida, $hora_de_chegada;
 
     function __construct() {
@@ -66,6 +68,7 @@ class ViagemBuilder
         $this->aeroporto_de_chegada = $voo->getAeroportoChegada();
         $this->assentos = $voo->construirAssentos();
         $this->pontuacaoMilhagem = $voo->getPontuacaoMilhagem();
+        $this->hora_de_partida_estimada = $voo->getHoraDePartida()->comData($this->data);
         return $this;
     }
 
@@ -188,6 +191,30 @@ class ViagemBuilder
     public function getCodigoDoVoo(): CodigoVoo
     {
         return $this->codigo_do_voo;
+    }
+
+    /**
+     * @return DataTempo
+     */
+    public function getHoraDePartidaEstimada(): DataTempo
+    {
+        return $this->hora_de_partida_estimada;
+    }
+
+    /**
+     * @return SiglaAeroporto
+     */
+    public function getAeroportoDeSaida(): SiglaAeroporto
+    {
+        return $this->aeroporto_de_saida;
+    }
+
+    /**
+     * @return SiglaAeroporto
+     */
+    public function getAeroportoDeChegada(): SiglaAeroporto
+    {
+        return $this->aeroporto_de_chegada;
     }
 
     /**

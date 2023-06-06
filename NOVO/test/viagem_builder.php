@@ -114,8 +114,9 @@ class ViagemBuilderTestCase extends TestCase
         $this->checkEq($this->getNonPublicProperty($vb, "passageiros"), $capacidadePassageiros);
         $this->checkEq($vb->getCodigoDoVoo(), $codigoVoo);
         $this->checkEq($this->getNonPublicProperty($vb, "tarifa"), $tarifa);
-        $this->checkEq($this->getNonPublicProperty($vb, "aeroporto_de_saida"), $aeroportoSaida);
-        $this->checkEq($this->getNonPublicProperty($vb, "aeroporto_de_chegada"), $aeroportoChegada);
+        $this->checkEq($vb->getAeroportoDeSaida(), $aeroportoSaida);
+        $this->checkEq($vb->getAeroportoDeChegada(), $aeroportoChegada);
+        $this->checkEq($vb->getHoraDePartidaEstimada(), $horaPartida->comData($data));
         /**
          * @var HashMap<CodigoDoAssento, Assento> $assentos
          */

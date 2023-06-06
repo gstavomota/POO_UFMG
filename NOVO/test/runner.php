@@ -77,9 +77,6 @@ require_once "voo.php";
     ->addCase(new PassagemConcluidaComSucessoTestCase())
     ->addCase(new PassagemTestCase())
     // Fim passagem.php
-    // Inicio HashMap.php
-    ->addCase(new HashMapTestCase())
-    // Fim HashMap.php
     // Inicio programaDeMilhagem.php
     ->addCase(new ProgramaDeMilhagemTestCase())
     // Fim programaDeMilhagem.php

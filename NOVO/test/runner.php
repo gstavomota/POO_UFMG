@@ -10,6 +10,7 @@ require_once "passageiro.php";
 require_once "passageiroVip.php";
 require_once "passagem.php";
 require_once "programaDeMilhagem.php";
+require_once "roteiro_de_testes.php";
 require_once "suite.php";
 require_once "suite_test.php";
 require_once "temporal.php";
@@ -82,6 +83,9 @@ require_once "voo.php";
     // Inicio programaDeMilhagem.php
     ->addCase(new ProgramaDeMilhagemTestCase())
     // Fim programaDeMilhagem.php
+    // Inicio roteiro_de_testes.php
+    ->addCase(new RoteiroDeTestesTestCase())
+    // Fim roteiro_de_testes.php
     // Inicio suite_test.php
     ->addCase(new TestSuiteTestCase())
     // Fim suite_test.php

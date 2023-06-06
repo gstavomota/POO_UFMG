@@ -362,6 +362,16 @@ abstract class TestCase
         return $reflectionProperty->getValue($object);
     }
 
+    protected function setNonPublicProperty(object $object, string $property, mixed $value, string $class = null): mixed
+    {
+        $reflectionProperty = new ReflectionProperty($class ?? $object, $property);
+        if ($reflectionProperty->isPublic()) {
+            throw new ReflectionException("The property is public");
+        }
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($object, $value);
+    }
+
     protected function getPropertyDefault(string $class, string $property): mixed
     {
         $reflectionProperty = new ReflectionProperty($class, $property);

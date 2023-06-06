@@ -314,7 +314,7 @@ class GeradorDeRegistroDeVeiculo extends GeradorDeRegistroNumerico{
     }
 }
 
-class RegistroDeCartaoDeEmbarque {
+class RegistroDeCartaoDeEmbarque implements HashableAndEquatable {
     private SiglaCompanhiaAerea $sigla;
     public int $number;
 
@@ -333,6 +333,11 @@ class RegistroDeCartaoDeEmbarque {
         }
 
         return $this->number == $outro->number && $this->sigla->eq($outro->sigla);
+    }
+
+    public function hashCode(): int
+    {
+        return combineHash([$this->number, $this->sigla]);
     }
 }
 

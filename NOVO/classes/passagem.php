@@ -205,10 +205,10 @@ class Passagem
     private Data $data;
     private float $valor;
     private float $valor_pago;
-    /**
-     * @var HashMap<RegistroDeViagem, CodigoDoAssento>
+    /** TODO: should be an tuple actually
+     * @var HashMapEntry<RegistroDeViagem, CodigoDoAssento>[]
      */
-    private HashMap $assentos;
+    private array $assentos;
     private DataTempo $data_tempo_de_compra;
     private StatusDaPassagem $status;
 
@@ -221,7 +221,7 @@ class Passagem
         Data                $data,
         float               $valor,
         float               $valor_pago,
-        HashMap             $assentos,
+        array               $assentos,
         DataTempo           $data_tempo_de_compra,
         StatusDaPassagem    $status
     )
@@ -304,9 +304,9 @@ class Passagem
     }
 
     /**
-     * @return HashMap<RegistroDeViagem, CodigoDoAssento>
+     * @return HashMapEnry<RegistroDeViagem, CodigoDoAssento>[]
      */
-    public function getAssentos(): HashMap
+    public function getAssentos(): array
     {
         return $this->assentos;
     }

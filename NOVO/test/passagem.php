@@ -137,7 +137,7 @@ class PassagemTestCase extends TestCase
         $data = new Data(2023, 9, 23);
         $valor = 100.0;
         $valorPago = 50.0;
-        $assentos = new HashMap();
+        $assentos = [];
         $data_compra = new Data(2023, 07, 21);
         $tempo_compra = new Tempo(10, 35, 22);
         $dataTempoCompra = new DataTempo($data_compra, $tempo_compra);

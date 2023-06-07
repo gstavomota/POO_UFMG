@@ -6,9 +6,9 @@ require_once "enum_to_array.php";
 require_once "franquia_de_bagagem.php";
 require_once "HashMap.php";
 require_once "identificadores.php";
-require_once "passageiro.php";
 require_once "passageiroVip.php";
 require_once "passagem.php";
+require_once "Pessoa.php";
 require_once "programaDeMilhagem.php";
 require_once "roteiro_de_testes.php";
 require_once "suite.php";
@@ -61,9 +61,6 @@ require_once "voo.php";
     ->addCase(new CPFTestCase())
     ->addCase(new CEPTestCase())
     // Fim identificadores.php
-    // Inicio passageiro.php
-    ->addCase(new PassageiroTestCase())
-    // Fim passageiro.php
     // Inicio passageiroVip.php
     ->addCase(new PassageiroVipTestCase())
     // Fim passageiroVip.php
@@ -77,6 +74,9 @@ require_once "voo.php";
     ->addCase(new PassagemConcluidaComSucessoTestCase())
     ->addCase(new PassagemTestCase())
     // Fim passagem.php
+    // Inicio Pessoa.php
+    ->addCase(new PessoaTestCase())
+    // Fim Pessoa.php
     // Inicio programaDeMilhagem.php
     ->addCase(new ProgramaDeMilhagemTestCase())
     // Fim programaDeMilhagem.php

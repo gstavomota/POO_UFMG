@@ -19,7 +19,7 @@
             $validEmail = new Email('joao@gmail.com');
             $validData = new Data(2023, 05, 01);
             $passaporte = new Passaporte('A00000000');
-            $documentoCliente = new DocumentoPassageiro($passaporte);
+            $documentoCliente = new DocumentoPessoa($passaporte);
 
             try {
                 // nome vazio

@@ -51,7 +51,7 @@ require_once "voo.php";
     ->addCase(new GeradorDeRegistroDeTripulanteTestCase())
     ->addCase(new RGTestCase())
     ->addCase(new PassaporteTestCase())
-    ->addCase(new DocumentoPassageiroTestCase())
+    ->addCase(new DocumentoPessoaTestCase())
     ->addCase(new GeradorDeRegistroDeViagemTestCase())
     ->addCase(new GeradorDeRegistroDePassagemTestCase())
     ->addCase(new ClasseTestCase())

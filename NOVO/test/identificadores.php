@@ -566,11 +566,11 @@ class PassaporteTestCase extends TestCase {
         $this->checkNeq($passaporte0->hashCode(), $passaporte1->hashCode());
     }
 }
-class DocumentoPassageiroTestCase extends TestCase {
+class DocumentoPessoaTestCase extends TestCase {
 
     protected function getName(): string
     {
-        return "DocumentoPassageiro";
+        return "DocumentoPessoa";
     }
 
     public function run()
@@ -580,39 +580,39 @@ class DocumentoPassageiroTestCase extends TestCase {
         $passaporte = new Passaporte("A11111111");
         $rg = new RG("MG11.111.111");
         try {
-            new DocumentoPassageiro($passaporte, $rg);
+            new DocumentoPessoa($passaporte, $rg);
             $this->checkNotReached();
         } catch (InvalidArgumentException $e) {
             $this->checkReached();
         }
         try {
-            new DocumentoPassageiro();
+            new DocumentoPessoa();
             $this->checkNotReached();
         } catch (InvalidArgumentException $e) {
             $this->checkReached();
         }
         try {
-            new DocumentoPassageiro($passaporte);
+            new DocumentoPessoa($passaporte);
             $this->checkReached();
         } catch (InvalidArgumentException $e) {
             $this->checkNotReached();
         }
         try {
-            new DocumentoPassageiro(null, $rg);
+            new DocumentoPessoa(null, $rg);
             $this->checkReached();
         } catch (InvalidArgumentException $e) {
             $this->checkNotReached();
         }
         # Stringfication
-        $documentoPassaporte = new DocumentoPassageiro($passaporte);
-        $documentoRg = new DocumentoPassageiro(null, $rg);
+        $documentoPassaporte = new DocumentoPessoa($passaporte);
+        $documentoRg = new DocumentoPessoa(null, $rg);
         $this->startSection("Stringfication");
         $this->checkEq("{$documentoPassaporte}", "{$passaporte}");
         $this->checkEq("{$documentoRg}", "{$rg}");
         # Equality
         $this->startSection("Equality");
-        $documentoPassaporte_2 = new DocumentoPassageiro($passaporte);
-        $documentoRg_2 = new DocumentoPassageiro(null, $rg);
+        $documentoPassaporte_2 = new DocumentoPessoa($passaporte);
+        $documentoRg_2 = new DocumentoPessoa(null, $rg);
         $this->checkEq($documentoPassaporte, $documentoPassaporte_2);
         $this->checkEq($documentoRg, $documentoRg_2);
         $this->checkNeq($documentoRg, $documentoPassaporte);

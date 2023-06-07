@@ -22,17 +22,17 @@ class PassageiroVip extends Passageiro
 
     public function __construct(
         //passageiro
-        string              $nome,
-        string              $sobrenome,
-        DocumentoPassageiro $documento,
-        Nacionalidade       $nacionalidade,
-        ?CPF                $cpf,
-        Data                $data_de_nascimento,
-        Email               $email,
+        string             $nome,
+        string             $sobrenome,
+        DocumentoPessoa    $documento,
+        Nacionalidade      $nacionalidade,
+        ?CPF               $cpf,
+        Data               $data_de_nascimento,
+        Email              $email,
 
         //passageiro VIP
-        string              $numero_de_registro,
-        ProgramaDeMilhagem  $programa_de_milhagem,
+        string             $numero_de_registro,
+        ProgramaDeMilhagem $programa_de_milhagem,
     )
     {
         parent::__construct($nome, $sobrenome, $documento, $nacionalidade, $cpf, $data_de_nascimento, $email);

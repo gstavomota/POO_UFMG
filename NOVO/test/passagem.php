@@ -133,7 +133,7 @@ class PassagemTestCase extends TestCase
         $aeroportoChegada = new SiglaAeroporto('CDG');
         $companhiaAerea = new SiglaCompanhiaAerea('GL');
         $passaporte = new Passaporte('A12345678');
-        $documentoCliente = new DocumentoPassageiro($passaporte);
+        $documentoCliente = new DocumentoPessoa($passaporte);
         $data = new Data(2023, 9, 23);
         $valor = 100.0;
         $valorPago = 50.0;

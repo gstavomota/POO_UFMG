@@ -201,7 +201,7 @@ class Passagem
     private SiglaAeroporto $aeroporto_de_saida;
     private SiglaAeroporto $aeroporto_de_chegada;
     private SiglaCompanhiaAerea $companhia_aerea;
-    private DocumentoPassageiro $documento_cliente;
+    private DocumentoPessoa $documento_cliente;
     private Data $data;
     private float $valor;
     private float $valor_pago;
@@ -217,7 +217,7 @@ class Passagem
         SiglaAeroporto      $aeroporto_de_saida,
         SiglaAeroporto      $aeroporto_de_chegada,
         SiglaCompanhiaAerea $companhia_aerea,
-        DocumentoPassageiro $documento_cliente,
+        DocumentoPessoa     $documento_cliente,
         Data                $data,
         float               $valor,
         float               $valor_pago,
@@ -272,9 +272,9 @@ class Passagem
     }
 
     /**
-     * @return DocumentoPassageiro
+     * @return DocumentoPessoa
      */
-    public function getDocumentoCliente(): DocumentoPassageiro
+    public function getDocumentoCliente(): DocumentoPessoa
     {
         return $this->documento_cliente;
     }

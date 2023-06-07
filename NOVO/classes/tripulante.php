@@ -4,14 +4,8 @@ require_once('nacionalidades.php');
 require_once('aeroporto.php');
 require_once('cargo.php');
 
-class Tripulante
+class Tripulante extends Pessoa
 {
-    private string $nome;
-    private string $sobrenome;
-    private CPF $cpf;
-    private Nacionalidade $nacionalidade;
-    private Data $data_de_nascimento;
-    private Email $email;
     private string $cht; // esse documento ainda não possui um identificador
     private Endereco $endereco;
     private SiglaCompanhiaAerea $companhia;
@@ -23,8 +17,9 @@ class Tripulante
     public function __construct(
         string               $nome,
         string               $sobrenome,
-        CPF                  $cpf,
+        DocumentoPessoa      $documento,
         Nacionalidade        $nacionalidade,
+        ?CPF                 $cpf,
         Data                 $data_de_nascimento,
         Email                $email,
         string               $cht,
@@ -34,48 +29,21 @@ class Tripulante
         Cargo                $cargo,
         RegistroDeTripulante $registro)
     {
-        $this->nome = $nome;
-        $this->sobrenome = $sobrenome;
-        $this->cpf = $cpf;
-        $this->nacionalidade = $nacionalidade;
-        $this->data_de_nascimento = $data_de_nascimento;
-        $this->email = $email;
+        parent::__construct(
+            $nome,
+            $sobrenome,
+            $documento,
+            $nacionalidade,
+            $cpf,
+            $data_de_nascimento,
+            $email,
+        );
         $this->cht = $cht;
         $this->endereco = $endereco;
         $this->companhia = $companhia;
         $this->aeroporto_base = $aeroporto_base;
         $this->cargo = $cargo;
         $this->registro = $registro;
-    }
-
-    public function getNome(): string
-    {
-        return $this->nome;
-    }
-
-    public function getSobrenome(): string
-    {
-        return $this->sobrenome;
-    }
-
-    public function getCpf(): CPF
-    {
-        return $this->cpf;
-    }
-
-    public function getNacionalidade(): Nacionalidade
-    {
-        return $this->nacionalidade;
-    }
-
-    public function getDataDeNascimento(): Data
-    {
-        return $this->data_de_nascimento;
-    }
-
-    public function getEmail(): Email
-    {
-        return $this->email;
     }
 
     public function getCht(): string

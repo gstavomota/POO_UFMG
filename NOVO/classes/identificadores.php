@@ -549,7 +549,7 @@ class Passaporte implements HashableAndEquatable
     }
 }
 
-class DocumentoPassageiro implements HashableAndEquatable
+class DocumentoPessoa implements HashableAndEquatable
 {
     private ?Passaporte $passaporte;
     private ?RG $rg;

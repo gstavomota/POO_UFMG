@@ -17,7 +17,7 @@ class PassageiroVipTestCase extends TestCase{
         $validEmail = new Email('raphael@gmail.com');
         $validDataNascimento = new Data(2021, 07, 06);
         $passaporte = new Passaporte('A00000000');
-        $documentoPassageiro = new DocumentoPassageiro($passaporte);
+        $documentoPessoa = new DocumentoPessoa($passaporte);
         $numero_de_registro = '12345';
         $categorias = [
             new Categoria('branca', 0),
@@ -26,7 +26,7 @@ class PassageiroVipTestCase extends TestCase{
         ];
         $dataTempoParaTeste = null;
         $programaDeMilhagem = new ProgramaDeMilhagem($categorias, "Programa Teste");
-        $passageiroTeste = new PassageiroVip($validNome, $validSobrenome, $documentoPassageiro, $validNacionalidade, $validCPF,$validDataNascimento, $validEmail, $numero_de_registro, $programaDeMilhagem);
+        $passageiroTeste = new PassageiroVip($validNome, $validSobrenome, $documentoPessoa, $validNacionalidade, $validCPF,$validDataNascimento, $validEmail, $numero_de_registro, $programaDeMilhagem);
         # Add pontos
         $this->startSection("addPontos");
         $anoRetrasado = DataTempo::agora()->sub(new Duracao(365*2, 0));

@@ -2,6 +2,7 @@
 
 require_once 'aeronave.php';
 require_once 'cartaoDeEmbarque.php';
+require_once 'encontrar_melhor_voo_strategy.php';
 require_once 'passageiro.php';
 require_once 'franquia_de_bagagem.php';
 require_once 'identificadores.php';
@@ -120,189 +121,6 @@ class CompanhiaAerea extends Persist
      * Procura de voos
      */
 
-    /**
-     * @param Data $data
-     * @param SiglaAeroporto $aeroporto_de_saida
-     * @param SiglaAeroporto $aeroporto_de_chegada
-     * @return CodigoVoo[]
-     * @throws EquatableTypeException
-     */
-    private function encontrarVoosSemConexao(Data $data, SiglaAeroporto $aeroporto_de_saida, SiglaAeroporto $aeroporto_de_chegada): array
-    {
-        /**
-         * @var CodigoVoo[] $voos
-         */
-        $voos = [];
-
-        $voo_desejado = function (Voo $voo) use ($data, $aeroporto_de_saida, $aeroporto_de_chegada) {
-            if (!in_array($data->getDiaDaSemana(), $voo->getDiasDaSemana()))
-                return false;
-            if (!$aeroporto_de_saida->eq($voo->getAeroportoSaida()))
-                return false;
-            if (!$aeroporto_de_chegada->eq($voo->getAeroportoChegada()))
-                return false;
-            return true;
-        };
-
-        /**
-         * @var Voo $voo
-         */
-        foreach (array_filter($this->voos_planejados->values(), $voo_desejado) as $voo) {
-            $voos[] = $voo->getCodigo();
-        }
-
-        return $voos;
-    }
-
-    /**
-     * @param Data $data
-     * @param SiglaAeroporto $aeroporto_de_saida
-     * @param SiglaAeroporto $aeroporto_de_chegada
-     * @return CodigoVoo[][]
-     * @throws ComparableTypeException
-     * @throws EquatableTypeException
-     */
-    private function encontrarVoosComConexao(Data $data, SiglaAeroporto $aeroporto_de_saida, SiglaAeroporto $aeroporto_de_chegada): array
-    {
-        /**
-         * @var CodigoVoo[][] $voos
-         */
-        $voos = [];
-
-        $voo_intermediario_desejado = function (Voo $voo) use ($data, $aeroporto_de_saida) {
-            if (!in_array($data->getDiaDaSemana(), $voo->getDiasDaSemana())) {
-                return false;
-            }
-            if (!$aeroporto_de_saida->eq($voo->getAeroportoSaida())) {
-                return false;
-            }
-            return true;
-        };
-
-        $voo_final_desejado = function (Voo $voo, SiglaAeroporto $aeroporto_intermediario, Tempo $hora_de_chegada) use ($data, $aeroporto_de_chegada) {
-            if (!in_array($data->getDiaDaSemana(), $voo->getDiasDaSemana())) {
-                return false;
-            }
-            if (!$voo->getAeroportoSaida()->eq($aeroporto_intermediario)) {
-                return false;
-            }
-            if (!$voo->getAeroportoChegada()->eq($aeroporto_de_chegada)) {
-                return false;
-            }
-            $tempo_da_conexao = $hora_de_chegada->add(Duracao::meiaHora());
-            if ($voo->getHoraDePartida()->st($tempo_da_conexao)) {
-                return false;
-            }
-            return true;
-        };
-
-        /**
-         * @var Voo $voo_intermediario
-         */
-        foreach (array_filter($this->voos_planejados->values(), $voo_intermediario_desejado) as $voo_intermediario) {
-            $hora_de_chegada = $voo_intermediario->getHoraDePartida()->add($voo_intermediario->getDuracaoEstimada());
-            $voo_final_desejado_com_aeroporto_intermediario_e_hora_de_chegada = function (Voo $voo_final) use ($voo_intermediario, $voo_final_desejado, $hora_de_chegada) {
-                return $voo_final_desejado($voo_final, $voo_intermediario->getAeroportoChegada(), $hora_de_chegada);
-            };
-            /**
-             * @var Voo $voo_final
-             */
-            foreach (array_filter($this->voos_planejados->values(), $voo_final_desejado_com_aeroporto_intermediario_e_hora_de_chegada) as $voo_final) {
-                $voos[] = [$voo_intermediario->getCodigo(), $voo_final->getCodigo()];
-            }
-        }
-
-        return $voos;
-    }
-
-    /**
-     * @param bool $cliente_vip
-     * @param Data $data
-     * @param SiglaAeroporto $aeroporto_de_saida
-     * @param SiglaAeroporto $aeroporto_de_chegada
-     * @param FranquiasDeBagagem $franquias
-     * @return CodigoVoo[]
-     * @throws ComparableTypeException
-     * @throws EquatableTypeException
-     */
-    private function encontrarMelhorVoo(bool $cliente_vip, Data $data, SiglaAeroporto $aeroporto_de_saida, SiglaAeroporto $aeroporto_de_chegada, FranquiasDeBagagem $franquias)
-    {
-        /**
-         * @var CodigoVoo[] $voos_sem_conexao
-         */
-        $voos_sem_conexao = $this->encontrarVoosSemConexao($data, $aeroporto_de_saida, $aeroporto_de_chegada);
-        $melhor_tarifa = INF;
-
-        if (count($voos_sem_conexao) != 0) {
-            /**
-             * @var Voo $melhor_voo
-             */
-            $melhor_voo = null;
-
-            /**
-             * @var CodigoVoo $codigo_voo
-             */
-            foreach ($voos_sem_conexao as $codigo_voo) {
-                /**
-                 * @var Voo $voo
-                 */
-                $voo = $this->voos_planejados->get($codigo_voo);
-                $tarifa = $voo->calculaTarifa($cliente_vip, $franquias, $this->tarifa_franquia);
-
-                if ($tarifa >= $melhor_tarifa)
-                    continue;
-
-                $melhor_voo = $voo;
-                $melhor_tarifa = $tarifa;
-            }
-
-            return [$melhor_voo->getCodigo()];
-        }
-
-        /**
-         * @var CodigoVoo[][] $pares_de_voos
-         */
-        $pares_de_voos = $this->encontrarVoosComConexao($data, $aeroporto_de_saida, $aeroporto_de_chegada);
-
-        if (count($pares_de_voos) == 0) {
-            return [];
-        }
-
-        /**
-         * @var Voo $melhor_voo_intermediario
-         */
-        $melhor_voo_intermediario = null;
-
-        /**
-         * @var Voo $melhor_voo_final
-         */
-        $melhor_voo_final = null;
-
-        foreach ($pares_de_voos as $par_de_voos) {
-            [$codigo_voo_intermediario, $codigo_voo_final] = $par_de_voos;
-            /**
-             * @var Voo $voo_intermediario
-             */
-            $voo_intermediario = $this->voos_planejados->get($codigo_voo_intermediario);
-            /**
-             * @var Voo $voo_final
-             */
-            $voo_final = $this->voos_planejados->get($codigo_voo_final);
-            $tarifa_intermediario = $voo_intermediario->calculaTarifa($cliente_vip, $franquias, $this->tarifa_franquia);
-            $tarifa_final = $voo_final->calculaTarifa($cliente_vip, $franquias, $this->tarifa_franquia);
-            $tarifa = $tarifa_intermediario + $tarifa_final;
-
-            if ($tarifa >= $melhor_tarifa) {
-                continue;
-            }
-
-            $melhor_voo_intermediario = $voo_intermediario;
-            $melhor_voo_final = $voo_final;
-            $melhor_tarifa = $tarifa;
-        }
-
-        return [$melhor_voo_intermediario->getCodigo(), $melhor_voo_final->getCodigo()];
-    }
 
     /**
      * Bookkeeping para ViagemBuilder
@@ -631,7 +449,11 @@ class CompanhiaAerea extends Persist
          * @var Passageiro $passageiro
          */
         $passageiro = $this->passageiros->get($documentoPassageiro);
-        $voos = $this->encontrarMelhorVoo($passageiro instanceof PassageiroVip, $data, $aeroporto_de_saida, $aeroporto_de_chegada, $franquias);
+        /**
+         * @var EncontrarMelhorVooStrategy $strategy
+         */
+        $strategy = new EncontrarMelhorVooPreferindoSemConexaoEEmPelaMenorTarifaStrategy();
+        $voos = $strategy->encontrar($passageiro instanceof PassageiroVip, $data, $aeroporto_de_saida, $aeroporto_de_chegada, $franquias, $this->tarifa_franquia, $this->voos_planejados);
 
         if (count($voos) == 0) {
             return null;

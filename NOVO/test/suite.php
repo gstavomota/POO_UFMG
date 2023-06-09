@@ -370,6 +370,7 @@ abstract class TestCase
         }
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($object, $value);
+        return $value;
     }
 
     protected function getPropertyDefault(string $class, string $property): mixed

@@ -11,7 +11,7 @@
             $cpf = new CPF('123.456.789-09');
             $nacionalidade = Nacionalidade::BRASIL;
             $rg = new RG("MG"."11.111.111");
-            $documentoPassageiro = new DocumentoPassageiro(null, $rg);
+            $documentoPessoa = new DocumentoPessoa(null, $rg);
             $data = Data::fromString("11/03/2003");
             $email = new Email("mariaeduardamrs0@gmail.com");
             $pontuacaoPreenchida = [
@@ -74,18 +74,18 @@
             $programaDeMilhagem = new ProgramaDeMilhagem($categorias, "Programa Teste");
             $this->startSection("update");
             
-            $passageiroSemPontos = new PassageiroVip('Maria', 'Sampaio', $documentoPassageiro, $nacionalidade, $cpf, $data , $email,
+            $passageiroSemPontos = new PassageiroVip('Maria', 'Sampaio', $documentoPessoa, $nacionalidade, $cpf, $data , $email,
             $numeroDeRegistro, $programaDeMilhagem);
             $this->checkEq($programaDeMilhagem->update($passageiroSemPontos), $categoriaBase);
 
-            $passageiroComPontosVencidos = new PassageiroVip('Maria', 'Sampaio', $documentoPassageiro, $nacionalidade, $cpf, $data , $email,
+            $passageiroComPontosVencidos = new PassageiroVip('Maria', 'Sampaio', $documentoPessoa, $nacionalidade, $cpf, $data , $email,
             $numeroDeRegistro, $programaDeMilhagem);
             foreach ($pontuacaoVencida as $pontos) {
                 $passageiroComPontosVencidos->addPontos($pontos->getPontosGanhos(), $pontos->getDataDeObtencao());
             }
             $this->checkEq($programaDeMilhagem->update($passageiroComPontosVencidos), $categoriaBase);
 
-            $passageiroComPontos = new PassageiroVip('Maria', 'Sampaio', $documentoPassageiro, $nacionalidade, $cpf, $data , $email, $numeroDeRegistro, $programaDeMilhagem);
+            $passageiroComPontos = new PassageiroVip('Maria', 'Sampaio', $documentoPessoa, $nacionalidade, $cpf, $data , $email, $numeroDeRegistro, $programaDeMilhagem);
 
             foreach ($pontuacaoPreenchida as $pontos) {
                 $passageiroComPontos->addPontos($pontos->getPontosGanhos(), $pontos->getDataDeObtencao());

@@ -44,7 +44,7 @@ function array_diff_equatable(array $array1, array $array2): array {
     }
     return $diff;
 }
-function equals(mixed $a, mixed $b, bool $strict): bool
+function equals(mixed $a, mixed $b, bool $strict = true): bool
 {
     if ($a instanceof Equatable && $b instanceof Equatable) {
         return $a->eq($b);

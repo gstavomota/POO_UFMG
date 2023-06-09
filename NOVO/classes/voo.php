@@ -44,12 +44,22 @@ class Voo
         $this->aeroporto_de_chegada = $aeroporto_de_chegada;
         $this->hora_de_partida = $hora_de_partida;
         $this->duracao_estimada = $duracao_estimada;
-        $this->dias_da_semana = $dias_da_semana;
+        $this->dias_da_semana = Voo::validarDiasDaSemana($dias_da_semana);
         $this->aeronave_padrao = $aeronave_padrao;
         $this->capacidade_passageiros = $capacidade_passageiros;
         $this->capacidade_carga = $capacidade_carga;
         $this->tarifa = $tarifa;
         $this->pontuacaoMilhagem = $pontuacaoMilhagem;
+    }
+
+    /**
+     * Validações
+     */
+    private static function validarDiasDaSemana(array $diasDaSemana): array {
+        if (empty($diasDaSemana)) {
+            throw new InvalidArgumentException("Dias da semana não pode ser vazio");
+        }
+        return $diasDaSemana;
     }
 
     /** Getters

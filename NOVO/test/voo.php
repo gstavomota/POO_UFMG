@@ -11,7 +11,7 @@ class VooTestCase extends TestCase
 
     public function run()
     {
-        # Calcula Tarifa
+        # Construtor
         $siglaCA = new SiglaCompanhiaAerea("TM");
         $siglaAeroSaida = new SiglaAeroporto("CON");
         $siglaAeroChegada = new SiglaAeroporto("GUA");
@@ -21,6 +21,44 @@ class VooTestCase extends TestCase
         $diasDaSemana = [DiaDaSemana::SEGUNDA];
         $aeroPadrao = new RegistroDeAeronave(PrefixoRegistroDeAeronave::PP, "AAA");
         $tarifa_voo = 300.0;
+        $this->startSection("Construtor");
+        try {
+            $nenhumDiaDaSemana = [];
+
+            $voo = new Voo($codigo,
+                $siglaAeroSaida,
+                $siglaAeroChegada,
+                $horaPartida,
+                $duracaoVoo,
+                $nenhumDiaDaSemana,
+                $aeroPadrao,
+                2,
+                758.7,
+                $tarifa_voo,
+                10
+            );
+            $this->checkNotReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkReached();
+        }
+        try {
+            $voo = new Voo($codigo,
+                $siglaAeroSaida,
+                $siglaAeroChegada,
+                $horaPartida,
+                $duracaoVoo,
+                $diasDaSemana,
+                $aeroPadrao,
+                2,
+                758.7,
+                $tarifa_voo,
+                10
+            );
+            $this->checkReached();
+        } catch (InvalidArgumentException $e) {
+            $this->checkNotReached();
+        }
+        # Calcula Tarifa
         $voo = new Voo($codigo,
             $siglaAeroSaida,
             $siglaAeroChegada,

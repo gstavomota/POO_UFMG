@@ -44,7 +44,7 @@ class CompanhiaAerea extends Persist
      */
     private HashMap $passagens;
     /**
-     * @var HashMap<DocumentoPassageiro, Passageiro>
+     * @var HashMap<DocumentoPessoa, Passageiro>
      */
     private HashMap $passageiros;
     /**
@@ -310,21 +310,21 @@ class CompanhiaAerea extends Persist
     }
 
     /** Retorna o historico de viagens de um passageiro
-     * @param DocumentoPassageiro $documentoPassageiro
+     * @param DocumentoPessoa $documentoPessoa
      * @return Viagem[]
      * @throws ComparableTypeException
      * @throws EquatableTypeException
      */
-    public function acessarHistoricoDeViagens(DocumentoPassageiro $documentoPassageiro): array
+    public function acessarHistoricoDeViagens(DocumentoPessoa $documentoPessoa): array
     {
-        if (!$this->passageiros->containsKey($documentoPassageiro)) {
+        if (!$this->passageiros->containsKey($documentoPessoa)) {
             throw new Exception("Passageiro nao cadastrado");
         }
 
         /**
          * @var Passageiro $passageiro
          */
-        $passageiro = $this->passageiros->get($documentoPassageiro);
+        $passageiro = $this->passageiros->get($documentoPessoa);
         $registros_de_passagens = $passageiro->getPassagens();
         /**
          * @var Passagem[] $passagens
@@ -423,6 +423,7 @@ class CompanhiaAerea extends Persist
         }
         return $cartoesDeEmbarque;
     }
+
     function embarcar(RegistroDePassagem $registroDePassagem): void
     {
         if (!$this->passagens->containsKey($registroDePassagem)) {
@@ -438,17 +439,17 @@ class CompanhiaAerea extends Persist
         }
     }
 
-    function comprarPassagem(DocumentoPassageiro $documentoPassageiro, Data $data, SiglaAeroporto $aeroporto_de_saida, SiglaAeroporto $aeroporto_de_chegada, FranquiasDeBagagem $franquias, ?CodigoDoAssento $assento = null)
+    function comprarPassagem(DocumentoPessoa $documentoPessoa, Data $data, SiglaAeroporto $aeroporto_de_saida, SiglaAeroporto $aeroporto_de_chegada, FranquiasDeBagagem $franquias, ?CodigoDoAssento $assento = null)
     {
         $this->adicionarViagensEmVenda();
-        if (!$this->passageiros->containsKey($documentoPassageiro)) {
+        if (!$this->passageiros->containsKey($documentoPessoa)) {
             throw new Exception("Cliente nao cadastrado");
         }
 
         /**
          * @var Passageiro $passageiro
          */
-        $passageiro = $this->passageiros->get($documentoPassageiro);
+        $passageiro = $this->passageiros->get($documentoPessoa);
         /**
          * @var EncontrarMelhorVooStrategy $strategy
          */
@@ -513,7 +514,7 @@ class CompanhiaAerea extends Persist
             $this->voos_planejados->get($primeiro_voo)->getAeroportoSaida(),
             $this->voos_planejados->get($ultimo_voo)->getAeroportoChegada(),
             $this->sigla,
-            $documentoPassageiro,
+            $documentoPessoa,
             $data,
             $valor_total,
             0,
@@ -702,7 +703,7 @@ class CompanhiaAerea extends Persist
         $this->passageiros->put($passageiro->getDocumento(), $passageiro);
     }
 
-    public function encontrarPassageiro(DocumentoPassageiro $passageiro): ?Passageiro
+    public function encontrarPassageiro(DocumentoPessoa $passageiro): ?Passageiro
     {
         return $this->passageiros->get($passageiro);
     }

@@ -1,38 +1,39 @@
 <?php
 include_once('container.php');
 
+/**
+ * @template T of persist
+ */
 abstract class persist
 {
     private ?int $index = null;
 
-    public function __construct()
+    public function __construct(?int $index = null)
     {
-        if (func_num_args() == 0) {
-
-        } else if (func_num_args() == 1) {
-            $this->index = func_get_arg(1);
-        } else {
-            throw(new Exception('Eror ao instanciar objeto da classe Persist - Número de parâmetros incorreto.'));
-        }
+        $this->index = $index;
     }
 
-    public function __destruct()
+    /**
+     * @param T $pObj
+     * @return void
+     */
+    public function load(mixed $pObj): void
     {
-        //print "Destroying " . __CLASS__ . "\n";
-    }
-
-    public function load($p_obj): void
-    {
-        $class_vars = get_class_vars(get_class($p_obj));
-        foreach ($class_vars as $name => $value) {
-            echo "$name : $value\n";
-            $this->$name = $value;
+        $reflectionClass = new ReflectionClass($this);
+        $reflectionProperties = $reflectionClass->getProperties();
+        foreach ($reflectionProperties as $reflectionProperty) {
+            $pObjValue = $reflectionProperty->getValue($pObj);
+            if (!$reflectionProperty->isPublic()) {
+                $reflectionProperty->setAccessible(true);
+            }
+            echo "{$reflectionProperty->getName()} : $pObjValue\n";
+            $reflectionProperty->setValue($this, $pObjValue);
         }
     }
 
     public function save(): void
     {
-        if ($this->index != null)
+        if (!is_null($this->index))
             $this->edit();
         else
             $this->insert();
@@ -40,42 +41,81 @@ abstract class persist
 
     private function insert(): void
     {
-        $container = new container(get_called_class()::getFilename());
-        //print_r(get_called_class()::getFilename()); exit();
+        /**
+         * @var class-string<persist> $calledClass
+         */
+        $calledClass = get_called_class();
+        $container = container::getInstance($calledClass::getFilename());
         $container->addObject($this);
         $container->persist();
     }
 
     private function edit(): void
     {
-        $container = new container(get_called_class()::getFilename());
+        /**
+         * @var class-string<persist> $calledClass
+         */
+        $calledClass = get_called_class();
+        $container = container::getInstance($calledClass::getFilename());
         $container->editObject($this->index, $this);
         $container->persist();
     }
 
-    static public function getRecordsByField(string $p_field, mixed $p_value): array
+    private static function getPossiblyNonPublicProperty(mixed $object, string $name): mixed
     {
-        $container = new container(get_called_class()::getFilename());
-        //$container = container::getInstance(get_called_class()::getFilename());
-        $objs = $container->getObjects();
-        $matchObjects = array();
-        for ($i = 0; $i < count($objs); $i++) {
-            if (equals($objs[$i]->$p_field, $p_value)) {
-                array_push($matchObjects, $objs[$i]);
-            }
+        $rp = new ReflectionProperty($object, $name);
+        if ($rp->isPublic()) {
+            return $object->$name;
         }
-        //if ( count($matchObjects) > 0 )
-        return $matchObjects;
-        //else
-        //    throw( new Exception('Registro não encontrado.'));
+        $rp->setAccessible(true);
+        return $rp->getValue($object);
     }
 
+    /**
+     * @param string $p_field
+     * @param mixed $p_value
+     * @return T[]
+     * @throws Exception
+     */
+    static public function getRecordsByField(string $p_field, mixed $p_value): array
+    {
+        /**
+         * @var class-string<persist> $calledClass
+         */
+        $calledClass = get_called_class();
+        $container = container::getInstance($calledClass::getFilename());
+        $objs = $container->getObjects();
+        $matchObjects = [];
+        for ($i = 0; $i < count($objs); $i++) {
+            if (equals(static::getPossiblyNonPublicProperty($objs[$i], $p_field), $p_value)) {
+                $matchObjects[] = $objs[$i];
+            }
+        }
+        return $matchObjects;
+    }
+
+    /**
+     * @return T[]
+     * @throws Exception
+     */
     static public function getRecords(): array
     {
-        $container = new container(get_called_class()::getFilename());
-        //$container = container::getInstance(get_called_class()::getFilename());
-        $objs = $container->getObjects();
-        return $objs;
+        /**
+         * @var class-string<persist> $calledClass
+         */
+        $calledClass = get_called_class();
+        $container = container::getInstance($calledClass::getFilename());
+        return $container->getObjects();
+    }
+
+    static public function deleteAllRecords(): void {
+        /**
+         * @var class-string<persist> $calledClass
+         */
+        $calledClass = get_called_class();
+        $container = container::getInstance($calledClass::getFilename());
+        $container->deleteAllObjects();
+        $container->persist();
     }
 
     public function setIndex(int $index): void
@@ -83,10 +123,20 @@ abstract class persist
         $this->index = $index;
     }
 
-    public function __toString()
+    public function delete(): void
     {
-        return print_r($this, true);
+        if (is_null($this->index)) {
+            echo "WARNING: Asking to delete an object of type " . get_called_class() . " that was not stored" . PHP_EOL;
+            return;
+        }
+        /**
+         * @var class-string<persist> $calledClass
+         */
+        $calledClass = get_called_class();
+        $container = container::getInstance($calledClass::getFilename());
+        $container->deleteObject($this->index);
+        $container->persist();
     }
 
-    abstract static public function getFilename();
+    abstract static public function getFilename(): string;
 }

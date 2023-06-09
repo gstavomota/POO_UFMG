@@ -14,6 +14,9 @@ require_once 'viagem_builder.php';
 require_once 'voo.php';
 require_once 'tripulante.php';
 
+/**
+ * @extends persist<CompanhiaAerea>
+ */
 class CompanhiaAerea extends Persist
 {
     private string $nome;
@@ -112,7 +115,7 @@ class CompanhiaAerea extends Persist
         return $this->tarifa_franquia;
     }
 
-    public static function getFilename()
+    public static function getFilename(): string
     {
         return self::$local_filename;
     }
@@ -781,6 +784,15 @@ class CompanhiaAerea extends Persist
     public function encontrarPassagem(RegistroDePassagem $registro): ?Passagem
     {
         return $this->passagens->get($registro);
+    }
+
+    /**
+     * @param SiglaCompanhiaAerea $sigla
+     * @return CompanhiaAerea[]
+     */
+    static public function getRecordsBySigla(SiglaCompanhiaAerea $sigla): array
+    {
+        return parent::getRecordsByField("sigla", $sigla);
     }
 }
 

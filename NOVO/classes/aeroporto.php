@@ -4,6 +4,9 @@ require_once ("identificadores.php");
 require_once 'coordenada.php';
 require_once "persist.php";
 
+/**
+ * @extends persist<Aeroporto>
+ */
 class Aeroporto extends persist
 {
     private SiglaAeroporto $sigla;
@@ -50,5 +53,14 @@ class Aeroporto extends persist
     static public function getFilename(): string
     {
         return self::$local_filename;
+    }
+
+    /**
+     * @param SiglaAeroporto $sigla
+     * @return Aeroporto[]
+     * @throws Exception
+     */
+    static public function getRecordsBySigla(SiglaAeroporto $sigla): array {
+        return parent::getRecordsByField("sigla", $sigla);
     }
 }

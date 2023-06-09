@@ -1,8 +1,8 @@
 <?php
-require_once('identificadores.php');
-require_once('nacionalidades.php');
-require_once('aeroporto.php');
-require_once('cargo.php');
+require_once 'identificadores.php';
+require_once 'nacionalidades.php';
+require_once 'aeroporto.php';
+require_once 'cargo.php';
 
 class Tripulante extends Pessoa
 {
@@ -15,6 +15,7 @@ class Tripulante extends Pessoa
 
 
     public function __construct(
+        // Pessoa
         string               $nome,
         string               $sobrenome,
         DocumentoPessoa      $documento,
@@ -22,6 +23,7 @@ class Tripulante extends Pessoa
         ?CPF                 $cpf,
         Data                 $data_de_nascimento,
         Email                $email,
+        // Tripulante
         string               $cht,
         Endereco             $endereco,
         SiglaCompanhiaAerea  $companhia,

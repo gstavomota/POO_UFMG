@@ -23,6 +23,7 @@ class Passageiro extends Pessoa
      * @throws InvalidArgumentException se o passageiro for invalido
      */
     public function __construct(
+        // Pessoa
         string          $nome,
         string          $sobrenome,
         DocumentoPessoa $documento,

@@ -395,7 +395,7 @@ class CompanhiaAerea extends Persist
         }
         $passageiro = $this->passageiros->get($passagem->getDocumentoCliente());
         /**
-         * @var CartaoDeEmbarque[]
+         * @var CartaoDeEmbarque[] $cartoesDeEmbarque
          */
         $cartoesDeEmbarque = [];
         foreach ($passagem->getAssentos() as $viagem_assento) {

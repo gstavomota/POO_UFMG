@@ -1,6 +1,7 @@
 <?php
 require_once "assento.php";
 require_once "calculo_tarifa_strategy.php";
+require_once "encontrar_voo_strategy.php";
 require_once "endereco.php";
 require_once "enum_to_array.php";
 require_once "franquia_de_bagagem.php";
@@ -26,6 +27,10 @@ require_once "voo.php";
     ->addCase(new PassageiroComumCalculoTarifaStrategyTestCase())
     ->addCase(new PassageiroVipCalculoTarifaStrategyTestCase())
     // Fim calculo_tarifa_strategy.php
+    // Inicio encontrar_voo_strategy.php
+    ->addCase(new EncontrarVoosSemConexaoStrategyTestCase())
+    ->addCase(new EncontrarVoosComUmaConexaoStrategyTestCase())
+    // Fim encontrar_voo_strategy.php
     // Inicio endereco.php
     ->addCase(new EnderecoTestCase())
     // Fim endereco.php

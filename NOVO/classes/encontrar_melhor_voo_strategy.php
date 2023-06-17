@@ -1,4 +1,5 @@
 <?php
+require_once "encontrar_voo_strategy.php";
 
 interface EncontrarMelhorVooStrategy
 {
@@ -45,7 +46,7 @@ class EncontrarMelhorVooPreferindoSemConexaoEEmPelaMenorTarifaStrategy implement
             return [$melhor_voo->getCodigo()];
         }
 
-        $pares_de_voos = (new EncontrarVoosComConexaoStrategy())->encontrar($data, $aeroportoDeSaida, $aeroportoDeChegada, $voos->values());
+        $pares_de_voos = (new EncontrarVoosComUmaConexaoStrategy())->encontrar($data, $aeroportoDeSaida, $aeroportoDeChegada, $voos->values());
 
         if (count($pares_de_voos) == 0) {
             return [];

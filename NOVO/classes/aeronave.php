@@ -1,7 +1,8 @@
 <?php
 require_once 'identificadores.php';
+require_once "Equatable.php";
 
-class Aeronave
+class Aeronave implements Equatable
 {
     private SiglaCompanhiaAerea $companhia_aerea;
     private string $fabricante;
@@ -55,5 +56,19 @@ class Aeronave
     public function getRegistro(): RegistroDeAeronave
     {
         return $this->registro;
+    }
+
+    public function eq(Equatable $other): bool
+    {
+        if (!$other instanceof self) {
+            throw new EquatableTypeException();
+        }
+
+        return $this->companhia_aerea->eq($other->companhia_aerea) &&
+        $this->fabricante === $other->fabricante &&
+        $this->modelo === $other->modelo &&
+        $this->capacidade_passageiros === $other->capacidade_passageiros &&
+        $this->capacidade_carga === $other->capacidade_carga &&
+        $this->registro->eq($other->registro);
     }
 }

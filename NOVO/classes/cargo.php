@@ -1,6 +1,7 @@
 <?php
 
 require_once("enum_to_array.php");
+require_once "log.php";
 
 enum Cargo: string
 {

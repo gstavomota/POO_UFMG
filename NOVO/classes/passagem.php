@@ -3,6 +3,7 @@
 require_once 'identificadores.php';
 require_once "HashMap.php";
 require_once "Equatable.php";
+require_once "log.php";
 
 enum Tipo: string
 {

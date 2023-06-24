@@ -1,6 +1,7 @@
 <?php
 
 require_once "Equatable.php";
+require_once "log.php";
 
 /** Uma exception para quando for utilizado o tipo incorreto em uma comparação
  *

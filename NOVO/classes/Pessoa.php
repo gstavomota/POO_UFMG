@@ -1,5 +1,6 @@
 <?php
 
+require_once "log.php";
 abstract class Pessoa
 {
     private string $nome;

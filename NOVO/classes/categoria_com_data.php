@@ -1,5 +1,6 @@
 <?php
 require_once("categoria.php");
+require_once "log.php";
 
 class CategoriaComData
 {

@@ -2,6 +2,7 @@
 
 
 require_once 'Equatable.php';
+require_once "log.php";
 
 interface ICoordenada extends Equatable
 {

@@ -14,6 +14,7 @@ require_once 'viagem_builder.php';
 require_once 'voo.php';
 require_once 'tripulante.php';
 require_once 'coordenada.php';
+require_once "log.php";
 
 /**
  * @extends persist<CompanhiaAerea>

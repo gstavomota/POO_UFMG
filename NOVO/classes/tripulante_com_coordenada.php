@@ -1,6 +1,7 @@
 <?php
 require_once "identificadores.php";
 require_once "coordenada.php";
+require_once "log.php";
 
 class TripulanteComCoordenada implements ICoordenada
 {

@@ -1,5 +1,6 @@
 <?php
 require_once 'franquia_de_bagagem.php';
+require_once "log.php";
 
 interface CalculoTarifaStrategy
 {

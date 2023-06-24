@@ -1,6 +1,7 @@
 <?php
 require_once "estado.php";
 require_once "identificadores.php";
+require_once "log.php";
 
 /** Um endereço normalizado.
  * TODO: BACKLOG: Integrar api dos correios para validar os dados.

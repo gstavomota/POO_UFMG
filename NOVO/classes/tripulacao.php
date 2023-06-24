@@ -1,5 +1,6 @@
 <?php
 require_once("identificadores.php");
+require_once "log.php";
 
 class Tripulacao
 {

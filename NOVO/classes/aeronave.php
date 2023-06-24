@@ -1,6 +1,7 @@
 <?php
 require_once 'identificadores.php';
 require_once "Equatable.php";
+require_once "log.php";
 
 class Aeronave implements Equatable
 {

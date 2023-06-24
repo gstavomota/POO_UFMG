@@ -6,6 +6,7 @@ require_once 'ProgramaDeMilhagem.php';
 require_once 'pontos.php';
 require_once 'categoria.php';
 require_once 'categoria_com_data.php';
+require_once "log.php";
 
 class PassageiroVip extends Passageiro
 {

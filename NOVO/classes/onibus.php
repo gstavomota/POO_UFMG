@@ -1,4 +1,5 @@
 <?php
+require_once "log.php";
 class Onibus {
     /**
      * @var TripulanteComCoordenada[]

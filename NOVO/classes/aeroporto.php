@@ -3,6 +3,7 @@ require_once ("estado.php");
 require_once ("identificadores.php");
 require_once 'coordenada.php';
 require_once "persist.php";
+require_once "log.php";
 
 /**
  * @extends persist<Aeroporto>

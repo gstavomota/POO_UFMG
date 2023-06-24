@@ -8,6 +8,7 @@ require_once "franquia_de_bagagem.php";
 require_once "identificadores.php";
 require_once "temporal.php";
 require_once "Equatable.php";
+require_once "log.php";
 
 class Voo implements Equatable
 {

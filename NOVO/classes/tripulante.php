@@ -3,6 +3,7 @@ require_once 'identificadores.php';
 require_once 'nacionalidades.php';
 require_once 'aeroporto.php';
 require_once 'cargo.php';
+require_once "log.php";
 
 class Tripulante extends Pessoa
 {

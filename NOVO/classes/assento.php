@@ -1,6 +1,7 @@
 <?php
 require_once 'franquia_de_bagagem.php';
 require_once 'identificadores.php';
+require_once "log.php";
 
 class PreenchimentoDeAssentoException extends Exception {
     public function __construct(string $message = "", int $code = 0, ?Throwable $previous = null)

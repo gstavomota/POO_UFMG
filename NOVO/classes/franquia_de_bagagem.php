@@ -1,5 +1,6 @@
 <?php
 
+require_once "log.php";
 class FranquiaDeBagagem
 {
     private float $peso;

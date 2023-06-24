@@ -1,5 +1,6 @@
 <?php
 require_once "encontrar_voo_strategy.php";
+require_once "log.php";
 
 interface EncontrarMelhorVooStrategy
 {

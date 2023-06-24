@@ -11,6 +11,7 @@ require_once "HashMap.php";
 require_once "onibus.php";
 require_once "coordenada.php";
 require_once "tripulante_com_coordenada.php";
+require_once "log.php";
 
 class ViagemBuilder
 {

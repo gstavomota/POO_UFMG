@@ -2,6 +2,7 @@
 require_once "temporal.php";
 require_once "identificadores.php";
 require_once "voo.php";
+require_once "log.php";
 
 interface EncontrarVoosStrategy
 {

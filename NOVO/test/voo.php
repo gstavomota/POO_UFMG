@@ -1,6 +1,6 @@
 <?php
-include_once 'suite.php';
-include_once '../classes/voo.php';
+require_once 'suite.php';
+require_once '../classes/voo.php';
 
 class VooTestCase extends TestCase
 {

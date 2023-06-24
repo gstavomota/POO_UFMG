@@ -1,7 +1,8 @@
 <?php
-include_once "../../classes/tripulante.php";
-include_once "../../classes/companhia_aerea.php";
-include_once "endereco_mixin.php";
+require_once __DIR__ . "/../../classes/tripulante.php";
+require_once __DIR__ . "/../../classes/companhia_aerea.php";
+require_once "endereco_mixin.php";
+require_once "passageiro_mixin.php";
 trait TripulanteMixin {
     use EnderecoMixin;
     use PassageiroMixin;

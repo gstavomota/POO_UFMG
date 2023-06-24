@@ -7,8 +7,9 @@ require_once "companhia_aerea.php";
 require_once "franquia_de_bagagem.php";
 require_once "identificadores.php";
 require_once "temporal.php";
+require_once "Equatable.php";
 
-class Voo
+class Voo implements Equatable
 {
     private CodigoVoo $codigo;
     private SiglaAeroporto $aeroporto_de_saida;
@@ -26,17 +27,17 @@ class Voo
     private int $pontuacaoMilhagem;
 
     public function __construct(
-        CodigoVoo           $codigo,
-        SiglaAeroporto      $aeroporto_de_saida,
-        SiglaAeroporto      $aeroporto_de_chegada,
-        Tempo               $hora_de_partida,
-        Duracao             $duracao_estimada,
-        array               $dias_da_semana,
-        RegistroDeAeronave  $aeronave_padrao,
-        int                 $capacidade_passageiros,
-        float               $capacidade_carga,
-        float               $tarifa,
-        int                 $pontuacaoMilhagem
+        CodigoVoo          $codigo,
+        SiglaAeroporto     $aeroporto_de_saida,
+        SiglaAeroporto     $aeroporto_de_chegada,
+        Tempo              $hora_de_partida,
+        Duracao            $duracao_estimada,
+        array              $dias_da_semana,
+        RegistroDeAeronave $aeronave_padrao,
+        int                $capacidade_passageiros,
+        float              $capacidade_carga,
+        float              $tarifa,
+        int                $pontuacaoMilhagem
     )
     {
         $this->codigo = $codigo;
@@ -55,7 +56,8 @@ class Voo
     /**
      * Validações
      */
-    private static function validarDiasDaSemana(array $diasDaSemana): array {
+    private static function validarDiasDaSemana(array $diasDaSemana): array
+    {
         if (empty($diasDaSemana)) {
             throw new InvalidArgumentException("Dias da semana não pode ser vazio");
         }
@@ -189,6 +191,25 @@ class Voo
             $hashmap_assentos->put($codigo_assento, new Assento($codigo_assento));
         }
         return $hashmap_assentos;
+    }
+
+    public function eq(Equatable $other): bool
+    {
+        if (!$other instanceof self) {
+            throw new EquatableTypeException();
+        }
+        return
+            $this->codigo->eq($other->codigo) &&
+            $this->aeroporto_de_saida->eq($other->aeroporto_de_saida) &&
+            $this->aeroporto_de_chegada->eq($other->aeroporto_de_chegada) &&
+            $this->hora_de_partida->eq($other->hora_de_partida) &&
+            $this->duracao_estimada->eq($other->duracao_estimada) &&
+            $this->dias_da_semana == $other->dias_da_semana &&
+            $this->aeronave_padrao->eq($other->aeronave_padrao) &&
+            $this->capacidade_passageiros == $other->capacidade_passageiros &&
+            $this->capacidade_carga == $other->capacidade_carga &&
+            $this->tarifa == $other->tarifa &&
+            $this->pontuacaoMilhagem == $other->pontuacaoMilhagem;
     }
 }
 

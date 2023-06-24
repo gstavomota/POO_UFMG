@@ -326,6 +326,54 @@ abstract class TestCase
         $this->checkResultsOrSections[] = new CheckResult($success, "should be reached", $line, $file);
     }
 
+    protected function checkNull(mixed $obj, bool $strict = true)
+    {
+        $success = equals($obj, null, $strict);
+        [$line, $file] = $this->getLineAndFileForPreviousFunction();
+        $this->checkResultsOrSections[] = new CheckResult($success, "should be null", $line, $file);
+    }
+
+    protected function checkNotNull(mixed $obj, bool $strict = true)
+    {
+        $success = !equals($obj, null, $strict);
+        [$line, $file] = $this->getLineAndFileForPreviousFunction();
+        $this->checkResultsOrSections[] = new CheckResult($success, "should not be null", $line, $file);
+    }
+
+    protected function assertEq(mixed $a, mixed $b, bool $strict = true) {
+        if (!equals($a, $b, $strict)) {
+            $repr = $this->objOrEnumToString($a)." !== ".$this->objOrEnumToString($b);
+            throw new AssertionError($repr);
+        }
+    }
+
+    protected function assertNeq(mixed $a, mixed $b, bool $strict = true) {
+        if (equals($a, $b, $strict)) {
+            $repr = $this->objOrEnumToString($a)." === ".$this->objOrEnumToString($b);
+            throw new AssertionError($repr);
+        }
+    }
+    protected function assertNotNull(mixed $obj, bool $strict = true) {
+        if (equals($obj, null, $strict)) {
+            $repr = "is null";
+            throw new AssertionError($repr);
+        }
+    }
+    protected function assertNull(mixed $obj, bool $strict = true) {
+        if (!equals($obj, null, $strict)) {
+            $repr = "is not null";
+            throw new AssertionError($repr);
+        }
+    }
+
+    /**
+     * @template T
+     * @param class-string $class
+     * @param string $method
+     * @param mixed ...$args
+     * @return T
+     * @throws ReflectionException
+     */
     protected function runNonPublicStaticMethod(string $class, string $method, mixed ...$args): mixed
     {
         $reflectionMethod = new ReflectionMethod($class, $method);
@@ -339,6 +387,14 @@ abstract class TestCase
         return $reflectionMethod->invoke(null, ...$args);
     }
 
+    /**
+     * @template T
+     * @param object $object
+     * @param string $method
+     * @param mixed ...$args
+     * @return T
+     * @throws ReflectionException
+     */
     protected function runNonPublicMethod(object $object, string $method, mixed ...$args): mixed
     {
         $reflectionMethod = new ReflectionMethod($object, $method);
@@ -352,6 +408,14 @@ abstract class TestCase
         return $reflectionMethod->invoke($object, ...$args);
     }
 
+    /**
+     * @template T
+     * @param object $object
+     * @param string $property
+     * @param class-string|null $class
+     * @return T
+     * @throws ReflectionException
+     */
     protected function getNonPublicProperty(object $object, string $property, string $class = null): mixed
     {
         $reflectionProperty = new ReflectionProperty($class ?? $object, $property);
@@ -362,6 +426,15 @@ abstract class TestCase
         return $reflectionProperty->getValue($object);
     }
 
+    /**
+     * @template T
+     * @param object $object
+     * @param string $property
+     * @param T $value
+     * @param class-string|null $class
+     * @return T
+     * @throws ReflectionException
+     */
     protected function setNonPublicProperty(object $object, string $property, mixed $value, string $class = null): mixed
     {
         $reflectionProperty = new ReflectionProperty($class ?? $object, $property);

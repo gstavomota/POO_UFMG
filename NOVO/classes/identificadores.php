@@ -1,9 +1,9 @@
 <?php
 
-include_once("estado.php");
-include_once("enum_to_array.php");
-include_once("Equatable.php");
-include_once "HashableAndEquatable.php";
+require_once("estado.php");
+require_once("enum_to_array.php");
+require_once("Equatable.php");
+require_once "HashableAndEquatable.php";
 
 abstract class GeradorDeRegistroNumerico {
 
@@ -357,7 +357,7 @@ class GeradorDeRegistroDeCartaoDeEmbarque {
     }
 }
 
-class SiglaAeroporto implements Equatable
+class SiglaAeroporto implements HashableAndEquatable
 {
     public string $sigla;
 
@@ -391,6 +391,11 @@ class SiglaAeroporto implements Equatable
             throw new EquatableTypeException();
         }
         return $this->sigla == $outro->sigla;
+    }
+
+    public function hashCode(): int
+    {
+        return hashObject($this->sigla);
     }
 }
 

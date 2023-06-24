@@ -1,6 +1,6 @@
 <?php
-    include_once "suite.php";
-    include_once "../classes/tripulacao.php";
+    require_once "suite.php";
+    require_once "../classes/tripulacao.php";
 
     class TripulacaoTestCase extends TestCase {
         protected function getName(): string {
@@ -22,9 +22,9 @@
 
             $tripulacaoVazia = new Tripulacao(null, null, null);
             
-            $this->checkEq($tripulacaoVazia->getCopiloto(), null);
-            $this->checkEq($tripulacaoVazia->getPiloto(), null);
-            $this->checkNeq($tripulacaoVazia->getComissarios(), null);
+            $this->checkNull($tripulacaoVazia->getCopiloto());
+            $this->checkNull($tripulacaoVazia->getPiloto());
+            $this->checkNotNull($tripulacaoVazia->getComissarios());
             $this->checkTrue($tripulacaoVazia->getTrancado() === false);
 
             #Métodos

@@ -1,5 +1,5 @@
 <?php
-include_once("enum_to_array.php");
+require_once("enum_to_array.php");
 
 enum Nacionalidade: string
 {

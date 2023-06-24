@@ -10,10 +10,42 @@ interface CalculoRotaStrategy
      * @return float
      */
     function calculaDistanciaTotal(array $coordenadas, ICoordenada $pontoFinal): float;
+    /** Calcula a distancia de parciais uma rota
+     * @param ICoordenada[] $coordenadas
+     * @param ICoordenada $pontoFinal
+     * @return float[]
+     */
+    function calculaDistanciaParciais(array $coordenadas, ICoordenada $pontoFinal): array;
 }
 
 class CalculoRotaAproximadaStrategy implements CalculoRotaStrategy
 {
+    /** Calcula a distancia de parciais uma rota
+     * @param ICoordenada[] $coordenadas
+     * @param ICoordenada $pontoFinal
+     * @return float[]
+     */
+    function calculaDistanciaParciais(array $coordenadas, ICoordenada $pontoFinal): array {
+        if (empty($coordenadas)) {
+            return [];
+        }
+        if (count($coordenadas) == 1) {
+            return [$this->calculaDistanciaDeDoisPontos($coordenadas[0], $pontoFinal)];
+        }
+        /**
+         * @var float[] $out
+         */
+        $out = [];
+        $distancia = 0.0;
+        $primeiraCoordenada = $coordenadas[0];
+        $restoDeCoordenadas = [...array_splice($coordenadas, 1), $pontoFinal];
+        $ultimaCoordenada = $primeiraCoordenada;
+        foreach ($restoDeCoordenadas as $coordenadaSeguinte) {
+            $out[] = $this->calculaDistanciaDeDoisPontos($ultimaCoordenada, $coordenadaSeguinte);
+            $ultimaCoordenada = $coordenadaSeguinte;
+        }
+        return $out;
+    }
     public function calculaDistanciaTotal(array $coordenadas, ICoordenada $pontoFinal): float
     {
         if (empty($coordenadas)) {

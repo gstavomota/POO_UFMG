@@ -1,6 +1,6 @@
 <?php
-include_once 'suite.php';
-include_once '../classes/calculo_tarifa_strategy.php';
+require_once 'suite.php';
+require_once '../classes/calculo_tarifa_strategy.php';
 
 class PassageiroComumCalculoTarifaStrategyTestCase extends TestCase {
 

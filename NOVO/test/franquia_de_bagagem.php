@@ -1,7 +1,7 @@
 <?php
 
-include_once 'suite.php';
-include_once '../classes/franquia_de_bagagem.php';
+require_once 'suite.php';
+require_once '../classes/franquia_de_bagagem.php';
 
 class FranquiaDeBagagemTestCase extends TestCase {
 

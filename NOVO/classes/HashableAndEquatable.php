@@ -1,6 +1,6 @@
 <?php
-include_once "Hashable.php";
-include_once "Equatable.php";
+require_once "Hashable.php";
+require_once "Equatable.php";
 
 /**
  * An interface for hashable and equatable types

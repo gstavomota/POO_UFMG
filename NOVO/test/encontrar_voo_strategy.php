@@ -1,7 +1,7 @@
 <?php
-include_once "suite.php";
-include_once "../classes/encontrar_voo_strategy.php";
-include_once "mixins/voos_mixin.php";
+require_once "suite.php";
+require_once "../classes/encontrar_voo_strategy.php";
+require_once "mixins/voos_mixin.php";
 
 class EncontrarVoosSemConexaoStrategyTestCase extends TestCase
 {

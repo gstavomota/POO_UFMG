@@ -1,7 +1,7 @@
 <?php
 
-include_once "Hashable.php";
-include_once "Comparable.php";
+require_once "Hashable.php";
+require_once "Comparable.php";
 
 /**
  * An interface for hashable and comparable types

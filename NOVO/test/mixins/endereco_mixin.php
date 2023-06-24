@@ -1,5 +1,5 @@
 <?php
-include_once "../../classes/endereco.php";
+require_once __DIR__ . "/../../classes/endereco.php";
 
 trait EnderecoMixin {
     protected Endereco $endereco;

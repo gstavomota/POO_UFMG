@@ -1,6 +1,6 @@
 <?php
-include_once "HashableAndEquatable.php";
-include_once "HashableAndComparable.php";
+require_once "HashableAndEquatable.php";
+require_once "HashableAndComparable.php";
 
 /**
  * @template K of HashableAndEquatable|HashableAndComparable
@@ -206,5 +206,18 @@ class HashMap
     {
         $hashCode = $key->hashCode();
         return crc32($hashCode) % PHP_INT_MAX;
+    }
+    public function __toString(): string {
+        $s = "{\n";
+        $first = true;
+        foreach ($this->entries() as $kv) {
+            if (!$first ) {
+                $s = $s.",\n";
+            }
+            $s = '  '.$s.$kv->key.": ".$kv->value;
+            $first = false;
+        }
+        $s = $s."\n}";
+        return $s;
     }
 }

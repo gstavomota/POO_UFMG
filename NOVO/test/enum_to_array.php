@@ -1,6 +1,6 @@
 <?php
-include_once "suite.php";
-include_once "../classes/enum_to_array.php";
+require_once "suite.php";
+require_once "../classes/enum_to_array.php";
 enum Enum: string {
     use EnumToArray;
     case A = "1";

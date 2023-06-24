@@ -1,6 +1,6 @@
 <?php
-include_once "suite.php";
-include_once "../classes/HashMap.php";
+require_once "suite.php";
+require_once "../classes/HashMap.php";
 
 class IntegerKey implements HashableAndEquatable
 {
@@ -69,20 +69,20 @@ class HashMapTestCase extends TestCase
         $this->checkEq($map->size(), 2);
         $this->checkEq($map->get($key0), 2);
         $this->checkEq($map->get($key1), 3);
-        $this->checkEq($map->get($key10), null);
+        $this->checkNull($map->get($key10));
         # Deleting without collision
         $this->checkTrue($map->remove($key0));
         $this->checkFalse($map->remove($key0));
         $this->checkEq($map->size(), 1);
-        $this->checkEq($map->get($key0), null);
+        $this->checkNull($map->get($key0));
         $this->checkEq($map->get($key1), 3);
-        $this->checkEq($map->get($key10), null);
+        $this->checkNull($map->get($key10));
         # Clearing
         $map->clear();
         $this->checkEq($map->size(), 0);
-        $this->checkEq($map->get($key0), null);
-        $this->checkEq($map->get($key1), null);
-        $this->checkEq($map->get($key10), null);
+        $this->checkNull($map->get($key0));
+        $this->checkNull($map->get($key1));
+        $this->checkNull($map->get($key10));
         # Keys
         $this->checkEq($map->put($key0, 0), 0);
         $this->checkEq($map->put($key1, 1), 1);

@@ -1,6 +1,6 @@
 <?php
-include_once("../classes/passageiroVip.php");
-include_once "suite.php";
+require_once("../classes/passageiroVip.php");
+require_once "suite.php";
 
 class PassageiroVipTestCase extends TestCase{
     protected function getName(): string

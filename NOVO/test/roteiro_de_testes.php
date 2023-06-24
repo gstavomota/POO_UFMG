@@ -1,73 +1,51 @@
 <?php
-
+require_once "suite.php";
+require_once "mixins/aeroportos_mixin.php";
+require_once "mixins/tripulante_mixin.php";
+require_once "../classes/calculo_rota_strategy.php";
 class RoteiroDeTestesTestCase extends TestCase
 {
+    use AeroportosMixin;
+    use TripulanteMixin;
     protected function getName(): string
     {
         return "RoteiroDeTestes";
     }
-    private function buildEndereco(): Endereco
-    {
 
-        $logradouro = "Avenida Amazonas";
-        $numero = 1;
-        $bairro = "Gutierrez";
-        $cep = new CEP("30150-312");
-        $cidade = "Belo Horizonte";
-        $estado = Estado::MG;
-        $referencia = "Proximo a Avenida Silva Lobo";
-        return new Endereco(
-            $logradouro,
-            $numero,
-            $bairro,
-            $cep,
-            $cidade,
-            $estado,
-            $referencia
-        );
+
+    private function coordenadaTripulante(SiglaAeroporto $aeroporto): ICoordenada {
+        $coordAeroporto = Aeroporto::getRecordsBySigla($aeroporto)[0]->getCoordenada();
+        $dt = 0.001;
+        $dx = $dt * rand(-10, 10);
+        $dy = $dt * rand(-10, 10);
+        return new Coordenada($dx + $coordAeroporto->getX(), $dy + $coordAeroporto->getY());
     }
-    private int $lastComissario = 0;
-
-    private function registrarTripulante(CompanhiaAerea &$companhiaAerea, Cargo $cargo): RegistroDeTripulante
-    {
-        $nome = "";
-        match ($cargo) {
-            Cargo::PILOTO => $nome = "Pedro",
-            Cargo::COPILOTO => $nome = "Gustavo",
-            Cargo::COMISSARIO => $nome = ["Bruno", "Raissa", "Maria Eduarda"][$this->lastComissario]
-        };
-        $sobrenome = "";
-        match ($cargo) {
-            Cargo::PILOTO => $sobrenome = "Kalil",
-            Cargo::COPILOTO => $sobrenome = "Motta",
-            Cargo::COMISSARIO => $sobrenome = ["Lima", "Diniz", "Sampaio"][$this->lastComissario]
-        };
-        $registro = null;
-        match ($cargo) {
-            Cargo::PILOTO => $registro = new RegistroDeTripulante(0),
-            Cargo::COPILOTO => $registro = new RegistroDeTripulante(1),
-            Cargo::COMISSARIO => $registro = [new RegistroDeTripulante(2), new RegistroDeTripulante(3), new RegistroDeTripulante(4)][$this->lastComissario]
-        };
-        $dataDeNascimento = new Data(2003,1,1);
-        if ($cargo === Cargo::COMISSARIO) {
-            $this->lastComissario++;
-        }
-        return $companhiaAerea->registrarTripulante(
-            $nome,
-            $sobrenome,
-            new CPF("111.111.111-11"),
-            Nacionalidade::BRASIL,
-            $dataDeNascimento,
-            new Email("tripulante@gmail.com"),
-            "CHT",
-            $this->buildEndereco(),
-            new SiglaAeroporto("GRU"),
-            $cargo
-        )->getRegistro();
+    private function cartaoDeEmbarqueToString(CartaoDeEmbarque $cartaoDeEmbarque) {
+        $s = "";
+        $s = $s."CartaoDeEmbarque(";
+        $s = $s.$cartaoDeEmbarque->getId();
+        $s = $s.", ";
+        $s = $s.'"';
+        $s = $s.$cartaoDeEmbarque->getNomePassageiro();
+        $s = $s." ";
+        $s = $s.$cartaoDeEmbarque->getSobrenomePassageiro();
+        $s = $s.'"';
+        $s = $s.", ";
+        $s = $s.$cartaoDeEmbarque->getSiglaAeroportoDeSaida();
+        $s = $s.", ";
+        $s = $s.$cartaoDeEmbarque->getSiglaAeroportoDeChegada();
+        $s = $s.", ";
+        $s = $s.$cartaoDeEmbarque->getMomentoMaximoDeEmbarque();
+        $s = $s.", ";
+        $s = $s.$cartaoDeEmbarque->getAssento();
+        $s = $s.")";
+        return $s;
     }
-
     public function run()
     {
+        $this->initTripulante();
+        $this->initAeroportos();
+        $this->limparAeroportos();
         // Cadastre duas companhias aéreas
         // • Nome: Latam
         // • Código: 001
@@ -96,22 +74,15 @@ class RoteiroDeTestesTestCase extends TestCase
         $registroAeronaveLatam = new RegistroDeAeronave(PrefixoRegistroDeAeronave::PP, "RUZ");
         $registroAeronaveAzul_1 = new RegistroDeAeronave(PrefixoRegistroDeAeronave::PP, "FOO");
         $aeronaveLatam = $latam->registrarAeronave("Embraer", "175", 180, 600, $registroAeronaveLatam);
+        $this->assertNotNull($aeronaveLatam);
+        $this->assertNotNull($latam->encontrarAeronave($registroAeronaveLatam));
         $latam->save();
         $aeronaveAzul_1 = $azul->registrarAeronave("Embraer", "175", 180, 600, $registroAeronaveAzul_1);
         $azul->save();
 
         // Cadastre os aeroportos de Confins, Guarulhos, Congonhas, Galeão e Afonso Pena. Os
         // dados desse aeroporto podem ser encontrados na internet.
-        $aeroportoConfins = new Aeroporto(new SiglaAeroporto("CNF"), "Confins", "Belo Horizonte", Estado::MG);
-        $aeroportoConfins->save();
-        $aeroportoGuarulhos = new Aeroporto(new SiglaAeroporto("GRU"), "Guarulhos", "São Paulo", Estado::SP);
-        $aeroportoGuarulhos->save();
-        $aeroportoCongonhas = new Aeroporto(new SiglaAeroporto("CGH"), "Congonhas", "São Paulo", Estado::SP);
-        $aeroportoCongonhas->save();
-        $aeroportoGaleao = new Aeroporto(new SiglaAeroporto("GIG"), "Galeão", "Rio de Janeiro", Estado::RJ);
-        $aeroportoGaleao->save();
-        $aeroportoAfonsoPena = new Aeroporto(new SiglaAeroporto("CWB"), "Afonso Pena", "São José dos Pinhais", Estado::PR);
-        $aeroportoAfonsoPena->save();
+        $this->registrarAeroportos();
 
         // Cadastre o voo AC1329 da Azul ligando os aeroportos de Confins e Guarulhos. Seu
         // código de testes deve validar o código do voo, tratar a exceção e em seguida alterar o
@@ -127,8 +98,8 @@ class RoteiroDeTestesTestCase extends TestCase
             // Esse estado invalido é impossivel de ser representado com a arquitetura atual
             $vooAzulInvalido = new Voo(
                 new CodigoVoo(new SiglaCompanhiaAerea("AC"), 1329),
-                $aeroportoConfins->getSigla(),
-                $aeroportoGuarulhos->getSigla(),
+                $this->siglaConfins,
+                $this->siglaGuarulhos,
                 $hora9am,
                 $duracaoDuasHoras,
                 $todosOsDias,
@@ -145,8 +116,8 @@ class RoteiroDeTestesTestCase extends TestCase
         }
         $vooAzul1329 = $azul->registrarVoo(
             1329,
-            $aeroportoConfins->getSigla(),
-            $aeroportoGuarulhos->getSigla(),
+            $this->siglaConfins,
+            $this->siglaGuarulhos,
             $hora9am,
             $duracaoDuasHoras,
             $todosOsDias,
@@ -170,8 +141,8 @@ class RoteiroDeTestesTestCase extends TestCase
         $aeronaveAzul_2 = $azul->registrarAeronave("Embraer", "175", 180, 600, $registroAeronaveAzul_2);
         $vooAzul0001 = $azul->registrarVoo(
             1,
-            $aeroportoConfins->getSigla(),
-            $aeroportoCongonhas->getSigla(),
+            $this->siglaConfins,
+            $this->siglaCongonhas,
             $hora9am,
             $duracaoDuasHoras,
             $todosOsDias,
@@ -184,8 +155,8 @@ class RoteiroDeTestesTestCase extends TestCase
         // Volta confins-congonhas manha
         $vooAzul0002 = $azul->registrarVoo(
             2,
-            $aeroportoCongonhas->getSigla(),
-            $aeroportoConfins->getSigla(),
+            $this->siglaCongonhas,
+            $this->siglaConfins,
             $hora1pm,
             $duracaoDuasHoras,
             $todosOsDias,
@@ -201,8 +172,8 @@ class RoteiroDeTestesTestCase extends TestCase
         $aeronaveAzul_3 = $azul->registrarAeronave("Embraer", "175", 180, 600, $registroAeronaveAzul_3);
         $vooAzul0003 = $azul->registrarVoo(
             3,
-            $aeroportoCongonhas->getSigla(),
-            $aeroportoAfonsoPena->getSigla(),
+            $this->siglaCongonhas,
+            $this->siglaAfonsoPena,
             $hora6pm,
             $duracaoDuasHoras,
             $todosOsDias,
@@ -215,8 +186,8 @@ class RoteiroDeTestesTestCase extends TestCase
         // Volta congonhas-afonso pena tarde
         $vooAzul0004 = $azul->registrarVoo(
             4,
-            $aeroportoAfonsoPena->getSigla(),
-            $aeroportoCongonhas->getSigla(),
+            $this->siglaAfonsoPena,
+            $this->siglaCongonhas,
             $hora9pm,
             $duracaoDuasHoras,
             $todosOsDias,
@@ -247,11 +218,11 @@ class RoteiroDeTestesTestCase extends TestCase
             new Categoria("prata", 2000),
             new Categoria("ouro", 3000)
         ], "Azul");
-        $documentoPassageiro = new DocumentoPassageiro(new Passaporte("A12345678"));
+        $documentoPessoa = new DocumentoPessoa(new Passaporte("A12345678"));
         $passageiro = new PassageiroVip(
             "Joao",
             "Alves",
-            $documentoPassageiro,
+            $documentoPessoa,
             Nacionalidade::BRASIL,
             new CPF("111.111.111-11"),
             new Data(1970, 1, 1),
@@ -263,30 +234,15 @@ class RoteiroDeTestesTestCase extends TestCase
         // 2. Comprar passagem somente de ida de Confins (Belo Horizonte-MG) e Afonso Pena (Curitiba-PR)
         $franquias = new FranquiasDeBagagem([new FranquiaDeBagagem(20.0)]);
         $amanha = Data::hoje()->add(Duracao::umDia());
-        $registroPassagem = $azul->comprarPassagem($documentoPassageiro, $amanha, $aeroportoConfins->getSigla(), $aeroportoAfonsoPena->getSigla(), $franquias);
+        $registroPassagem = $azul->comprarPassagem($documentoPessoa, $amanha, $this->siglaConfins, $this->siglaAfonsoPena, $franquias);
         $passagem = $azul->encontrarPassagem($registroPassagem);
-        $this->checkNeq($registroPassagem, null);
+        $this->checkNotNull($registroPassagem);
         $cartoesDeEmbarque = $azul->fazerCheckIn($registroPassagem);
-        $s = "";
         // 3. Imprimir os cartoes de embarque
+        $s = "";
         foreach ($cartoesDeEmbarque as $cartaoDeEmbarque) {
-            $s = $s."CartaoDeEmbarque(";
-            $s = $s.$cartaoDeEmbarque->getId();
-            $s = $s.", ";
-            $s = $s.'"';
-            $s = $s.$cartaoDeEmbarque->getNomePassageiro();
-            $s = $s." ";
-            $s = $s.$cartaoDeEmbarque->getSobrenomePassageiro();
-            $s = $s.'"';
-            $s = $s.", ";
-            $s = $s.$cartaoDeEmbarque->getSiglaAeroportoDeSaida();
-            $s = $s.", ";
-            $s = $s.$cartaoDeEmbarque->getSiglaAeroportoDeChegada();
-            $s = $s.", ";
-            $s = $s.$cartaoDeEmbarque->getMomentoMaximoDeEmbarque();
-            $s = $s.", ";
-            $s = $s.$cartaoDeEmbarque->getAssento();
-            $s = $s.")\n";
+            $s = $s.$this->cartaoDeEmbarqueToString($cartaoDeEmbarque);
+            $s = $s."\n";
         }
         echo $s;
         // 4. Embarcar
@@ -302,12 +258,15 @@ class RoteiroDeTestesTestCase extends TestCase
              * @var RegistroDeViagem $registroViagem
              */
             $registroViagem = $viagem_assento->key;
-            print_r($registroViagem);
-            $azul->registrarTripulanteNaViagem($registroViagem, $piloto);
-            $azul->registrarTripulanteNaViagem($registroViagem, $copiloto);
-            $azul->registrarTripulanteNaViagem($registroViagem, $comissario);
-            $azul->registrarTripulanteNaViagem($registroViagem, $comissario1);
-            $azul->registrarTripulanteNaViagem($registroViagem, $comissario2);
+            /**
+             * @var ViagemBuilder $viagemBuilder
+             */
+            $viagemBuilder = $this->runNonPublicMethod($azul, "findRequiredViagemBuilder", $registroViagem);
+            $azul->registrarTripulanteNaViagem($registroViagem, $piloto->getRegistro(), $this->coordenadaTripulante($viagemBuilder->getAeroportoDeSaida()));
+            $azul->registrarTripulanteNaViagem($registroViagem, $copiloto->getRegistro(), $this->coordenadaTripulante($viagemBuilder->getAeroportoDeSaida()));
+            $azul->registrarTripulanteNaViagem($registroViagem, $comissario->getRegistro(), $this->coordenadaTripulante($viagemBuilder->getAeroportoDeSaida()));
+            $azul->registrarTripulanteNaViagem($registroViagem, $comissario1->getRegistro(), $this->coordenadaTripulante($viagemBuilder->getAeroportoDeSaida()));
+            $azul->registrarTripulanteNaViagem($registroViagem, $comissario2->getRegistro(), $this->coordenadaTripulante($viagemBuilder->getAeroportoDeSaida()));
         }
         /**
          * @var RegistroDeViagem $registroViagemConfinsCongonhas
@@ -335,15 +294,78 @@ class RoteiroDeTestesTestCase extends TestCase
         // dois dias após a ida. Deve-se tentar fazer checkin dessa passagem.
         // Logo após essa passagem deve ser cancelada. Os valores de ressarcimento devem ser
         // calculados e exibidos na tela.
-        //
+        // 1. Pegar a data daqui a dois dias
+        $doisDias = new Duracao(2, 0);
+        $doisDiasAposAIda = $amanha->add($doisDias);
+        // 2. Registrar voo de ida e de volta na latam
+        $vooLatam1330 = $latam->registrarVoo(
+            1330,
+            $this->siglaConfins,
+            $this->siglaAfonsoPena,
+            $hora9am,
+            $duracaoDuasHoras,
+            $todosOsDias,
+            $registroAeronaveLatam,
+            1000.0,
+            1000
+        );
+        $vooLatam1331 = $latam->registrarVoo(
+            1331,
+            $this->siglaAfonsoPena,
+            $this->siglaConfins,
+            $hora1pm,
+            $duracaoDuasHoras,
+            $todosOsDias,
+            $registroAeronaveLatam,
+            1000.0,
+            1000
+        );
+        // 3. Registrar passageiro na latam
+        $latam->adicionarPassageiro($passageiro);
+        // 4. Comprar a passagem de ida
+        $registroPassagemIda = $latam->comprarPassagem($documentoPessoa, $amanha, $this->siglaConfins, $this->siglaAfonsoPena, $franquias);
+        $this->assertNotNull($registroPassagemIda);
+        // 5. Comprar a passagem de volta
+        $registroPassagemVolta = $latam->comprarPassagem($documentoPessoa, $doisDiasAposAIda, $this->siglaAfonsoPena, $this->siglaConfins, $franquias);
+        $this->assertNotNull($registroPassagemVolta);
+        // 6. Cancelar passagem de volta
+        $passagemVolta = $latam->cancelarPassagem($registroPassagemVolta);
+        $valorRessarcido = $passagemVolta->reembolsar();
+        $valorDevendo = $passagemVolta->valorDevendo();
+        echo "Valor ressarcido: $valorRessarcido\n";
+        echo "Valor devendo: $valorDevendo\n";
         // Cadastre e planeje a tripulação que atuará na primeira viagem do vôo de ida do
         // passageiro. A rota da van que vai buscar a tripulação para a realização da viagem
         // também deve ser planejada. Os horários em que cada tripulante embarca na van devem
         // ser exibidos.
         // Ao final todos os logs das operações realizadas devem ser exibidos na tela.
-
-
-
+        // 1. Cadastrar tripulação na companhia aerea
+        $pilotoLatam = $this->registrarTripulante($latam, Cargo::PILOTO);
+        $copilotoLatam = $this->registrarTripulante($latam, Cargo::COPILOTO);
+        $comissarioLatam = $this->registrarTripulante($latam, Cargo::COMISSARIO);
+        $comissario1Latam = $this->registrarTripulante($latam, Cargo::COMISSARIO);
+        $comissario2Latam = $this->registrarTripulante($latam, Cargo::COMISSARIO);
+        // 2. Registrar tripulação na viagem de ida
+        $passagemIda = $latam->encontrarPassagem($registroPassagemIda);
+        /**
+         * @var RegistroDeViagem $registroViagem
+         */
+        $registroViagem = $passagemIda->getAssentos()[0]->key;
+        $latam->registrarTripulanteNaViagem($registroViagem, $pilotoLatam->getRegistro(), $this->coordenadaTripulante($this->siglaConfins));
+        $latam->registrarTripulanteNaViagem($registroViagem, $copilotoLatam->getRegistro(), $this->coordenadaTripulante($this->siglaConfins));
+        $latam->registrarTripulanteNaViagem($registroViagem, $comissarioLatam->getRegistro(), $this->coordenadaTripulante($this->siglaConfins));
+        $latam->registrarTripulanteNaViagem($registroViagem, $comissario1Latam->getRegistro(), $this->coordenadaTripulante($this->siglaConfins));
+        $latam->registrarTripulanteNaViagem($registroViagem, $comissario2Latam->getRegistro(), $this->coordenadaTripulante($this->siglaConfins));
+        // 3. Pegar o onibus
+        /**
+         * @var ViagemBuilder $viagemBuilder
+         */
+        $viagemBuilder = $this->runNonPublicMethod($latam, "findRequiredViagemBuilder", $registroViagem);
+        $onibus = $viagemBuilder->getOnibus();
+        // 4. Calcular a hora de saida
+        $horasDeSaida = $onibus->horaDeSaida(new CalculoRotaAproximadaStrategy());
+        // 5. Imprimir a hora de saida
+        echo $horasDeSaida;
 
     }
 }

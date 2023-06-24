@@ -1,7 +1,7 @@
 <?php
-include_once "../../classes/aeronave.php";
-include_once "../../classes/identificadores.php";
-include_once "../../classes/companhia_aerea.php";
+require_once __DIR__ . "/../../classes/aeronave.php";
+require_once __DIR__ . "/../../classes/identificadores.php";
+require_once __DIR__ . "/../../classes/companhia_aerea.php";
 
 trait AeronavesMixin {
     /**
@@ -20,9 +20,11 @@ trait AeronavesMixin {
         $this->sufixos = ["AAA", "AAB", "AAC", "AAD", "AAE", "AAF", "AAG", "AAH", "AAI", "AAJ", "AAK", "AAL", "AAM", "AAN", "AAO", "AAP", "AAQ"];
     }
 
-    protected function aeronaveDoisPassageiros(SiglaCompanhiaAerea $sigla) {
-        $sufixo = $this->sufixos[$this->sufixo];
-        $this->sufixo++;
+    protected function aeronaveDoisPassageiros(SiglaCompanhiaAerea $sigla, PrefixoRegistroDeAeronave $prefixo = PrefixoRegistroDeAeronave::PP, ?string $sufixo = null) {
+        if (is_null($sufixo)) {
+            $sufixo = $this->sufixos[$this->sufixo];
+            $this->sufixo++;
+        }
         $aeronave = new Aeronave(
             $sigla,
             "Fabricante",
@@ -34,7 +36,7 @@ trait AeronavesMixin {
         $this->aeronaves->put($aeronave->getRegistro(), $aeronave);
         return $aeronave;
     }
-    protected function aeronaveEmbraer175(SiglaCompanhiaAerea $sigla, PrefixoRegistroDeAeronave $prefixo = PrefixoRegistroDeAeronave::PP, ?string $sufixo) {
+    protected function aeronaveEmbraer175(SiglaCompanhiaAerea $sigla, PrefixoRegistroDeAeronave $prefixo = PrefixoRegistroDeAeronave::PP, ?string $sufixo = null) {
         if (is_null($sufixo)) {
             $sufixo = $this->sufixos[$this->sufixo];
             $this->sufixo++;

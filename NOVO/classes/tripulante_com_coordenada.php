@@ -5,9 +5,9 @@ require_once "coordenada.php";
 class TripulanteComCoordenada implements ICoordenada
 {
     private RegistroDeTripulante $tripulante;
-    private Coordenada $coordenada;
+    private ICoordenada $coordenada;
 
-    public function __construct(RegistroDeTripulante $tripulante, Coordenada $coordenada)
+    public function __construct(RegistroDeTripulante $tripulante, ICoordenada $coordenada)
     {
         $this->tripulante = $tripulante;
         $this->coordenada = $coordenada;
@@ -18,7 +18,7 @@ class TripulanteComCoordenada implements ICoordenada
         return $this->tripulante;
     }
 
-    public function getCoordenada(): Coordenada
+    public function getCoordenada(): ICoordenada
     {
         return $this->coordenada;
     }

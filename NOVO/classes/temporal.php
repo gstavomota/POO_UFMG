@@ -3,6 +3,7 @@
 require_once "enum_to_array.php";
 require_once "Comparable.php";
 require_once "Equatable.php";
+require_once "HashableAndComparable.php";
 
 /** Uma classe normalizada que determina um intervalo de tempo.
  *

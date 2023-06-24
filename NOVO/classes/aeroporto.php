@@ -13,6 +13,7 @@ class Aeroporto extends persist
     private string $nome;
     private string $cidade;
     private Estado $estado;
+    private ICoordenada $coordenada;
     private static string $local_filename = "aeroporto.txt";
 
     public function __construct(
@@ -20,6 +21,7 @@ class Aeroporto extends persist
         string $nome,
         string $cidade,
         Estado $estado,
+        ICoordenada $coordenada,
         ...$args
     )
     {
@@ -27,6 +29,7 @@ class Aeroporto extends persist
         $this->nome = $nome;
         $this->cidade = $cidade;
         $this->estado = $estado;
+        $this->coordenada = $coordenada;
         parent::__construct(...$args);
     }
 
@@ -47,6 +50,14 @@ class Aeroporto extends persist
     public function getEstado(): Estado
     {
         return $this->estado;
+    }
+
+    /**
+     * @return ICoordenada
+     */
+    public function getCoordenada(): ICoordenada
+    {
+        return $this->coordenada;
     }
 
 

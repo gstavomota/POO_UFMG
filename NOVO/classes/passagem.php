@@ -205,12 +205,14 @@ class Passagem
     private Data $data;
     private float $valor;
     private float $valor_pago;
+    private float $valor_ressarcido;
     /** TODO: should be an tuple actually
      * @var HashMapEntry<RegistroDeViagem, CodigoDoAssento>[]
      */
     private array $assentos;
     private DataTempo $data_tempo_de_compra;
     private StatusDaPassagem $status;
+    static private float $fracao_nao_ressarcivel = 0.5;
 
     public function __construct(
         RegistroDePassagem  $registro,
@@ -234,6 +236,7 @@ class Passagem
         $this->data = $data;
         $this->valor = $valor;
         $this->valor_pago = $valor_pago;
+        $this->valor_ressarcido = 0;
         $this->assentos = $assentos;
         $this->data_tempo_de_compra = $data_tempo_de_compra;
         $this->status = $status;
@@ -302,9 +305,16 @@ class Passagem
     {
         return $this->valor_pago;
     }
+    /**
+     * @return float
+     */
+    public function getValorRessarcido(): float
+    {
+        return $this->valor_ressarcido;
+    }
 
     /**
-     * @return HashMapEnry<RegistroDeViagem, CodigoDoAssento>[]
+     * @return HashMapEntry<RegistroDeViagem, CodigoDoAssento>[]
      */
     public function getAssentos(): array
     {
@@ -326,7 +336,7 @@ class Passagem
 
     public function valorDevendo(): float
     {
-        return $this->valor - $this->valor_pago;
+        return $this->valor - $this->valor_pago - $this->valor_ressarcido;
     }
 
     public function pagar(float $valor): float
@@ -338,11 +348,28 @@ class Passagem
         return $this->valorDevendo();
     }
 
+    public function reembolsar(): float {
+        $valor_reembolsavel = $this->valorDevendo();
+        if ($valor_reembolsavel >= 0) {
+            return -$valor_reembolsavel;
+        }
+        $valor_reembolsavel = abs($valor_reembolsavel);
+        $this->valor_ressarcido -= $valor_reembolsavel;
+        return $valor_reembolsavel;
+    }
+
     public function acionarEvento(Evento $evento): bool
     {
         $old_status = $this->status;
         $new_status = $this->status->dispatch_event($evento);
         $this->status = $new_status;
-        return $old_status !== $new_status;
+        $did_transition = $old_status !== $new_status;
+        if ($did_transition && $evento == Evento::CANCELAR) {
+            $valor_total = $this->valor;
+            $valor_nao_ressarcivel = $valor_total * static::$fracao_nao_ressarcivel;
+            $valor_ressarcivel = $valor_total - $valor_nao_ressarcivel;
+            $this->valor_ressarcido = $valor_ressarcivel;
+        }
+        return $did_transition;
     }
 }

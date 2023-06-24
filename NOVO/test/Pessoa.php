@@ -1,8 +1,8 @@
 <?php
 
-include_once 'suite.php';
-include_once '../classes/PessoaBasica.php';
-require_once '../classes/passagem.php';
+require_once 'suite.php';
+require_once '../classes/Pessoa.php';
+
 class PessoaBasica extends Pessoa {
     /**
      * @param string $nome

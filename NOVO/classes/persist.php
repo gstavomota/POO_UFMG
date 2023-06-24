@@ -1,5 +1,5 @@
 <?php
-include_once('container.php');
+require_once('container.php');
 
 /**
  * @template T of persist

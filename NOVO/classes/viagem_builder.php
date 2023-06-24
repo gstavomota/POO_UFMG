@@ -8,6 +8,9 @@ require_once('viagem.php');
 require_once('tripulacao.php');
 require_once('voo.php');
 require_once "HashMap.php";
+require_once "onibus.php";
+require_once "coordenada.php";
+require_once "tripulante_com_coordenada.php";
 
 class ViagemBuilder
 {
@@ -29,6 +32,7 @@ class ViagemBuilder
     private DataTempo $hora_de_partida_estimada;
 
     private DataTempo $hora_de_partida, $hora_de_chegada;
+    private Onibus $onibus;
 
     function __construct() {
         $this->tripulacao = new Tripulacao();
@@ -69,6 +73,8 @@ class ViagemBuilder
         $this->assentos = $voo->construirAssentos();
         $this->pontuacaoMilhagem = $voo->getPontuacaoMilhagem();
         $this->hora_de_partida_estimada = $voo->getHoraDePartida()->comData($this->data);
+        $aeroportoDeSaida = Aeroporto::getRecordsBySigla($voo->getAeroportoSaida())[0];
+        $this->onibus = new Onibus($aeroportoDeSaida->getCoordenada(), $voo->getHoraDePartida()->sub(new Duracao(0, 60*40)));
         return $this;
     }
 
@@ -160,14 +166,23 @@ class ViagemBuilder
         $assento->liberar();
     }
 
-    function addTripulante(Tripulante $tripulante): self {
+    function addTripulante(Tripulante $tripulante, ICoordenada $coordenada): self {
         $registro = $tripulante->getRegistro();
+        $this->onibus->adicionarTripulante(new TripulanteComCoordenada($registro, $coordenada));
         match ($tripulante->getCargo()) {
             Cargo::COMISSARIO => $this->tripulacao->addComissario($registro),
             Cargo::PILOTO => $this->tripulacao->setPiloto($registro),
             Cargo::COPILOTO => $this->tripulacao->setCopiloto($registro)
         };
         return $this;
+    }
+
+    /**
+     * @return Onibus
+     */
+    public function getOnibus(): Onibus
+    {
+        return $this->onibus;
     }
 
     function addHoraDePartidaEHoraDeChegada(DataTempo $hora_de_partida, DataTempo $hora_de_chegada): self

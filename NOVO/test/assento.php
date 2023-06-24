@@ -1,6 +1,6 @@
 <?php
-include_once 'suite.php';
-include_once '../classes/assento.php';
+require_once 'suite.php';
+require_once '../classes/assento.php';
 class AssentoTestCase extends TestCase {
 
     protected function getName(): string {

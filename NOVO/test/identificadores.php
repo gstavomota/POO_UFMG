@@ -1,6 +1,6 @@
 <?php
-include_once "suite.php";
-include_once "../classes/identificadores.php";
+require_once "suite.php";
+require_once "../classes/identificadores.php";
 
 class GeradorDeRegistroInteiro extends GeradorDeRegistroNumerico {
     public function __construct(int $ultimo_id = null)

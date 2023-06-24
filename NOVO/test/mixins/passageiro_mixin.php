@@ -1,7 +1,7 @@
 <?php
-require_once "../../classes/passageiro.php";
-require_once "../../classes/passageiroVip.php";
-require_once "../../classes/companhia_aerea.php";
+require_once __DIR__ . "/../../classes/passageiro.php";
+require_once __DIR__ . "/../../classes/passageiroVip.php";
+require_once __DIR__ . "/../../classes/companhia_aerea.php";
 
 trait PassageiroMixin {
     private int $passaporteCount = 0;

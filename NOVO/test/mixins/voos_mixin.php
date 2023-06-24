@@ -1,7 +1,7 @@
 <?php
-include_once "aeroportos_mixin.php";
-include_once "aeronaves_mixin.php";
-include_once "../../classes/companhia_aerea.php";
+require_once "aeroportos_mixin.php";
+require_once "aeronaves_mixin.php";
+require_once __DIR__ . "/../../classes/companhia_aerea.php";
 
 trait VoosMixin {
     use AeroportosMixin;

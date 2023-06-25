@@ -14,14 +14,16 @@ class Onibus {
     }
 
     public function adicionarTripulante(TripulanteComCoordenada $tripulanteComCoordenada): void {
+        $pre = clone $this;
         if (in_array($tripulanteComCoordenada, $this->tripulantes)) {
-            throw new InvalidArgumentException("O tripulante ja está no onibus");
+            log::getInstance()->logThrow(new InvalidArgumentException("O tripulante ja está no onibus"));
         }
         $this->tripulantes[] = $tripulanteComCoordenada;
+        log::getInstance()->logWrite($pre, $this);
     }
 
     public function distancia(CalculoRotaStrategy $calculoRotaStrategy): float {
-        return $calculoRotaStrategy->calculaDistanciaTotal($this->tripulantes, $this->coordenadaAeroporto);
+        return log::getInstance()->logCall($calculoRotaStrategy->calculaDistanciaTotal($this->tripulantes, $this->coordenadaAeroporto));
     }
 
     public function horaDeSaida(CalculoRotaStrategy $calculoRotaStrategy): HashMap {
@@ -42,6 +44,6 @@ class Onibus {
             $duracaoParcial = Duracao::umaHora()->mul($tempoParcialEmH);
             $ultimaHoraDeSaida = $ultimaHoraDeSaida->add($duracaoParcial);
         }
-        return $saidas;
+        return log::getInstance()->logCall($saidas);
     }
 }

@@ -45,7 +45,7 @@ class PassageiroVip extends Passageiro
 
     public function getNumeroDeRegistro(): string
     {
-        return $this->numero_de_registro;
+        return log::getInstance()->logRead($this->numero_de_registro);
     }
 
     /**
@@ -53,30 +53,34 @@ class PassageiroVip extends Passageiro
      */
     public function getCategoriaDoPrograma(): array
     {
-        return $this->categoria_do_programa;
+        return log::getInstance()->logRead($this->categoria_do_programa);
     }
 
     public function getProgramaDeMilhagem(): ProgramaDeMilhagem
     {
-        return $this->programa_de_milhagem;
+        return log::getInstance()->logRead($this->programa_de_milhagem);
     }
 
     public function addPontos(int $pontos, DataTempo $dataTempoParaTeste = null): void
     {
+        $pre = clone $this;
         $this->pontuacao[] = new Pontos($pontos, $dataTempoParaTeste ?? DataTempo::agora());
+        log::getInstance()->logWrite($pre, $this);
     }
 
 
     public function alterarCategoria(Categoria $categoria, DataTempo $dataTempoParaTeste = null)
     {
+        $pre = clone $this;
         if (!in_array($categoria, $this->programa_de_milhagem->getCategorias())) {
-            throw new InvalidArgumentException("A categoria deve estar no programa de milhagem");
+            log::getInstance()->logThrow(new InvalidArgumentException("A categoria deve estar no programa de milhagem"));
         }
         $pontuacao = $this->getPontosValidos();
         if ($pontuacao < $categoria->getPontuacao()) {
-            throw new InvalidArgumentException("A categoria precisa de mais pontos que o passageiro tem");
+            log::getInstance()->logThrow(new InvalidArgumentException("A categoria precisa de mais pontos que o passageiro tem"));
         }
         $this->categoria_do_programa[] = new CategoriaComData($categoria, $dataTempoParaTeste ?? DataTempo::agora());
+        log::getInstance()->logWrite($pre, $this);
     }
 
     public function getPontosValidos(): int
@@ -92,6 +96,6 @@ class PassageiroVip extends Passageiro
                 $pontuacao += $ponto->getPontosGanhos();
             }
         }
-        return $pontuacao;
+        return log::getInstance()->logCall($pontuacao);
     }
 }

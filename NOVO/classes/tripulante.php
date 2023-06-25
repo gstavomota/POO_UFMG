@@ -4,6 +4,7 @@ require_once 'nacionalidades.php';
 require_once 'aeroporto.php';
 require_once 'cargo.php';
 require_once "log.php";
+require_once "Pessoa.php";
 
 class Tripulante extends Pessoa
 {
@@ -51,34 +52,34 @@ class Tripulante extends Pessoa
 
     public function getCht(): string
     {
-        return $this->cht;
+        return log::getInstance()->logRead($this->cht);
     }
 
     public function getEndereco(): Endereco
     {
-        return $this->endereco;
+        return log::getInstance()->logRead($this->endereco);
     }
 
     public function getCompanhia(): SiglaCompanhiaAerea
     {
-        return $this->companhia;
+        return log::getInstance()->logRead($this->companhia);
     }
 
     public function getAeroportoBase(): SiglaAeroporto
     {
-        return $this->aeroporto_base;
+        return log::getInstance()->logRead($this->aeroporto_base);
     }
 
 
     public function getCargo(): Cargo
     {
-        return $this->cargo;
+        return log::getInstance()->logRead($this->cargo);
     }
 
 
     public function getRegistro(): RegistroDeTripulante
     {
-        return $this->registro;
+        return log::getInstance()->logRead($this->registro);
     }
 }
 

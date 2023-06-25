@@ -44,7 +44,7 @@ class EncontrarMelhorVooPreferindoSemConexaoEEmPelaMenorTarifaStrategy implement
                 $melhor_tarifa = $tarifa;
             }
 
-            return [$melhor_voo->getCodigo()];
+            return log::getInstance()->logCall([$melhor_voo->getCodigo()]);
         }
 
         $pares_de_voos = (new EncontrarVoosComUmaConexaoStrategy())->encontrar($data, $aeroportoDeSaida, $aeroportoDeChegada, $voos->values());
@@ -86,6 +86,6 @@ class EncontrarMelhorVooPreferindoSemConexaoEEmPelaMenorTarifaStrategy implement
             $melhor_tarifa = $tarifa;
         }
 
-        return [$melhor_voo_intermediario->getCodigo(), $melhor_voo_final->getCodigo()];
+        return log::getInstance()->logCall([$melhor_voo_intermediario->getCodigo(), $melhor_voo_final->getCodigo()]);
     }
 }

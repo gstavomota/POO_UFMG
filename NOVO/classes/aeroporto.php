@@ -36,21 +36,21 @@ class Aeroporto extends persist
 
     public function getSigla(): SiglaAeroporto
     {
-        return $this->sigla;
+        return log::getInstance()->logRead($this->sigla);
     }
 
     public function getNome(): string {
-        return $this->nome;
+        return log::getInstance()->logRead($this->nome);
     }
 
     public function getCidade(): string
     {
-        return $this->cidade;
+        return log::getInstance()->logRead($this->cidade);
     }
 
     public function getEstado(): Estado
     {
-        return $this->estado;
+        return log::getInstance()->logRead($this->estado);
     }
 
     /**
@@ -58,7 +58,7 @@ class Aeroporto extends persist
      */
     public function getCoordenada(): ICoordenada
     {
-        return $this->coordenada;
+        return log::getInstance()->logRead($this->coordenada);
     }
 
 

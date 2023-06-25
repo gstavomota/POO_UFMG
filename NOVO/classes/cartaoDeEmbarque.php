@@ -34,37 +34,37 @@ class CartaoDeEmbarque
 
     public function getId(): RegistroDeCartaoDeEmbarque
     {
-        return $this->id;
+        return log::getInstance()->logRead($this->id);
     }
 
     public function getNomePassageiro(): string
     {
-        return $this->nomePassageiro;
+        return log::getInstance()->logRead($this->nomePassageiro);
     }
 
     public function getSobrenomePassageiro(): string
     {
-        return $this->sobrenomePassageiro;
+        return log::getInstance()->logRead($this->sobrenomePassageiro);
     }
 
     public function getSiglaAeroportoDeChegada(): SiglaAeroporto
     {
-        return $this->siglaAeroportoDeChegada;
+        return log::getInstance()->logRead($this->siglaAeroportoDeChegada);
     }
 
     public function getSiglaAeroportoDeSaida(): SiglaAeroporto
     {
-        return $this->siglaAeroportoDeSaida;
+        return log::getInstance()->logRead($this->siglaAeroportoDeSaida);
     }
 
     public function getMomentoMaximoDeEmbarque(): DataTempo
     {
-        return $this->momentoMaximoDeEmbarque;
+        return log::getInstance()->logRead($this->momentoMaximoDeEmbarque);
     }
 
     public function getAssento(): CodigoDoAssento
     {
-        return $this->assento;
+        return log::getInstance()->logRead($this->assento);
     }
 }
 

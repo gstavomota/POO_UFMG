@@ -31,32 +31,32 @@ class Aeronave implements Equatable
 
     public function getSigla(): SiglaCompanhiaAerea
     {
-        return $this->companhia_aerea;
+        return log::getInstance()->logRead($this->companhia_aerea);
     }
 
     public function getFabricante(): string
     {
-        return $this->fabricante;
+        return log::getInstance()->logRead($this->fabricante);
     }
 
     public function getModelo(): string
     {
-        return $this->modelo;
+        return log::getInstance()->logRead($this->modelo);
     }
 
     public function getCapacidadePassageiros(): int
     {
-        return $this->capacidade_passageiros;
+        return log::getInstance()->logRead($this->capacidade_passageiros);
     }
 
     public function getCapacidadeCarga(): float
     {
-        return $this->capacidade_carga;
+        return log::getInstance()->logRead($this->capacidade_carga);
     }
 
     public function getRegistro(): RegistroDeAeronave
     {
-        return $this->registro;
+        return log::getInstance()->logRead($this->registro);
     }
 
     public function eq(Equatable $other): bool

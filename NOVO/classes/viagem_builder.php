@@ -41,30 +41,35 @@ class ViagemBuilder
 
     public function addTarifaFranquia(float $tarifa_franquia): self
     {
+        $pre = clone $this;
         $this->tarifa_franquia = $tarifa_franquia;
-        return $this;
+        return log::getInstance()->logWrite($pre, $this);
     }
 
     public function adicionarGeradorDeRegistro(GeradorDeRegistroDeViagem $gerador_de_registro): self
     {
+        $pre = clone $this;
         $this->gerador_de_registro = $gerador_de_registro;
-        return $this;
+        return log::getInstance()->logWrite($pre, $this);
     }
 
     public function gerarRegistro(): self
     {
+        $pre = clone $this;
         $this->registro = $this->gerador_de_registro->gerar();
-        return $this;
+        return log::getInstance()->logWrite($pre, $this);
     }
 
     public function addData(Data $data): self
     {
+        $pre = clone $this;
         $this->data = $data;
-        return $this;
+        return log::getInstance()->logWrite($pre, $this);
     }
 
     public function addVoo(Voo $voo): self
     {
+        $pre = clone $this;
         $this->carga = $voo->getCapacidadeCarga();
         $this->passageiros = $voo->getCapacidadeDePassageiros();
         $this->codigo_do_voo = $voo->getCodigo();
@@ -76,36 +81,37 @@ class ViagemBuilder
         $this->hora_de_partida_estimada = $voo->getHoraDePartida()->comData($this->data);
         $aeroportoDeSaida = Aeroporto::getRecordsBySigla($voo->getAeroportoSaida())[0];
         $this->onibus = new Onibus($aeroportoDeSaida->getCoordenada(), $voo->getHoraDePartida()->sub(new Duracao(0, 60*40)));
-        return $this;
+        return log::getInstance()->logWrite($pre, $this);
     }
 
     public function addAeronave(Aeronave $aeronave): self
     {
+        $pre = clone $this;
         $carga = $aeronave->getCapacidadeCarga();
         $passageiros = $aeronave->getCapacidadePassageiros();
         if ($carga != $this->carga || $passageiros != $this->passageiros) {
             throw new InvalidArgumentException("Essa aeronave não tem a carga e passageiros necessários");
         }
         $this->aeronave = $aeronave->getRegistro();
-        return $this;
+        return log::getInstance()->logWrite($pre, $this);
     }
 
     function temAssentosLiberados(): bool
     {
         foreach ($this->assentos->values() as $assento) {
             if ($assento->vazio()) {
-                return true;
+                return log::getInstance()->logCall(true);
             }
         }
-        return false;
+        return log::getInstance()->logCall(false);
     }
 
     function assentoEstaLiberado(CodigoDoAssento $assento): bool
     {
         if (!$this->assentos->containsKey($assento)) {
-            throw new InvalidArgumentException('Assento não encontrado');
+            log::getInstance()->logThrow(new InvalidArgumentException('Assento não encontrado'));
         }
-        return $this->assentos->get($assento)->vazio();
+        return log::getInstance()->logCall($this->assentos->get($assento)->vazio());
     }
 
     function temCargaDisponivelParaFranquias(FranquiasDeBagagem $franquias): bool
@@ -122,52 +128,53 @@ class ViagemBuilder
             $carga_usada += $franquiasAssento->carga();
         }
         if ($carga_usada + $franquias->carga() > $this->carga) {
-            return false;
+            return log::getInstance()->logCall(false);
         }
-        return true;
+        return log::getInstance()->logCall(true);
     }
 
     function codigoAssentoLiberado(): CodigoDoAssento
     {
         foreach ($this->assentos->values() as $assento) {
             if ($assento->vazio()) {
-                return $assento->getCodigo();
+                return log::getInstance()->logCall($assento->getCodigo());
             }
         }
         // TODO: Custom exception type
-        throw new Exception('Não tem assentos liberados');
+        log::getInstance()->logThrow(new Exception('Não tem assentos liberados'));
     }
 
     function reservarAssento(bool $cliente_vip, RegistroDePassagem $registro_passagem, FranquiasDeBagagem $franquias, CodigoDoAssento $assento_desejado): float
     {
         if (!$this->temCargaDisponivelParaFranquias($franquias)) {
             // TODO: Custom exception type
-            throw new Exception('Não tem carga para franquia disponível');
+            log::getInstance()->logThrow(new Exception('Não tem carga para franquia disponível'));
         }
         if (!$this->assentos->containsKey($assento_desejado)) {
-            throw new InvalidArgumentException('Assento não encontrado');
+            log::getInstance()->logThrow(new InvalidArgumentException('Assento não encontrado'));
         }
         $assento = $this->assentos->get($assento_desejado);
         if ($assento->preenchido()) {
-            throw new PreenchimentoDeAssentoException('O assento está preenchido');
+            log::getInstance()->logThrow(new PreenchimentoDeAssentoException('O assento está preenchido'));
         }
         $assento->reservar($registro_passagem, $franquias);
-        return calculo_tarifa_strategy_for($cliente_vip, $this->tarifa, $this->tarifa_franquia)->calcula($franquias);
+        return log::getInstance()->logCall(calculo_tarifa_strategy_for($cliente_vip, $this->tarifa, $this->tarifa_franquia)->calcula($franquias));
     }
 
     function liberarAssento(RegistroDePassagem $registro_passagem, CodigoDoAssento $codigoAssento): void
     {
         if (!$this->assentos->containsKey($codigoAssento)) {
-            throw new InvalidArgumentException('Assento não encontrado');
+            log::getInstance()->logThrow(new InvalidArgumentException('Assento não encontrado'));
         }
         $assento = $this->assentos->get($codigoAssento);
         if (!$assento->getPassagem()->eq($registro_passagem)) {
-            throw new Exception("Passagem errada");
+            log::getInstance()->logThrow(new Exception("Passagem errada"));
         }
         $assento->liberar();
     }
 
     function addTripulante(Tripulante $tripulante, ICoordenada $coordenada): self {
+        $pre = clone $this;
         $registro = $tripulante->getRegistro();
         $this->onibus->adicionarTripulante(new TripulanteComCoordenada($registro, $coordenada));
         match ($tripulante->getCargo()) {
@@ -175,7 +182,7 @@ class ViagemBuilder
             Cargo::PILOTO => $this->tripulacao->setPiloto($registro),
             Cargo::COPILOTO => $this->tripulacao->setCopiloto($registro)
         };
-        return $this;
+        return log::getInstance()->logWrite($pre, $this);
     }
 
     /**
@@ -183,14 +190,15 @@ class ViagemBuilder
      */
     public function getOnibus(): Onibus
     {
-        return $this->onibus;
+        return log::getInstance()->logRead($this->onibus);
     }
 
     function addHoraDePartidaEHoraDeChegada(DataTempo $hora_de_partida, DataTempo $hora_de_chegada): self
     {
+        $pre = clone $this;
         $this->hora_de_partida = $hora_de_partida;
         $this->hora_de_chegada = $hora_de_chegada;
-        return $this;
+        return log::getInstance()->logWrite($pre, $this);
     }
 
     /**
@@ -198,7 +206,7 @@ class ViagemBuilder
      */
     public function getRegistro(): RegistroDeViagem
     {
-        return $this->registro;
+        return log::getInstance()->logRead($this->registro);
     }
 
     /**
@@ -206,7 +214,7 @@ class ViagemBuilder
      */
     public function getCodigoDoVoo(): CodigoVoo
     {
-        return $this->codigo_do_voo;
+        return log::getInstance()->logRead($this->codigo_do_voo);
     }
 
     /**
@@ -214,7 +222,7 @@ class ViagemBuilder
      */
     public function getHoraDePartidaEstimada(): DataTempo
     {
-        return $this->hora_de_partida_estimada;
+        return log::getInstance()->logRead($this->hora_de_partida_estimada);
     }
 
     /**
@@ -222,7 +230,7 @@ class ViagemBuilder
      */
     public function getAeroportoDeSaida(): SiglaAeroporto
     {
-        return $this->aeroporto_de_saida;
+        return log::getInstance()->logRead($this->aeroporto_de_saida);
     }
 
     /**
@@ -230,7 +238,7 @@ class ViagemBuilder
      */
     public function getAeroportoDeChegada(): SiglaAeroporto
     {
-        return $this->aeroporto_de_chegada;
+        return log::getInstance()->logRead($this->aeroporto_de_chegada);
     }
 
     /**
@@ -238,13 +246,13 @@ class ViagemBuilder
      */
     public function getData(): Data
     {
-        return $this->data;
+        return log::getInstance()->logRead($this->data);
     }
 
     public function build(): Viagem
     {
         $this->tripulacao->trancar();
-        return new Viagem(
+        return log::getInstance()->logCall(new Viagem(
             $this->registro,
             $this->codigo_do_voo,
             $this->aeroporto_de_saida,
@@ -256,6 +264,6 @@ class ViagemBuilder
             $this->tarifa,
             $this->tarifa_franquia,
             $this->assentos,
-        );
+        ));
     }
 }

@@ -1,6 +1,32 @@
 <?php
 require_once "AuthenticationManager.php";
 require_once "temporal.php";
+function objOrEnumToString(mixed $obj)
+{
+    if (is_bool($obj)) {
+        return $obj ? "true" : "false";
+    }
+    # Enum
+    if (is_object($obj) && property_exists($obj, "value")) {
+        return $obj->value;
+    }
+    $quotes = is_string($obj) ? "\"" : "";
+    if (is_array($obj)) {
+        $arr = $obj;
+        $obj = "{";
+        foreach ($arr as $key => $value) {
+            $obj = $obj . $key . ": " . objOrEnumToString($value) . ", ";
+        }
+        $obj = $obj . "}";
+    }
+    try {
+        return "$quotes{$obj}$quotes";
+    } catch (Error $e) {
+        $class = get_class($obj);
+        $hash = spl_object_hash($obj);
+        return "{$class}#{$hash}";
+    }
+}
 enum Operation: string {
     case READ = "read";
     case WRITE = "write";
@@ -23,7 +49,8 @@ abstract class LogEntry {
     private string $sujeito;
     private string $metodo;
     private function prefix(): string {
-        return "[$this->momento][".$this->usuario->getUsuario()."][".$this->operation->name."]"."[$this->sujeito.$this->metodo]";
+        $usuario = $this->usuario ? $this->usuario->getUsuario() : "Usuario anonimo";
+        return "[$this->momento][".$usuario."][".$this->operation->name."]"."[$this->sujeito.$this->metodo]";
     }
     abstract protected function suffix(): string;
     public function __toString(): string {
@@ -40,7 +67,7 @@ public function __construct(mixed $valor, string $sujeito, string $metodo)
 
     protected function suffix(): string
     {
-        return "valor $this->valor";
+        return "valor ".objOrEnumToString($this->valor);
     }
 }
 
@@ -56,7 +83,7 @@ class LogEntryEscrita extends LogEntry {
 
     protected function suffix(): string
     {
-        return "de $this->antes para $this->depois";
+        return "de ".objOrEnumToString($this->antes)." para ".objOrEnumToString($this->depois);
     }
 }
 
@@ -73,7 +100,7 @@ class LogEntryCall extends LogEntry {
     protected function suffix(): string
     {
         $symbol = $this->throw ? "throw " : "-> ";
-        return $symbol.$this->retorno;
+        return $symbol.objOrEnumToString($this->retorno);
     }
 }
 interface LogOutputter {

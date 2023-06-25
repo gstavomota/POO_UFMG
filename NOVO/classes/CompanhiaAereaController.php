@@ -143,10 +143,10 @@ public function __construct(CompanhiaAerea $companhiaAerea, Sessao $sessao)
         AuthenticationManager::getInstance()->checkSession($this);
         return $this->companhiaAerea->encontrarPassagem($registro, );
     }
-    public function getFurgao(RegistroDeViagem $registroDeViagem, ): Onibus
+    public function getOnibus(RegistroDeViagem $registroDeViagem, ): Onibus
     {
         AuthenticationManager::getInstance()->checkSession($this);
-        return $this->companhiaAerea->getFurgao($registroDeViagem, );
+        return $this->companhiaAerea->getOnibus($registroDeViagem, );
     }
     public function load(mixed $pObj, ): void
     {

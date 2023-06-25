@@ -16,19 +16,19 @@ class TripulanteComCoordenada implements ICoordenada
 
     public function getTripulante(): RegistroDeTripulante
     {
-        return $this->tripulante;
+        return log::getInstance()->logRead($this->tripulante);
     }
 
     public function getCoordenada(): ICoordenada
     {
-        return $this->coordenada;
+        return log::getInstance()->logRead($this->coordenada);
     }
 
     public function getX(): float {
-        return $this->coordenada->getX();
+        return log::getInstance()->logRead($this->coordenada->getX());
     }
     public function getY(): float {
-        return $this->coordenada->getY();
+        return log::getInstance()->logRead($this->coordenada->getY());
     }
     public function eq(Equatable $outro): bool {
         if (!$outro instanceof self) {

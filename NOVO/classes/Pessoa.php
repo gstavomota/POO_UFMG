@@ -85,7 +85,7 @@ abstract class Pessoa
      */
     public function getNome(): string
     {
-        return $this->nome;
+        return log::getInstance()->logRead($this->nome);
     }
 
     /** Retorna o sobrenome
@@ -93,7 +93,7 @@ abstract class Pessoa
      */
     public function getSobrenome(): string
     {
-        return $this->sobrenome;
+        return log::getInstance()->logRead($this->sobrenome);
     }
 
     /** Retorna o documento
@@ -101,7 +101,7 @@ abstract class Pessoa
      */
     public function getDocumento(): DocumentoPessoa
     {
-        return $this->documento;
+        return log::getInstance()->logRead($this->documento);
     }
 
     /** Retorna a nacionalidade
@@ -109,7 +109,7 @@ abstract class Pessoa
      */
     public function getNacionalidade(): Nacionalidade
     {
-        return $this->nacionalidade;
+        return log::getInstance()->logRead($this->nacionalidade);
     }
 
     /** Retorna o cpf
@@ -117,7 +117,7 @@ abstract class Pessoa
      */
     public function getCpf(): ?CPF
     {
-        return $this->cpf;
+        return log::getInstance()->logRead($this->cpf);
     }
 
     /** Retorna a data de nascimento
@@ -125,7 +125,7 @@ abstract class Pessoa
      */
     public function getDataDeNascimento(): Data
     {
-        return $this->data_de_nascimento;
+        return log::getInstance()->logRead($this->data_de_nascimento);
     }
 
     /** Retorna o email
@@ -133,7 +133,7 @@ abstract class Pessoa
      */
     public function getEmail(): Email
     {
-        return $this->email;
+        return log::getInstance()->logRead($this->email);
     }
 
 }

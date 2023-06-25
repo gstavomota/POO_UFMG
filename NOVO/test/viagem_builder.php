@@ -1,79 +1,24 @@
 <?php
 require_once "../classes/viagem_builder.php";
 require_once "suite.php";
-
+require_once "mixins/aeroportos_mixin.php";
+require_once "mixins/tripulante_mixin.php";
 class ViagemBuilderTestCase extends TestCase
 {
+    use AeroportosMixin;
+    use TripulanteMixin;
 
     protected function getName(): string
     {
         return 'ViagemBuilder';
     }
 
-    private function buildEndereco(): Endereco
-    {
-
-        $logradouro = "Avenida Amazonas";
-        $numero = 1;
-        $bairro = "Gutierrez";
-        $cep = new CEP("30150-312");
-        $cidade = "Belo Horizonte";
-        $estado = Estado::MG;
-        $referencia = "Proximo a Avenida Silva Lobo";
-        return new Endereco(
-            $logradouro,
-            $numero,
-            $bairro,
-            $cep,
-            $cidade,
-            $estado,
-            $referencia
-        );
-    }
-
-    private int $lastComissario = 0;
-
-    private function buildTripulante(Cargo $cargo, SiglaCompanhiaAerea $siglaCompanhia)
-    {
-        $nome = "";
-        match ($cargo) {
-            Cargo::PILOTO => $nome = "Pedro",
-            Cargo::COPILOTO => $nome = "Gustavo",
-            Cargo::COMISSARIO => $nome = ["Bruno", "Raissa", "Maria Eduarda"][$this->lastComissario]
-        };
-        $sobrenome = "";
-        match ($cargo) {
-            Cargo::PILOTO => $sobrenome = "Kalil",
-            Cargo::COPILOTO => $sobrenome = "Motta",
-            Cargo::COMISSARIO => $sobrenome = ["Lima", "Diniz", "Sampaio"][$this->lastComissario]
-        };
-        $registro = null;
-        match ($cargo) {
-            Cargo::PILOTO => $registro = new RegistroDeTripulante(0),
-            Cargo::COPILOTO => $registro = new RegistroDeTripulante(1),
-            Cargo::COMISSARIO => $registro = [new RegistroDeTripulante(2), new RegistroDeTripulante(3), new RegistroDeTripulante(4)][$this->lastComissario]
-        };
-        $dataDeNascimento = new Data(2003,1,1);
-        if ($cargo === Cargo::COMISSARIO) {
-            $this->lastComissario++;
-        }
-        return new Tripulante(
-            $nome,
-            $sobrenome,
-            new CPF("111.111.111-11"),
-            Nacionalidade::BRASIL,
-            $dataDeNascimento,
-            new Email("tripulante@gmail.com"),
-            "CHT",
-            $this->buildEndereco(),
-            $siglaCompanhia,
-            new SiglaAeroporto("GRU"),
-            $cargo,
-            $registro);
-    }
-
     public function run()
     {
+        $this->initAeroportos();
+        $this->limparAeroportos();
+        $this->registrarAeroportos();
+        $this->initTripulante();
         # addTarifaFranquia
         $vb = new ViagemBuilder();
         $tarifaFranquia = 10.0;
@@ -97,8 +42,8 @@ class ViagemBuilderTestCase extends TestCase
         $this->checkEq($vb->getData(), $data);
         # addVoo
         $codigoVoo = new CodigoVoo(new SiglaCompanhiaAerea("LT"), 1);
-        $aeroportoSaida = new SiglaAeroporto("AAA");
-        $aeroportoChegada = new SiglaAeroporto("AAB");
+        $aeroportoSaida = $this->siglaConfins;
+        $aeroportoChegada = $this->siglaAfonsoPena;
         $horaPartida = new Tempo(9, 0, 0);
         $duracao = new Duracao(0, 60 * 60 * 2);
         $todosDiasDaSemana = DiaDaSemana::cases();
@@ -252,37 +197,37 @@ class ViagemBuilderTestCase extends TestCase
         $comissario1 = $this->buildTripulante(Cargo::COMISSARIO, $companhia);
         $comissario2 = $this->buildTripulante(Cargo::COMISSARIO, $companhia);
         $this->startSection("addTripulante");
-        $this->checkEq($vb, $vb->addTripulante($piloto));
+        $this->checkEq($vb, $vb->addTripulante($piloto, $this->coordenadaTripulante($aeroportoSaida)));
         try {
-            $vb->addTripulante($piloto);
+            $vb->addTripulante($piloto, $this->coordenadaTripulante($aeroportoSaida));
             $this->checkNotReached();
         } catch (Exception $e) {
             $this->checkReached();
         }
-        $this->checkEq($vb, $vb->addTripulante($copiloto));
+        $this->checkEq($vb, $vb->addTripulante($copiloto, $this->coordenadaTripulante($aeroportoSaida)));
         try {
-            $vb->addTripulante($copiloto);
+            $vb->addTripulante($copiloto, $this->coordenadaTripulante($aeroportoSaida));
             $this->checkNotReached();
         } catch (Exception $e) {
             $this->checkReached();
         }
-        $this->checkEq($vb, $vb->addTripulante($comissario));
+        $this->checkEq($vb, $vb->addTripulante($comissario, $this->coordenadaTripulante($aeroportoSaida)));
         try {
-            $vb->addTripulante($comissario);
+            $vb->addTripulante($comissario, $this->coordenadaTripulante($aeroportoSaida));
             $this->checkNotReached();
         } catch (Exception $e) {
             $this->checkReached();
         }
-        $this->checkEq($vb, $vb->addTripulante($comissario1));
+        $this->checkEq($vb, $vb->addTripulante($comissario1, $this->coordenadaTripulante($aeroportoSaida)));
         try {
-            $vb->addTripulante($comissario1);
+            $vb->addTripulante($comissario1, $this->coordenadaTripulante($aeroportoSaida));
             $this->checkNotReached();
         } catch (Exception $e) {
             $this->checkReached();
         }
-        $this->checkEq($vb, $vb->addTripulante($comissario2));
+        $this->checkEq($vb, $vb->addTripulante($comissario2, $this->coordenadaTripulante($aeroportoSaida)));
         try {
-            $vb->addTripulante($comissario2);
+            $vb->addTripulante($comissario2, $this->coordenadaTripulante($aeroportoSaida));
             $this->checkNotReached();
         } catch (Exception $e) {
             $this->checkReached();

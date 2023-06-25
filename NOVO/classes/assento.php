@@ -25,17 +25,17 @@ class Assento
 
     public function classe(): Classe
     {
-        return $this->codigo->getClasse();
+        return log::getInstance()->logRead($this->codigo->getClasse());
     }
 
     public function preenchido(): bool
     {
-        return $this->passagem !== null || $this->franquias !== null;
+        return log::getInstance()->logCall($this->passagem !== null || $this->franquias !== null);
     }
 
     public function vazio(): bool
     {
-        return !$this->preenchido();
+        return log::getInstance()->logCall(!$this->preenchido());
     }
 
     /** Tenta liberar o assento e retorna uma array contendo o registro da passagem e as franquias
@@ -45,13 +45,13 @@ class Assento
     public function liberar(): array
     {
         if (!$this->preenchido()) {
-            throw new PreenchimentoDeAssentoException("O assento não está preenchido");
+            log::getInstance()->logThrow(new PreenchimentoDeAssentoException("O assento não está preenchido"));
         }
         $passagem = $this->passagem;
         $this->passagem = null;
         $franquias = $this->franquias;
         $this->franquias = null;
-        return [$passagem, $franquias];
+        return log::getInstance()->logCall([$passagem, $franquias]);
     }
 
     /** Tenta reservar o assento
@@ -60,24 +60,25 @@ class Assento
     public function reservar(RegistroDePassagem $passagem, FranquiasDeBagagem $franquias): void
     {
         if ($this->preenchido()) {
-            throw new PreenchimentoDeAssentoException("O assento está preenchido");
+            log::getInstance()->logThrow(new PreenchimentoDeAssentoException("O assento está preenchido"));
         }
         $this->passagem = $passagem;
         $this->franquias = $franquias;
+        log::getInstance()->logCall(null);
     }
 
     public function getCodigo(): CodigoDoAssento
     {
-        return $this->codigo;
+        return log::getInstance()->logRead($this->codigo);
     }
 
     public function getPassagem(): ?RegistroDePassagem
     {
-        return $this->passagem;
+        return log::getInstance()->logRead($this->passagem);
     }
 
     public function getFranquias(): ?FranquiasDeBagagem
     {
-        return $this->franquias;
+        return log::getInstance()->logRead($this->franquias);
     }
 }

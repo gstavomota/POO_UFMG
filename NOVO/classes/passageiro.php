@@ -52,7 +52,7 @@ class Passageiro extends Pessoa
      */
     public function getPassagens(): array
     {
-        return $this->passagens;
+        return log::getInstance()->logRead($this->passagens);
     }
 
     /** Adiciona uma passagem
@@ -61,7 +61,9 @@ class Passageiro extends Pessoa
      */
     public function addPassagem(RegistroDePassagem $registroDePassagem)
     {
+        $pre = clone $this;
         $this->passagens[] = $registroDePassagem;
+        log::getInstance()->logWrite($pre, $this);
     }
 
 }

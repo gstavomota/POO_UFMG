@@ -49,7 +49,7 @@ class EncontrarVoosSemConexaoStrategy implements EncontrarVoosStrategy
             $resultado[] = [$voo->getCodigo()];
         }
 
-        return $resultado;
+        return log::getInstance()->logCall($resultado);
     }
 }
 
@@ -125,6 +125,6 @@ class EncontrarVoosComUmaConexaoStrategy implements EncontrarVoosStrategy
             }
         }
 
-        return $resultado;
+        return log::getInstance()->logCall($resultado);
     }
 }

@@ -248,7 +248,7 @@ class Passagem
      */
     public function getRegistro(): RegistroDePassagem
     {
-        return $this->registro;
+        return log::getInstance()->logRead($this->registro);
     }
 
     /**
@@ -256,7 +256,7 @@ class Passagem
      */
     public function getAeroportoDeSaida(): SiglaAeroporto
     {
-        return $this->aeroporto_de_saida;
+        return log::getInstance()->logRead($this->aeroporto_de_saida);
     }
 
     /**
@@ -264,7 +264,7 @@ class Passagem
      */
     public function getAeroportoDeChegada(): SiglaAeroporto
     {
-        return $this->aeroporto_de_chegada;
+        return log::getInstance()->logRead($this->aeroporto_de_chegada);
     }
 
     /**
@@ -272,7 +272,7 @@ class Passagem
      */
     public function getCompanhiaAerea(): SiglaCompanhiaAerea
     {
-        return $this->companhia_aerea;
+        return log::getInstance()->logRead($this->companhia_aerea);
     }
 
     /**
@@ -280,7 +280,7 @@ class Passagem
      */
     public function getDocumentoCliente(): DocumentoPessoa
     {
-        return $this->documento_cliente;
+        return log::getInstance()->logRead($this->documento_cliente);
     }
 
     /**
@@ -288,7 +288,7 @@ class Passagem
      */
     public function getData(): Data
     {
-        return $this->data;
+        return log::getInstance()->logRead($this->data);
     }
 
     /**
@@ -296,7 +296,7 @@ class Passagem
      */
     public function getValor(): float
     {
-        return $this->valor;
+        return log::getInstance()->logRead($this->valor);
     }
 
     /**
@@ -304,14 +304,14 @@ class Passagem
      */
     public function getValorPago(): float
     {
-        return $this->valor_pago;
+        return log::getInstance()->logRead($this->valor_pago);
     }
     /**
      * @return float
      */
     public function getValorRessarcido(): float
     {
-        return $this->valor_ressarcido;
+        return log::getInstance()->logRead($this->valor_ressarcido);
     }
 
     /**
@@ -319,7 +319,7 @@ class Passagem
      */
     public function getAssentos(): array
     {
-        return $this->assentos;
+        return log::getInstance()->logRead($this->assentos);
     }
 
     /**
@@ -327,40 +327,41 @@ class Passagem
      */
     public function getDataTempoDeCompra(): DataTempo
     {
-        return $this->data_tempo_de_compra;
+        return log::getInstance()->logRead($this->data_tempo_de_compra);
     }
 
     public function tipoDeStatus(): Tipo
     {
-        return $this->status->tipo;
+        return log::getInstance()->logCall($this->status->tipo);
     }
 
     public function valorDevendo(): float
     {
-        return $this->valor - $this->valor_pago - $this->valor_ressarcido;
+        return log::getInstance()->logCall($this->valor - $this->valor_pago - $this->valor_ressarcido);
     }
 
     public function pagar(float $valor): float
     {
         if ($this->valorDevendo() < $valor) {
-            throw new Exception("Você está pagando muito, a companhia não pode ficar te devendo");
+            log::getInstance()->logThrow(new Exception("Você está pagando muito, a companhia não pode ficar te devendo"));
         }
         $this->valor_pago += $valor;
-        return $this->valorDevendo();
+        return log::getInstance()->logCall($this->valorDevendo());
     }
 
     public function reembolsar(): float {
         $valor_reembolsavel = $this->valorDevendo();
         if ($valor_reembolsavel >= 0) {
-            return -$valor_reembolsavel;
+            return log::getInstance()->logCall(-$valor_reembolsavel);
         }
         $valor_reembolsavel = abs($valor_reembolsavel);
         $this->valor_ressarcido -= $valor_reembolsavel;
-        return $valor_reembolsavel;
+        return log::getInstance()->logCall($valor_reembolsavel);
     }
 
     public function acionarEvento(Evento $evento): bool
     {
+        $pre = clone $this;
         $old_status = $this->status;
         $new_status = $this->status->dispatch_event($evento);
         $this->status = $new_status;
@@ -371,6 +372,7 @@ class Passagem
             $valor_ressarcivel = $valor_total - $valor_nao_ressarcivel;
             $this->valor_ressarcido = $valor_ressarcivel;
         }
+        log::getInstance()->logWrite($pre, $this);
         return $did_transition;
     }
 }

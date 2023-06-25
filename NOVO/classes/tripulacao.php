@@ -21,83 +21,91 @@ class Tripulacao
 
     public function getTrancado() 
     {
-        return $this->trancado;
+        return log::getInstance()->logRead($this->trancado);
     }
     
     public function getPiloto()
     {
-        return $this->piloto;
+        return log::getInstance()->logRead($this->piloto);
     }
 
     public function getCopiloto()
     {
-        return $this->copiloto;
+        return log::getInstance()->logRead($this->copiloto);
     }
 
     public function getComissarios()
     {
-        return $this->comissarios;
+        return log::getInstance()->logRead($this->comissarios);
     }
 
     public function setPiloto(RegistroDeTripulante $piloto)
     {
+        $pre = clone $this;
         if ($this->trancado) {
-            throw new Exception("A tripulação está trancada");
+            log::getInstance()->logThrow(new Exception("A tripulação está trancada"));
         }
         if ($this->piloto != null) {
-            throw new Exception("Piloto só pode ser setado uma vez.");
+            log::getInstance()->logThrow(new Exception("Piloto só pode ser setado uma vez."));
         }
         $this->piloto = $piloto;
+        log::getInstance()->logWrite($pre, $this);
     }
 
     public function setCopiloto(RegistroDeTripulante $copiloto)
     {
+        $pre = clone $this;
         if ($this->trancado) {
-            throw new Exception("A tripulação está trancada");
+            log::getInstance()->logThrow(new Exception("A tripulação está trancada"));
         }
         if ($this->copiloto != null) {
-            throw new Exception("Copiloto só pode ser setado uma vez.");
+            log::getInstance()->logThrow(new Exception("Copiloto só pode ser setado uma vez."));
         }
         $this->copiloto = $copiloto;
+        log::getInstance()->logWrite($pre, $this);
     }
 
     public function addComissario(RegistroDeTripulante $comissario_novo)
     {
+        $pre = clone $this;
         if ($this->trancado) {
-            throw new Exception("A tripulação está trancada");
+            log::getInstance()->logThrow(new Exception("A tripulação está trancada"));
         }
         foreach ($this->comissarios as $comissario) {
             if ($comissario->eq($comissario_novo)) {
-                throw new InvalidArgumentException("Comissario já presente");
+                log::getInstance()->logThrow(new InvalidArgumentException("Comissario já presente"));
             }
         }
         $this->comissarios[] = $comissario_novo;
+        log::getInstance()->logWrite($pre, $this);
     }
 
 
     public function validar(): void
     {
         if ($this->piloto == null) {
-            throw new Exception("Não há piloto na tripulação.");
+            log::getInstance()->logThrow(new Exception("Não há piloto na tripulação."));
         }
 
         if ($this->copiloto == null) {
-            throw new Exception("Não há copiloto na tripulação.");
+            log::getInstance()->logThrow(new Exception("Não há copiloto na tripulação."));
         }
 
         if (count($this->comissarios) < 2) {
-            throw new Exception("Quantidade mínima de comissários não foi atingida.");
+            log::getInstance()->logThrow(new Exception("Quantidade mínima de comissários não foi atingida."));
         }
+        log::getInstance()->logCall(null);
     }
 
     public function trancar(): void
     {
         if ($this->trancado) {
-            throw new Exception ("Não é possível trancar duas vezes.");
+            log::getInstance()->logThrow(new Exception ("Não é possível trancar duas vezes."));
         }
 
         $this->validar();
         $this->trancado = true;
+        log::getInstance()->logCall(null);
     }
 }
 

@@ -40,7 +40,7 @@ class Endereco implements Equatable
      */
     public function getLogradouro(): string
     {
-        return $this->logradouro;
+        return log::getInstance()->logRead($this->logradouro);
     }
 
     /** Retorna o numero
@@ -48,7 +48,7 @@ class Endereco implements Equatable
      */
     public function getNumero(): int
     {
-        return $this->numero;
+        return log::getInstance()->logRead($this->numero);
     }
 
     /** Retorna o bairro
@@ -56,7 +56,7 @@ class Endereco implements Equatable
      */
     public function getBairro(): string
     {
-        return $this->bairro;
+        return log::getInstance()->logRead($this->bairro);
     }
 
     /** Retorna o CEP
@@ -64,7 +64,7 @@ class Endereco implements Equatable
      */
     public function getCep(): CEP
     {
-        return $this->cep;
+        return log::getInstance()->logRead($this->cep);
     }
 
     /** Retorna a cidade
@@ -72,7 +72,7 @@ class Endereco implements Equatable
      */
     public function getCidade(): string
     {
-        return $this->cidade;
+        return log::getInstance()->logRead($this->cidade);
     }
 
     /** Retorna o estado
@@ -80,7 +80,7 @@ class Endereco implements Equatable
      */
     public function getEstado(): Estado
     {
-        return $this->estado;
+        return log::getInstance()->logRead($this->estado);
     }
 
     /** Retorna a referencia
@@ -88,7 +88,7 @@ class Endereco implements Equatable
      */
     public function getReferencia(): ?string
     {
-        return $this->referencia;
+        return log::getInstance()->logRead($this->referencia);
     }
 
     private static function validaLogradouro(string $v): string

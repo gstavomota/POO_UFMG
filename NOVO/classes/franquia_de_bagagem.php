@@ -23,7 +23,7 @@ class FranquiaDeBagagem
      */
     public function getPeso(): float
     {
-        return $this->peso;
+        return log::getInstance()->logRead($this->peso);
     }
 }
 
@@ -53,11 +53,11 @@ class FranquiasDeBagagem
         foreach ($this->franquias as $franquia) {
             $carga += $franquia->getPeso();
         }
-        return $carga;
+        return log::getInstance()->logCall($carga);
     }
 
     public function numeroDeFranquias(): int
     {
-        return count($this->franquias);
+        return log::getInstance()->logCall(count($this->franquias));
     }
 }

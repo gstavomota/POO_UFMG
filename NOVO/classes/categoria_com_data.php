@@ -15,12 +15,12 @@ class CategoriaComData
 
     public function getCategoria(): Categoria
     {
-        return $this->categoria;
+        return log::getInstance()->logRead($this->categoria);
     }
 
     public function getDataDeEntrada(): DataTempo
     {
-        return $this->data_de_entrada;
+        return log::getInstance()->logRead($this->data_de_entrada);
     }
 }
 

@@ -40,11 +40,11 @@ class Coordenada implements ICoordenada
 
     public function getX(): float
     {
-        return $this->x;
+        return log::getInstance()->logRead($this->x);
     }
 
     public function getY(): float
     {
-        return $this->y;
+        return log::getInstance()->logRead($this->y);
     }
 }

@@ -94,22 +94,22 @@ class CompanhiaAerea extends Persist
 
     public function getNome(): string
     {
-        return $this->nome;
+        return log::getInstance()->logRead($this->nome);
     }
 
     public function getCodigo(): string
     {
-        return $this->codigo;
+        return log::getInstance()->logRead($this->codigo);
     }
 
     public function getRazaoSocial(): string
     {
-        return $this->razao_social;
+        return log::getInstance()->logRead($this->razao_social);
     }
 
     public function getSigla(): SiglaCompanhiaAerea
     {
-        return $this->sigla;
+        return log::getInstance()->logRead($this->sigla);
     }
 
     public function getTarifaFranquia(): float
@@ -174,12 +174,13 @@ class CompanhiaAerea extends Persist
                 $viagens_nesse_dia_da_semana->put($registro_da_viagem, $viagem_builder);
             }
         }
+        log::getInstance()->logCall(null);
     }
 
     public function registrarAeronaveNaViagem(RegistroDeViagem $registroDeViagem, RegistroDeAeronave $registroDeAeronave)
     {
         if (!$this->aeronaves->containsKey($registroDeAeronave)) {
-            throw new Exception("Aeronave não presente na companhia");
+            log::getInstance()->logThrow(new Exception("Aeronave não presente na companhia"));
         }
         /**
          * @var Aeronave $aeronave
@@ -187,12 +188,13 @@ class CompanhiaAerea extends Persist
         $aeronave = $this->aeronaves->get($registroDeAeronave);
         $vb = $this->findRequiredViagemBuilder($registroDeViagem);
         $vb->addAeronave($aeronave);
+        log::getInstance()->logCall(null);
     }
 
     public function registrarTripulanteNaViagem(RegistroDeViagem $registroDeViagem, RegistroDeTripulante $registroDeTripulante, ICoordenada $coordenada)
     {
         if (!$this->tripulantes->containsKey($registroDeTripulante)) {
-            throw new Exception("Tripulante não presente na companhia");
+            log::getInstance()->logThrow(new Exception("Tripulante não presente na companhia"));
         }
         /**
          * @var Tripulante $tripulante
@@ -200,6 +202,7 @@ class CompanhiaAerea extends Persist
         $tripulante = $this->tripulantes->get($registroDeTripulante);
         $vb = $this->findRequiredViagemBuilder($registroDeViagem);
         $vb->addTripulante($tripulante, $coordenada);
+        log::getInstance()->logCall(null);
     }
 
     public function registrarQueViagemAconteceu(DataTempo $hora_de_partida, DataTempo $hora_de_chegada, RegistroDeViagem $registro_de_viagem)
@@ -210,7 +213,7 @@ class CompanhiaAerea extends Persist
             $viagem = $builder->build();
         } catch (Throwable $e) {
             $this->voos_em_venda->get($builder->getData())->put($builder->getRegistro(), $builder);
-            throw new Exception("Não foi possivel buildar a Viagem", $e->getCode(), $e);
+            log::getInstance()->logThrow(new Exception("Não foi possivel buildar a Viagem", $e->getCode(), $e));
         }
         $this->voos_executados->put($viagem->getRegistro(), $viagem);
         /**
@@ -227,6 +230,7 @@ class CompanhiaAerea extends Persist
             $passagem = $this->passagens->get($registro_passagem);
             $passagem->acionarEvento(Evento::CONCLUIR);
         }
+        log::getInstance()->logCall(null);
     }
 
     /**
@@ -236,7 +240,7 @@ class CompanhiaAerea extends Persist
     public function cancelarPassagem(RegistroDePassagem $registroDePassagem): Passagem
     {
         if (!$this->passagens->containsKey($registroDePassagem)) {
-            throw new Exception("Passagem não está na companhia");
+            log::getInstance()->logThrow(new Exception("Passagem não está na companhia"));
         }
 
         /**
@@ -245,7 +249,7 @@ class CompanhiaAerea extends Persist
         $passagem = $this->passagens->get($registroDePassagem);
 
         if (!$passagem->acionarEvento(Evento::CANCELAR)) {
-            throw new Exception("A passagem não pode ser cancelada agora");
+            log::getInstance()->logThrow(new Exception("A passagem não pode ser cancelada agora"));
         }
 
         $data = $passagem->getData();
@@ -262,7 +266,7 @@ class CompanhiaAerea extends Persist
             $viagem_builder = $this->findRequiredViagemBuilder($registro_viagem, $data);
             $viagem_builder->liberarAssento($passagem->getRegistro(), $codigo_assento);
         }
-        return $passagem;
+        return log::getInstance()->logCall($passagem);
     }
 
     public function abrirCheckInParaPassagens(RegistroDePassagem ...$args)
@@ -272,7 +276,7 @@ class CompanhiaAerea extends Persist
         if (!empty($args)) {
             foreach ($args as $registro_passagem) {
                 if (!$this->passagens->containsKey($registro_passagem)) {
-                    throw new Exception("Passagem não está na companhia");
+                    log::getInstance()->logThrow(new Exception("Passagem não está na companhia"));
                 }
 
                 /**
@@ -285,7 +289,7 @@ class CompanhiaAerea extends Persist
                     continue;
                 }
 
-                throw new Exception("Passagem está a mais de 48h de distância");
+                log::getInstance()->logThrow(new Exception("Passagem está a mais de 48h de distância"));
             }
 
             foreach ($args as $registro_passagem) {
@@ -296,7 +300,7 @@ class CompanhiaAerea extends Persist
                 $passagem->acionarEvento(Evento::ABRIR_CHECK_IN);
             }
 
-            return;
+            return log::getInstance()->logCall(null);
         }
 
         /**
@@ -308,6 +312,7 @@ class CompanhiaAerea extends Persist
                 $passagem->acionarEvento(Evento::ABRIR_CHECK_IN);
             }
         }
+        log::getInstance()->logCall(null);
     }
 
     /** Retorna o historico de viagens de um passageiro
@@ -319,7 +324,7 @@ class CompanhiaAerea extends Persist
     public function acessarHistoricoDeViagens(DocumentoPessoa $documentoPessoa): array
     {
         if (!$this->passageiros->containsKey($documentoPessoa)) {
-            throw new Exception("Passageiro nao cadastrado");
+            log::getInstance()->logThrow(new Exception("Passageiro nao cadastrado"));
         }
 
         /**
@@ -373,7 +378,7 @@ class CompanhiaAerea extends Persist
     function fazerCheckIn(RegistroDePassagem $registroDePassagem): array
     {
         if (!$this->passagens->containsKey($registroDePassagem)) {
-            throw new Exception("Passagem não está na companhia");
+            log::getInstance()->logThrow(new Exception("Passagem não está na companhia"));
         }
 
         /**
@@ -389,7 +394,7 @@ class CompanhiaAerea extends Persist
         }
 
         if (!$passagem->acionarEvento(Evento::FAZER_CHECK_IN)) {
-            throw new Exception("Não é possível fazer check-in agora");
+            log::getInstance()->logThrow(new Exception("Não é possível fazer check-in agora"));
         }
         $passageiro = $this->passageiros->get($passagem->getDocumentoCliente());
         /**
@@ -422,13 +427,13 @@ class CompanhiaAerea extends Persist
             $this->cartoesDeEmbarque->put($registroDeCartaoDeEmbarque, $cartaoDeEmbarque);
             $cartoesDeEmbarque[] = $cartaoDeEmbarque;
         }
-        return $cartoesDeEmbarque;
+        return log::getInstance()->logCall($cartoesDeEmbarque);
     }
 
     function embarcar(RegistroDePassagem $registroDePassagem): void
     {
         if (!$this->passagens->containsKey($registroDePassagem)) {
-            throw new Exception("Passagem não está na companhia");
+            log::getInstance()->logThrow(new Exception("Passagem não está na companhia"));
         }
 
         /**
@@ -436,7 +441,7 @@ class CompanhiaAerea extends Persist
          */
         $passagem = $this->passagens->get($registroDePassagem);
         if (!$passagem->acionarEvento(Evento::EMBARCAR)) {
-            throw new Exception("Não é possivel embarcar agora");
+            log::getInstance()->logThrow(new Exception("Não é possivel embarcar agora"));
         }
     }
 
@@ -446,7 +451,7 @@ class CompanhiaAerea extends Persist
     {
         $this->adicionarViagensEmVenda();
         if (!$this->passageiros->containsKey($documentoPessoa)) {
-            throw new Exception("Cliente nao cadastrado");
+            log::getInstance()->logThrow(new Exception("Cliente nao cadastrado"));
         }
 
         /**
@@ -460,7 +465,7 @@ class CompanhiaAerea extends Persist
         $voos = $strategy->encontrar($passageiro instanceof PassageiroVip, $data, $aeroporto_de_saida, $aeroporto_de_chegada, $franquias, $this->tarifa_franquia, $this->voos_planejados);
 
         if (count($voos) == 0) {
-            return null;
+            return log::getInstance()->logCall(null);
         }
 
         /**
@@ -473,20 +478,20 @@ class CompanhiaAerea extends Persist
 
         foreach ($viagem_builders as $viagem_builder) {
             if (!$viagem_builder->getData()->eq($data)) {
-                throw new Exception("spookie dookie");
+                log::getInstance()->logThrow(new Exception("spookie dookie"));
             }
             if ($assento === null) {
                 if (!$viagem_builder->temAssentosLiberados()) {
                     # Not tested
-                    return null;
+                    return log::getInstance()->logCall(null);
                 }
             } else if (!$viagem_builder->assentoEstaLiberado($assento)) {
                 # Not tested
-                return null;
+                return log::getInstance()->logCall(null);
             }
             if (!$viagem_builder->temCargaDisponivelParaFranquias($franquias)) {
                 # Not tested
-                return null;
+                return log::getInstance()->logCall(null);
             }
         }
 
@@ -530,7 +535,7 @@ class CompanhiaAerea extends Persist
 
         $passageiro->addPassagem($registro_passagem);
         $this->passagens->put($registro_passagem, $passagem);
-        return $registro_passagem;
+        return log::getInstance()->logCall($registro_passagem);
     }
 
     /**
@@ -548,9 +553,9 @@ class CompanhiaAerea extends Persist
         $vb = $this->findRequiredViagemBuilder($registroDeViagem);
         $data = $vb->getData();
         if (!$this->voos_em_venda->get($data)->remove($registroDeViagem)) {
-            throw new Exception("Não foi possivel remover o viagem builder");
+            log::getInstance()->logThrow(new Exception("Não foi possivel remover o viagem builder"));
         }
-        return $vb;
+        return log::getInstance()->logCall($vb);
     }
 
     /** Encontra um viagem builder pelo RegistroDeViagem e arremessa Exception se não encontrar
@@ -563,9 +568,9 @@ class CompanhiaAerea extends Persist
     {
         $vb = $this->findViagemBuilder($registroDeViagem, $data);
         if (is_null($vb)) {
-            throw new Exception("Viagem builder não encontrado");
+            log::getInstance()->logThrow(new Exception("Viagem builder não encontrado"));
         }
-        return $vb;
+        return log::getInstance()->logCall($vb);
     }
 
     /** Encontra um viagem builder pelo RegistroDeViagem e opcionalmente Data e retona null se não encontrar
@@ -578,30 +583,30 @@ class CompanhiaAerea extends Persist
     {
         if (!is_null($data)) {
             if (!$this->voos_em_venda->containsKey($data)) {
-                return null;
+                return log::getInstance()->logCall(null);
             }
             /**
              * @var HashMap<RegistroDeViagem, ViagemBuilder> $registroViagemBuilder
              */
             $registroViagemBuilder = $this->voos_em_venda->get($data);
             if (!$registroViagemBuilder->containsKey($registroDeViagem)) {
-                return null;
+                return log::getInstance()->logCall(null);
             }
             /**
              * @var ViagemBuilder $viagemBuilder
              */
             $viagemBuilder = $registroViagemBuilder->get($registroDeViagem);
-            return $viagemBuilder;
+            return log::getInstance()->logCall($viagemBuilder);
         }
         /**
          * @var HashMap<RegistroDeViagem, ViagemBuilder> $registroViagemBuilder
          */
         foreach ($this->voos_em_venda->values() as $registroViagemBuilder) {
             if ($registroViagemBuilder->containsKey($registroDeViagem)) {
-                return $registroViagemBuilder->get($registroDeViagem);
+                return log::getInstance()->logCall($registroViagemBuilder->get($registroDeViagem));
             }
         }
-        return null;
+        return log::getInstance()->logCall(null);
     }
 
     /** Encontra um viagem builder pela Data e CodigoVoo e arremessa Exception se não encontrar
@@ -614,9 +619,9 @@ class CompanhiaAerea extends Persist
     {
         $vb = $this->findViagemBuilderByDataECodigoVoo($data, $codigoVoo);
         if (is_null($vb)) {
-            throw new Exception("Viagem builder não encontrado");
+            log::getInstance()->logThrow(new Exception("Viagem builder não encontrado"));
         }
-        return $vb;
+        return log::getInstance()->logCall($vb);
     }
 
     /** Encontra um viagem builder pela Data e CodigoVoo e retorna null se não encontrar
@@ -628,7 +633,7 @@ class CompanhiaAerea extends Persist
     private function findViagemBuilderByDataECodigoVoo(Data $data, CodigoVoo $codigoVoo): ?ViagemBuilder
     {
         if (!$this->voos_em_venda->containsKey($data)) {
-            return null;
+            return log::getInstance()->logCall(null);
         }
         $voos_em_venda_na_data = $this->voos_em_venda->get($data);
         /**
@@ -636,10 +641,10 @@ class CompanhiaAerea extends Persist
          */
         foreach ($voos_em_venda_na_data->values() as $viagemBuilder) {
             if ($viagemBuilder->getCodigoDoVoo()->eq($codigoVoo)) {
-                return $viagemBuilder;
+                return log::getInstance()->logCall($viagemBuilder);
             }
         }
-        return null;
+        return log::getInstance()->logCall(null);
     }
 
     /**
@@ -708,29 +713,30 @@ class CompanhiaAerea extends Persist
             $registro_da_viagem = $viagem_builder->getRegistro();
             $viagem_builders->put($registro_da_viagem, $viagem_builder);
         }
-        return $voo;
+        return log::getInstance()->logCall($voo);
     }
 
     // TESTED
     public function encontrarVoo(CodigoVoo $voo): ?Voo
     {
-        return $this->voos_planejados->get($voo);
+        return log::getInstance()->logCall($this->voos_planejados->get($voo));
     }
 
     // TESTED
     public function adicionarPassageiro(Passageiro $passageiro): void
     {
         if ($this->passageiros->containsKey($passageiro->getDocumento())) {
-            throw new Exception("Passageiro já presente");
+            log::getInstance()->logThrow(new Exception("Passageiro já presente"));
         }
         $passageiroClonado = clone $passageiro;
         $this->passageiros->put($passageiro->getDocumento(), $passageiroClonado);
+        log::getInstance()->logCall(null);
     }
 
     // TESTED
     public function encontrarPassageiro(DocumentoPessoa $passageiro): ?Passageiro
     {
-        return $this->passageiros->get($passageiro);
+        return log::getInstance()->logCall($this->passageiros->get($passageiro));
     }
 
     // TESTED
@@ -766,13 +772,13 @@ class CompanhiaAerea extends Persist
             $registro,
         );
         $this->tripulantes->put($registro, $tripulante);
-        return $tripulante;
+        return log::getInstance()->logCall($tripulante);
     }
 
     // TESTED
     public function encontrarTripulante(RegistroDeTripulante $tripulante): ?Tripulante
     {
-        return $this->tripulantes->get($tripulante);
+        return log::getInstance()->logCall($this->tripulantes->get($tripulante));
     }
 
 
@@ -781,9 +787,9 @@ class CompanhiaAerea extends Persist
     {
         $vb = $this->findViagemBuilder($registroDeViagem);
         if (!is_null($vb)) {
-            throw new Exception("A viagem ainda não foi executada");
+            log::getInstance()->logThrow(new Exception("A viagem ainda não foi executada"));
         }
-        return $this->voos_executados->get($registroDeViagem);
+        return log::getInstance()->logCall($this->voos_executados->get($registroDeViagem));
     }
 
     // TESTED
@@ -796,7 +802,7 @@ class CompanhiaAerea extends Persist
     ): Aeronave
     {
         if ($this->aeronaves->containsKey($registro)) {
-            throw new InvalidArgumentException("Aeronave já presente");
+            log::getInstance()->logThrow(new InvalidArgumentException("Aeronave já presente"));
         }
         $aeronave = new Aeronave(
             $this->sigla,
@@ -806,22 +812,24 @@ class CompanhiaAerea extends Persist
             $capacidade_carga, $registro
         );
         $this->aeronaves->put($registro, $aeronave);
-        return $aeronave;
+        return log::getInstance()->logCall($aeronave);
     }
 
     // TESTED
     public function encontrarAeronave(RegistroDeAeronave $registro): ?Aeronave
     {
-        return $this->aeronaves->get($registro);
+        return log::getInstance()->logCall($this->aeronaves->get($registro));
     }
 
     // TESTED
     public function encontrarPassagem(RegistroDePassagem $registro): ?Passagem
     {
-        return $this->passagens->get($registro);
+        return log::getInstance()->logCall($this->passagens->get($registro));
     }
 
-    public function getFurgao(RegistroDeViagem $registroDeViagem): Onibus {}
+    public function getOnibus(RegistroDeViagem $registroDeViagem): Onibus {
+        return log::getInstance()->logCall($this->findRequiredViagemBuilder($registroDeViagem)->getOnibus());
+    }
 
     /**
      * @param SiglaCompanhiaAerea $sigla

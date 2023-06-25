@@ -28,10 +28,10 @@ class CalculoRotaAproximadaStrategy implements CalculoRotaStrategy
      */
     function calculaDistanciaParciais(array $coordenadas, ICoordenada $pontoFinal): array {
         if (empty($coordenadas)) {
-            return [];
+            return log::getInstance()->logCall([]);
         }
         if (count($coordenadas) == 1) {
-            return [$this->calculaDistanciaDeDoisPontos($coordenadas[0], $pontoFinal)];
+            return log::getInstance()->logCall([$this->calculaDistanciaDeDoisPontos($coordenadas[0], $pontoFinal)]);
         }
         /**
          * @var float[] $out
@@ -45,15 +45,15 @@ class CalculoRotaAproximadaStrategy implements CalculoRotaStrategy
             $out[] = $this->calculaDistanciaDeDoisPontos($ultimaCoordenada, $coordenadaSeguinte);
             $ultimaCoordenada = $coordenadaSeguinte;
         }
-        return $out;
+        return log::getInstance()->logCall($out);
     }
     public function calculaDistanciaTotal(array $coordenadas, ICoordenada $pontoFinal): float
     {
         if (empty($coordenadas)) {
-            return 0.0;
+            return log::getInstance()->logCall(0.0);
         }
         if (count($coordenadas) == 1) {
-            return $this->calculaDistanciaDeDoisPontos($coordenadas[0], $pontoFinal);
+            return log::getInstance()->logCall($this->calculaDistanciaDeDoisPontos($coordenadas[0], $pontoFinal));
         }
         $distancia = 0.0;
         $primeiraCoordenada = $coordenadas[0];
@@ -63,7 +63,7 @@ class CalculoRotaAproximadaStrategy implements CalculoRotaStrategy
             $distancia += $this->calculaDistanciaDeDoisPontos($ultimaCoordenada, $coordenadaSeguinte);
             $ultimaCoordenada = $coordenadaSeguinte;
         }
-        return $distancia;
+        return log::getInstance()->logCall($distancia);
     }
 
     /** Calcula a distancia aproximada de dois pontos
@@ -73,7 +73,7 @@ class CalculoRotaAproximadaStrategy implements CalculoRotaStrategy
      */
     private function calculaDistanciaDeDoisPontos(ICoordenada $a, ICoordenada $b): float
     {
-        return 110.57 * sqrt(pow($b->getX() - $a->getX(), 2) + pow($b->getY() - $a->getY(), 2));
+        return log::getInstance()->logCall(110.57 * sqrt(pow($b->getX() - $a->getX(), 2) + pow($b->getY() - $a->getY(), 2)));
     }
 }
 

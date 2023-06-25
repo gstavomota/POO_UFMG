@@ -14,12 +14,12 @@ class Pontos
 
     public function getPontosGanhos(): int
     {
-        return $this->pontos_ganhos;
+        return log::getInstance()->logRead($this->pontos_ganhos);
     }
 
     public function getDataDeObtencao(): DataTempo
     {
-        return $this->data_de_obtencao;
+        return log::getInstance()->logRead($this->data_de_obtencao);
     }
 }
 

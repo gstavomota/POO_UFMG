@@ -11,15 +11,6 @@ class RoteiroDeTestesTestCase extends TestCase
     {
         return "RoteiroDeTestes";
     }
-
-
-    private function coordenadaTripulante(SiglaAeroporto $aeroporto): ICoordenada {
-        $coordAeroporto = Aeroporto::getRecordsBySigla($aeroporto)[0]->getCoordenada();
-        $dt = 0.001;
-        $dx = $dt * rand(-10, 10);
-        $dy = $dt * rand(-10, 10);
-        return new Coordenada($dx + $coordAeroporto->getX(), $dy + $coordAeroporto->getY());
-    }
     private function cartaoDeEmbarqueToString(CartaoDeEmbarque $cartaoDeEmbarque) {
         $s = "";
         $s = $s."CartaoDeEmbarque(";

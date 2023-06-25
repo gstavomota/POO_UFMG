@@ -20,7 +20,7 @@ class PassageiroComumCalculoTarifaStrategy implements CalculoTarifaStrategy
 
     public function calcula(FranquiasDeBagagem $franquias): float
     {
-        return $this->tarifa + $franquias->numeroDeFranquias() * $this->tarifa_franquia;
+        return log::getInstance()->logCall($this->tarifa + $franquias->numeroDeFranquias() * $this->tarifa_franquia);
     }
 }
 
@@ -39,11 +39,11 @@ class PassageiroVipCalculoTarifaStrategy implements CalculoTarifaStrategy
     {
         $franquias_a_serem_pagas = $franquias->numeroDeFranquias();
         if ($franquias_a_serem_pagas == 0) {
-            return $this->tarifa;
+            return log::getInstance()->logCall($this->tarifa);
         }
         $franquias_a_serem_pagas--;
 
-        return $this->tarifa + $franquias_a_serem_pagas * $this->tarifa_franquia / 2;
+        return log::getInstance()->logCall($this->tarifa + $franquias_a_serem_pagas * $this->tarifa_franquia / 2);
     }
 }
 

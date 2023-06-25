@@ -74,7 +74,7 @@ class Voo implements Equatable
      */
     public function getCodigo(): CodigoVoo
     {
-        return $this->codigo;
+        return log::getInstance()->logRead($this->codigo);
     }
 
     /** Retorna a CompanhiaAerea do Voo
@@ -82,7 +82,7 @@ class Voo implements Equatable
      */
     public function getSiglaCompanhiaAerea(): SiglaCompanhiaAerea
     {
-        return $this->codigo->getSiglaDaCompanhia();
+        return log::getInstance()->logRead($this->codigo->getSiglaDaCompanhia());
     }
 
     /** Retorna o Aeroporto de saida do Voo
@@ -90,7 +90,7 @@ class Voo implements Equatable
      */
     public function getAeroportoSaida(): SiglaAeroporto
     {
-        return $this->aeroporto_de_saida;
+        return log::getInstance()->logRead($this->aeroporto_de_saida);
     }
 
     /** Retorna o Aeroporto de chegada do Voo
@@ -98,7 +98,7 @@ class Voo implements Equatable
      */
     public function getAeroportoChegada(): SiglaAeroporto
     {
-        return $this->aeroporto_de_chegada;
+        return log::getInstance()->logRead($this->aeroporto_de_chegada);
     }
 
     /** Retorna a hora de partida do Voo
@@ -106,7 +106,7 @@ class Voo implements Equatable
      */
     public function getHoraDePartida(): Tempo
     {
-        return $this->hora_de_partida;
+        return log::getInstance()->logRead($this->hora_de_partida);
     }
 
     /** Retorna a duração estimada do Voo
@@ -114,7 +114,7 @@ class Voo implements Equatable
      */
     public function getDuracaoEstimada(): Duracao
     {
-        return $this->duracao_estimada;
+        return log::getInstance()->logRead($this->duracao_estimada);
     }
 
     /** Retorna os dias da semana do Voo
@@ -122,7 +122,7 @@ class Voo implements Equatable
      */
     public function getDiasDaSemana(): array
     {
-        return $this->dias_da_semana;
+        return log::getInstance()->logRead($this->dias_da_semana);
     }
 
     /** Retorna a Aeronave padrão do Voo
@@ -130,7 +130,7 @@ class Voo implements Equatable
      */
     public function getAeronavePadrao(): RegistroDeAeronave
     {
-        return $this->aeronave_padrao;
+        return log::getInstance()->logRead($this->aeronave_padrao);
     }
 
     /** Retorna a capacidade de passageiros do Voo
@@ -138,7 +138,7 @@ class Voo implements Equatable
      */
     public function getCapacidadeDePassageiros(): int
     {
-        return $this->capacidade_passageiros;
+        return log::getInstance()->logRead($this->capacidade_passageiros);
     }
 
     /** Retorna a capacidade de carga do Voo
@@ -146,7 +146,7 @@ class Voo implements Equatable
      */
     public function getCapacidadeCarga(): float
     {
-        return $this->capacidade_carga;
+        return log::getInstance()->logRead($this->capacidade_carga);
     }
 
     /** Retorna a tarifa do Voo
@@ -154,7 +154,7 @@ class Voo implements Equatable
      */
     public function getTarifa(): float
     {
-        return $this->tarifa;
+        return log::getInstance()->logRead($this->tarifa);
     }
 
     /** Retorna a pontuacao de milhagem desse Voo
@@ -162,7 +162,7 @@ class Voo implements Equatable
      */
     public function getPontuacaoMilhagem(): int
     {
-        return $this->pontuacaoMilhagem;
+        return log::getInstance()->logRead($this->pontuacaoMilhagem);
     }
 
     /** Methods
@@ -177,7 +177,7 @@ class Voo implements Equatable
      */
     public function calculaTarifa(bool $cliente_vip, FranquiasDeBagagem $franquias, float $tarifa_franquia): float
     {
-        return calculo_tarifa_strategy_for($cliente_vip, $this->tarifa, $tarifa_franquia)->calcula($franquias);
+        return log::getInstance()->logCall(calculo_tarifa_strategy_for($cliente_vip, $this->tarifa, $tarifa_franquia)->calcula($franquias));
     }
 
     /** Constroi os assentos para a capacidade de passageiros desse Voo
@@ -191,7 +191,7 @@ class Voo implements Equatable
         foreach ($assentos as $codigo_assento) {
             $hashmap_assentos->put($codigo_assento, new Assento($codigo_assento));
         }
-        return $hashmap_assentos;
+        return log::getInstance()->logCall($hashmap_assentos);
     }
 
     public function eq(Equatable $other): bool

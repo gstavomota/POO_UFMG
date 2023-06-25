@@ -15,12 +15,12 @@ class Categoria
 
     public function getNome(): string
     {
-        return $this->nome;
+        return log::getInstance()->logRead($this->nome);
     }
 
     public function getPontuacao(): int
     {
-        return $this->pontuacao;
+        return log::getInstance()->logRead($this->pontuacao);
     }
 }
 

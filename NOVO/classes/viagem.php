@@ -49,52 +49,52 @@ class Viagem
 
     public function getRegistro(): RegistroDeViagem
     {
-        return $this->registro;
+        return log::getInstance()->logRead($this->registro);
     }
 
     public function getCodigoDoVoo(): CodigoVoo
     {
-        return $this->codigo_do_voo;
+        return log::getInstance()->logRead($this->codigo_do_voo);
     }
 
     public function getAeroportoDeSaida(): SiglaAeroporto
     {
-        return $this->aeroporto_de_saida;
+        return log::getInstance()->logRead($this->aeroporto_de_saida);
     }
 
     public function getAeroportoDeChegada(): SiglaAeroporto
     {
-        return $this->aeroporto_de_chegada;
+        return log::getInstance()->logRead($this->aeroporto_de_chegada);
     }
 
     public function getHoraDePartida(): DataTempo
     {
-        return $this->hora_de_partida;
+        return log::getInstance()->logRead($this->hora_de_partida);
     }
 
     public function getHoraDeChegada(): DataTempo
     {
-        return $this->hora_de_chegada;
+        return log::getInstance()->logRead($this->hora_de_chegada);
     }
 
     public function getAeronave(): RegistroDeAeronave
     {
-        return $this->aeronave;
+        return log::getInstance()->logRead($this->aeronave);
     }
 
     public function getTripulacao(): Tripulacao
     {
-        return $this->tripulacao;
+        return log::getInstance()->logRead($this->tripulacao);
     }
 
     public function getTarifa(): float
     {
-        return $this->tarifa;
+        return log::getInstance()->logRead($this->tarifa);
     }
 
     public function getTarifaFranquia(): float
     {
-        return $this->tarifa_franquia;
+        return log::getInstance()->logRead($this->tarifa_franquia);
     }
 
     /**
@@ -102,7 +102,7 @@ class Viagem
      */
     public function getAssentos(): HashMap
     {
-        return $this->assentos;
+        return log::getInstance()->logRead($this->assentos);
     }
 }
 
